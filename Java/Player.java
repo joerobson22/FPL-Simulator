@@ -2,7 +2,7 @@ package Java;
 
 public class Player{
     private int rating;
-    private float price;
+    private double price;
 
     private String position;
     private String name;
@@ -14,7 +14,7 @@ public class Player{
     private int numCleanSheets;
 
     //constructor
-    public Player(int rating, float price, String position, String name, Team team)
+    public Player(int rating, double price, String position, String name, Team team)
     {
         this.rating = rating;
         this.price = price;
@@ -28,13 +28,13 @@ public class Player{
         numCleanSheets = 0;
     }
 
-    
+
     //accessors
     public int getRating(){
         return rating;
     }
 
-    public float getPrice(){
+    public double getPrice(){
         return price;
     }
 
@@ -68,7 +68,7 @@ public class Player{
 
 
     //mutators
-    public void changePrice(float change){
+    public void changePrice(double change){
         price += change;
     }
 
