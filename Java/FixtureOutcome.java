@@ -48,4 +48,10 @@ public class FixtureOutcome {
     public ArrayList<Player> getCleanSheets(){
         return cleanSheets;
     }
+
+    public String getScoreString(){
+        return Integer.toString(homeGoals) + "-" + Integer.toString(awayGoals);
+    }
 }
+
+

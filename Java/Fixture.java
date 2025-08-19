@@ -34,7 +34,6 @@ public class Fixture {
         return played;
     }
 
-
     //mutators
     public void playFixture(int homeGoals, int awayGoals, ArrayList<Player> goalScorers, ArrayList<Player> assisters, ArrayList<Player> cleanSheets){
         played = true;
