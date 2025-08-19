@@ -9,6 +9,7 @@ public class Player{
     private Team team;
 
     private int totalPoints;
+    private int weeklyPoints;
     private int numGoals;
     private int numAssists;
     private int numCleanSheets;
@@ -54,6 +55,10 @@ public class Player{
         return totalPoints;
     }
 
+    public int getWeeklyPoints(){
+        return weeklyPoints;
+    }
+
     public int getNumGoals(){
         return numGoals;
     }
@@ -76,8 +81,13 @@ public class Player{
         team = newTeam;
     }
 
-    public void changeTotalPoints(int change){
-        totalPoints += change;
+    public void addWeeklyToTotal(){
+        totalPoints += weeklyPoints;
+        weeklyPoints = 0;
+    }
+
+    public void changeWeeklyPoints(int change){
+        weeklyPoints += change;
     }
 
     public void increaseNumGoals(int increase){
