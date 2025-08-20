@@ -87,8 +87,22 @@ public class MainWindow extends JFrame implements ActionListener{
     private void setupTeams(){
         allTeams = new ArrayList<>();
 
-        allTeams.add(new Team(90, "Liverpool"));
-        allTeams.add(new Team(85, "Man City"));
+        Team liverpool = new Team(90, "Liverpool");
+        Team manCity = new Team(85, "Man City");
+
+        liverpool.addPlayer(new Player(0, 95, 14.5, "ATT", "Salah", liverpool));
+        liverpool.addPlayer(new Player(1, 90, 8.5, "MID", "Wirtz", liverpool));
+        liverpool.addPlayer(new Player(2, 85, 6.0, "DEF", "Van Dijk", liverpool));
+        liverpool.addPlayer(new Player(3, 85, 5.5, "GK", "Alisson", liverpool));
+
+        manCity.addPlayer(new Player(4, 92, 14.0, "ATT", "Haaland", manCity));
+        manCity.addPlayer(new Player(5, 84, 8.5, "MID", "Reijnders", manCity));
+        manCity.addPlayer(new Player(6, 82, 6.0, "DEF", "Gvardiol", manCity));
+        manCity.addPlayer(new Player(7, 80, 5.5, "GK", "Ederson", manCity));
+
+        allTeams.add(liverpool);
+        allTeams.add(manCity);
+        /*
         allTeams.add(new Team(60, "Sunderland"));
         allTeams.add(new Team(75, "Tottenham"));
         allTeams.add(new Team(78, "Nottingham Forest"));
@@ -107,6 +121,7 @@ public class MainWindow extends JFrame implements ActionListener{
         allTeams.add(new Team(50, "Burnley"));
         allTeams.add(new Team(60, "West Ham"));
         allTeams.add(new Team(54, "Wolves"));
+        */
     }
 
     private void setupFixtures(){
@@ -157,7 +172,6 @@ public class MainWindow extends JFrame implements ActionListener{
             
             ProcessBuilder pb = new ProcessBuilder(exeFile.getAbsolutePath());
             pb.redirectErrorStream(true);
-            pb.directory(new File("CPP")); // Set working directory
             
             System.out.println("Calling GameEngine.exe");
             Process process = pb.start();

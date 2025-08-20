@@ -3,6 +3,8 @@ package Java;
 import java.util.Dictionary;
 
 public class Player{
+    private int playerID;
+
     private int rating;
     private double price;
 
@@ -17,8 +19,10 @@ public class Player{
     private int numCleanSheets;
 
     //constructor
-    public Player(int rating, double price, String position, String name, Team team)
+    public Player(int id, int rating, double price, String position, String name, Team team)
     {
+        this.id = id;
+
         this.rating = rating;
         this.price = price;
         this.position = position;
@@ -33,6 +37,10 @@ public class Player{
 
 
     //accessors
+    public int getID(){
+        return playerID;
+    }
+
     public int getRating(){
         return rating;
     }
@@ -74,7 +82,7 @@ public class Player{
     }
 
     public String toDictionaryString(){
-        return String.format("{rating : %d, position : %s, name : %s}", rating, position, name);
+        return String.format("{id : %d, rating : %d, position : %s, name : %s}", playerID, rating, position, name);
     }
 
     //mutators
