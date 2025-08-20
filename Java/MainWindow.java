@@ -1,9 +1,14 @@
 package Java;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.Border;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOError;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class MainWindow extends JFrame implements ActionListener{
 
@@ -21,6 +26,7 @@ public class MainWindow extends JFrame implements ActionListener{
 
     User user;
     FixtureList fixtureList;
+    ArrayList<Team> allTeams;
 
     public MainWindow(User user){
         this.user = user;
@@ -71,15 +77,51 @@ public class MainWindow extends JFrame implements ActionListener{
 
         fixtureList = new FixtureList();
 
-        testSetupTeams("Liverpool", "Chelsea");
+        setupTeams();
+        setupFixtures();
 
         setFixtures(0);
     }
 
-    private void testSetupTeams(String home, String away){
-        fixtureList.addFixture(0, new Fixture(new Team(90, home), new Team(78, away)));
+    private void setupTeams(){
+        allTeams = new ArrayList<>();
+
+        allTeams.add(new Team(90, "Liverpool"));
+        allTeams.add(new Team(85, "Man City"));
+        allTeams.add(new Team(60, "Sunderland"));
+        allTeams.add(new Team(75, "Tottenham"));
+        allTeams.add(new Team(78, "Nottingham Forest"));
+        allTeams.add(new Team(88, "Arsenal"));
+        allTeams.add(new Team(56, "Leeds"));
+        allTeams.add(new Team(70, "Brighton"));
+        allTeams.add(new Team(65, "Fulham"));
+        allTeams.add(new Team(80, "Aston Villa"));
+        allTeams.add(new Team(82, "Chelsea"));
+        allTeams.add(new Team(76, "Palace"));
+        allTeams.add(new Team(81, "Newcastle"));
+        allTeams.add(new Team(69, "Everton"));
+        allTeams.add(new Team(73, "Man United"));
+        allTeams.add(new Team(72, "Bournemouth"));
+        allTeams.add(new Team(59, "Brentford"));
+        allTeams.add(new Team(50, "Burnley"));
+        allTeams.add(new Team(60, "West Ham"));
+        allTeams.add(new Team(54, "Wolves"));
     }
 
+    private void setupFixtures(){
+        fixtureList = new FixtureList();
+
+        Team homeTeam = null;
+        for(int i = 0; i < allTeams.size(); i++)
+        {
+            if(i % 2 == 0){
+                homeTeam = allTeams.get(i);
+            }
+            else{
+                fixtureList.addFixture(0, new Fixture(homeTeam, allTeams.get(i)));
+            }
+        }
+    }
 
     //displaying all the upcoming fixtures
     private void setFixtures(int gameWeek){
@@ -94,7 +136,23 @@ public class MainWindow extends JFrame implements ActionListener{
     //fixture simulating- communication with C++ backend
     public void simulateFixture(Fixture fixture)
     {
+        try{
+            //write fixture details to a JSON file
 
+            //call the GameEngine.exe file
+            Process process = new ProcessBuilder("../CPP/GameEngine").start();
+            process.waitFor();
+
+            //read the result of the fixture
+            fixture.playFixture(IOHandler.readFixtureOutcome());
+        }
+        catch(IOException e){
+            System.out.println(e.getStackTrace());
+        }
+        catch(InterruptedException e){
+            System.out.println("Interrupted");
+        }
+        
     }
 
     //action listener

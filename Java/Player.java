@@ -1,5 +1,7 @@
 package Java;
 
+import java.util.Dictionary;
+
 public class Player{
     private int rating;
     private double price;
@@ -71,6 +73,9 @@ public class Player{
         return numCleanSheets;
     }
 
+    public String toDictionaryString(){
+        return String.format("{rating : %d, position : %s, name : %s}", rating, position, name);
+    }
 
     //mutators
     public void changePrice(double change){

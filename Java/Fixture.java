@@ -35,8 +35,8 @@ public class Fixture {
     }
 
     //mutators
-    public void playFixture(int homeGoals, int awayGoals, ArrayList<Player> goalScorers, ArrayList<Player> assisters, ArrayList<Player> cleanSheets){
+    public void playFixture(FixtureOutcome outcome){
         played = true;
-        outcome = new FixtureOutcome(homeGoals, awayGoals, goalScorers, assisters, cleanSheets);
+        this.outcome = outcome;
     }
 }
