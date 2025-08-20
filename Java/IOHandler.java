@@ -19,20 +19,20 @@ public class IOHandler {
             FileWriter writer = new FileWriter("fixtureData.txt");
 
             //home team
-            writer.write(fixture.getHomeTeam().getName());
+            writer.write(fixture.getHomeTeam().getName() + "\n");
 
             //away team
-            writer.write(fixture.getAwayTeam().getName());
+            writer.write(fixture.getAwayTeam().getName() + "\n");
 
             //all players
-            writer.write("HOME PLAYERS:");
+            writer.write("HOME PLAYERS\n");
             for(Player p : fixture.getHomeTeam().getPlayers()){
-                writer.write(p.toDictionaryString());
+                writer.write(p.toDictionaryString() + "\n");
             }
 
-            writer.write("AWAY PLAYERS:");
+            writer.write("AWAY PLAYERS\n");
             for(Player p : fixture.getAwayTeam().getPlayers()){
-                writer.write(p.toDictionaryString());
+                writer.write(p.toDictionaryString() + "\n");
             }
 
             writer.close();
