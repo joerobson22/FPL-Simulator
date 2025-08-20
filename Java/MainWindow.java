@@ -5,6 +5,7 @@ import javax.swing.border.Border;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -138,19 +139,58 @@ public class MainWindow extends JFrame implements ActionListener{
     {
         try{
             //write fixture details to a JSON file
+            System.out.println("Writing fixture details to text file");
+            IOHandler.writeFixtureData(fixture);
 
             //call the GameEngine.exe file
-            Process process = new ProcessBuilder("../CPP/GameEngine").start();
-            process.waitFor();
+            System.out.println("Calling GameEngine.exe");
 
-            //read the result of the fixture
-            fixture.playFixture(IOHandler.readFixtureOutcome());
+
+            File exeFile = new File("CPP/GameEngine.exe").getCanonicalFile();
+            System.out.println("GameEngine path: " + exeFile.getAbsolutePath());
+            System.out.println("File exists: " + exeFile.exists());
+            
+            if (!exeFile.exists()) {
+                System.err.println("ERROR: GameEngine.exe not found!");
+                return;
+            }
+            
+            ProcessBuilder pb = new ProcessBuilder(exeFile.getAbsolutePath());
+            pb.redirectErrorStream(true);
+            pb.directory(new File("CPP")); // Set working directory
+            
+            System.out.println("Calling GameEngine.exe");
+            Process process = pb.start();
+
+
+            System.out.println("Waiting for GameEngine.exe to finish running");
+            int exitCode = process.waitFor();
+
+            System.out.println("GameEngine.exe exited with code " + exitCode + "!");
+
+            //read the result of the fixture if exit code is 0
+            if(exitCode == 0){
+                System.out.println("Reading game results");
+                fixture.playFixture(IOHandler.readFixtureOutcome());
+            }
+            else{
+                System.out.println("Failed");
+            }
+            
+
+            System.out.println("Complete!");
         }
-        catch(IOException e){
-            System.out.println(e.getStackTrace());
-        }
-        catch(InterruptedException e){
-            System.out.println("Interrupted");
+        catch (IOException e) {
+            System.err.println("IOException occurred: " + e.getMessage());
+            e.printStackTrace();
+        } 
+        catch (InterruptedException e) {
+            System.err.println("Process was interrupted: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        } 
+        catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
         }
         
     }

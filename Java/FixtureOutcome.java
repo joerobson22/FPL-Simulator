@@ -37,15 +37,15 @@ public class FixtureOutcome {
         return awayGoals;
     }
 
-    public ArrayList<Player> getGoalScorers(){
+    public ArrayList<String> getGoalScorers(){
         return goalScorers;
     }
 
-    public ArrayList<Player> getAssisters(){
+    public ArrayList<String> getAssisters(){
         return assisters;
     }
 
-    public ArrayList<Player> getCleanSheets(){
+    public ArrayList<String> getCleanSheets(){
         return cleanSheets;
     }
 
