@@ -21,7 +21,7 @@ public class Player{
     //constructor
     public Player(int id, int rating, double price, String position, String name, Team team)
     {
-        this.id = id;
+        this.playerID = id;
 
         this.rating = rating;
         this.price = price;

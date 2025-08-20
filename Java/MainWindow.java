@@ -173,7 +173,7 @@ public class MainWindow extends JFrame implements ActionListener{
             ProcessBuilder pb = new ProcessBuilder(exeFile.getAbsolutePath());
             pb.redirectErrorStream(true);
             
-            System.out.println("Calling GameEngine.exe");
+            System.out.println("Starting GameEngine.exe");
             Process process = pb.start();
 
 

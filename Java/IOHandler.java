@@ -47,7 +47,6 @@ public class IOHandler {
         int awayGoals = 0;
         ArrayList<String> goalScorers = new ArrayList<>();
         ArrayList<String> assisters = new ArrayList<>();
-        ArrayList<String> cleanSheets = new ArrayList<>();
 
         try{
             BufferedReader reader = new BufferedReader(new FileReader("fixtureResult.txt"));
