@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <optional>
+
 using namespace std;
 
 const string filePath = "../fixtureData.txt";
@@ -23,20 +25,11 @@ class Player{
     Player(vector<pair<string, string>> pairs){
         for(int i = 0; i < pairs.size(); i++){
             pair<string, string> p = pairs[i];
-
-            if(p.first == "id"){
-                id = stoi(p.second);
-            }
-            else if(p.first == "rating"){
-                rating = stoi(p.second);
-            }
-            else if(p.first == "position"){
-                position = p.second;
-            }
-            else if(p.first == "name"){
-                name = p.second;
-            }
+            setAttribute(p);
         }
+
+        goals = 0;
+        assists = 0;
     }
 
     Player(int id, int rating, string position, string name){
@@ -47,6 +40,21 @@ class Player{
 
         goals = 0;
         assists = 0;
+    }
+
+    void setAttribute(pair<string, string> p){
+        if(p.first == "id"){
+            id = stoi(p.second);
+        }
+        else if(p.first == "rating"){
+            rating = stoi(p.second);
+        }
+        else if(p.first == "position"){
+            position = p.second;
+        }
+        else if(p.first == "name"){
+            name = p.second;
+        }
     }
 
     void scored(){ goals++; }
@@ -71,6 +79,11 @@ class Team{
     vector<Player> players;
 
     public:
+    Team(){
+        this->name = "";
+        goals = 0;
+    }
+
     Team(string name){
         this->name = name;
         goals = 0;
@@ -91,9 +104,17 @@ class Team{
             }
         }
     }
-
     void addPlayer(Player& player){ players.push_back(player); }
 
+    std::optional<Player> getPlayer(int id){
+        for(int i = 0; i < players.size(); i++){
+            if(players[i].getID() == id){
+                return players[i];
+            }
+        }
+        //check is getPlayer.has_value()
+        return std::nullopt;
+    }
     void outputTeam(){
         cout << name + "\n\n";
         for(int i = 0; i < players.size(); i++){
@@ -117,14 +138,10 @@ pair<string, string> parseKeyValuePair(string section){
     return make_pair(key, value);
 }
 
-int main() {
-    cout << "GameEngine.exe running\n";
 
+void readInputFile(Team teams[]){
     string line;
     ifstream reader(filePath);
-
-    Team homeTeam("");
-    Team awayTeam("");
 
     int teamPlayers = -1;
 
@@ -133,11 +150,11 @@ int main() {
         i++;
         //different specific cases
         if(i == HOME_TEAM){
-            homeTeam = Team(line);
+            teams[0] = Team(line);
             continue;
         }
         else if(i == AWAY_TEAM){
-            awayTeam = Team(line);
+            teams[1] = Team(line);
             continue;
         }
         else if(line == HOME_PLAYERS_START) {
@@ -166,14 +183,20 @@ int main() {
         keyValuePairs.push_back(parseKeyValuePair(line.substr(subStrStart, j - subStrStart)));
 
         Player p(keyValuePairs);
-        (teamPlayers == 0) ? homeTeam.addPlayer(p) : awayTeam.addPlayer(p);
+        teams[teamPlayers].addPlayer(p);
     }
+}
 
-    /* output the teams if need be
-    homeTeam.outputTeam();
+
+int main() {
+    cout << "GameEngine.exe running\n";
+
+    Team teams[2];
+    readInputFile(teams);
+
+    /*teams[0].outputTeam();
     cout << "\n";
-    awayTeam.outputTeam();
-    */
+    teams[1].outputTeam();*/
 
     return 0;
 }
