@@ -19,12 +19,13 @@ public class FixtureOutcome {
         cleanSheets = new ArrayList<>();
     }
 
-    public FixtureOutcome(int homeGoals, int awayGoals, ArrayList<String> goalScorers, ArrayList<String> assisters, ArrayList<String> cleanSheets){
+    public FixtureOutcome(int homeGoals, int awayGoals, ArrayList<String> goalScorers, ArrayList<String> assisters){
         this.homeGoals = homeGoals;
         this.awayGoals = awayGoals;
         this.goalScorers = goalScorers;
         this.assisters = assisters;
-        this.cleanSheets = cleanSheets;
+
+        //generate clean sheeters
     }
 
 

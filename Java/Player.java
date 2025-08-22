@@ -82,7 +82,7 @@ public class Player{
     }
 
     public String toDictionaryString(){
-        return String.format("{id : %d, rating : %d, position : %s, name : %s}", playerID, rating, position, name);
+        return String.format("id:%d,rating:%d,position:%s,name:%s", playerID, rating, position, name);
     }
 
     //mutators

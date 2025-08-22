@@ -20,6 +20,25 @@ class Player{
     int assists;
 
     public:
+    Player(vector<pair<string, string>> pairs){
+        for(int i = 0; i < pairs.size(); i++){
+            pair<string, string> p = pairs[i];
+
+            if(p.first == "id"){
+                id = stoi(p.second);
+            }
+            else if(p.first == "rating"){
+                rating = stoi(p.second);
+            }
+            else if(p.first == "position"){
+                position = p.second;
+            }
+            else if(p.first == "name"){
+                name = p.second;
+            }
+        }
+    }
+
     Player(int id, int rating, string position, string name){
         this->id = id;
         this->rating = rating;
@@ -37,6 +56,12 @@ class Player{
     int getRating(){ return rating; }
     string getPosition(){ return position; }
     string getName(){ return name; }
+
+    void outputPlayer(){
+        cout << "name: " + name + "\n";
+        cout << "rating: " + to_string(rating);
+        cout << "\nposition: " + position + "\n";
+    }
 };
 
 class Team{
@@ -68,14 +93,28 @@ class Team{
     }
 
     void addPlayer(Player& player){ players.push_back(player); }
+
+    void outputTeam(){
+        cout << name + "\n\n";
+        for(int i = 0; i < players.size(); i++){
+            players[i].outputPlayer();
+            cout << "\n";
+        }
+    }
 };
 
-void trimString(string& line){
-    line = line.substr(1, line.length() - 2);
-}
-
 pair<string, string> parseKeyValuePair(string section){
+    string key = "";
+    string value = "";
 
+    size_t colonPos = section.find(':');
+
+    if(colonPos != string::npos){
+        key = section.substr(0, colonPos);
+        value = section.substr(colonPos + 1);
+    }
+
+    return make_pair(key, value);
 }
 
 int main() {
@@ -111,11 +150,30 @@ int main() {
         } 
 
         //otherwise the line is a new player's information
-        cout << line + "\n";
-        trimString(line);
-        cout << line + "\n";
+        //so find every comma, then pass that substring into parseKeyValuePair
+        vector<pair<string, string>> keyValuePairs;
+        
+        int subStrStart = 0;
+        int j = 0;
+        for(j; j < line.size(); j++){
+            char c = line.at(j);
+
+            if(c == ',' || j == line.size()){
+                keyValuePairs.push_back(parseKeyValuePair(line.substr(subStrStart, j - subStrStart)));
+                subStrStart = j + 1;
+            }
+        }
+        keyValuePairs.push_back(parseKeyValuePair(line.substr(subStrStart, j - subStrStart)));
+
+        Player p(keyValuePairs);
+        (teamPlayers == 0) ? homeTeam.addPlayer(p) : awayTeam.addPlayer(p);
     }
 
+    /* output the teams if need be
+    homeTeam.outputTeam();
+    cout << "\n";
+    awayTeam.outputTeam();
+    */
 
     return 0;
 }

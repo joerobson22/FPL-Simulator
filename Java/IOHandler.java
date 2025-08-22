@@ -12,7 +12,6 @@ public class IOHandler {
     protected static final int AWAY_GOALS = 1;
     protected static final int SCORERS = 2;
     protected static final int ASSISTERS = 3;
-    protected static final int CLEAN_SHEETS = 4;
 
     public static void writeFixtureData(Fixture fixture){
         try{
@@ -58,7 +57,6 @@ public class IOHandler {
                 else if(i == AWAY_GOALS) awayGoals = Integer.valueOf(line);
                 else if(i == SCORERS) goalScorers = new ArrayList<String>(Arrays.asList(line.split(",")));
                 else if(i == ASSISTERS) assisters = new ArrayList<String>(Arrays.asList(line.split(",")));
-                else if(i == CLEAN_SHEETS) cleanSheets = new ArrayList<String>(Arrays.asList(line.split(",")));
 
                 line = reader.readLine();
 
@@ -71,7 +69,7 @@ public class IOHandler {
             System.out.println(e.getStackTrace());
         }
         
-        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, goalScorers, assisters, cleanSheets);
+        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, goalScorers, assisters);
         return outcome;
     }
 }
