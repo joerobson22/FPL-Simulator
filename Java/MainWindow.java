@@ -30,6 +30,7 @@ public class MainWindow extends JFrame implements ActionListener{
     User user;
     FixtureList fixtureList;
     ArrayList<Team> allTeams;
+    ArrayList<Player> allPlayers;
 
     public MainWindow(User user){
         this.user = user;
@@ -124,6 +125,13 @@ public class MainWindow extends JFrame implements ActionListener{
         allTeams.add(new Team(60, "West Ham"));
         allTeams.add(new Team(54, "Wolves"));
         */
+
+        allPlayers = new ArrayList<Player>();
+        for(Team t : allTeams){
+            for(Player p : t.getPlayers()){
+                allPlayers.add(p);
+            }
+        }
     }
 
     private void setupFixtures(){
@@ -208,7 +216,7 @@ public class MainWindow extends JFrame implements ActionListener{
                 System.out.println("Reading game results");
 
                 //READ THE FIXTURE OUTCOME
-                fixture.playFixture(IOHandler.readFixtureOutcome());
+                fixture.playFixture(IOHandler.readFixtureOutcome(allPlayers));
                 fixturePanel.updateFixturePanel();
             }
             else{

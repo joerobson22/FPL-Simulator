@@ -11,11 +11,14 @@ public class FixturePanel extends JPanel implements ActionListener{
 
     MainWindow mainWindow;
 
+    JPanel scorePanel;
+    JPanel buttonPanel;
+    JPanel scorersPanel;
+
     JButton simulateButton;
     JLabel homeTeam;
     JLabel awayTeam;
     JLabel score;
-    JLabel paddingLabel;
 
     Fixture fixture;
     
@@ -24,69 +27,91 @@ public class FixturePanel extends JPanel implements ActionListener{
         this.mainWindow = mainWindow;
         this.fixture = fixture;
 
-        displayFixture();
+        setup();
     }
 
     //methods
-    public void displayFixture(){
-        this.removeAll();
+    public void setup(){
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        homeTeam = new JLabel(fixture.getHomeTeam().getName());
-        homeTeam.setForeground(new Color(0, 0, 0));
-        homeTeam.setFont(new Font(fixtureFont, Font.PLAIN, fixtureFontSize));
+        // Score panel with FlowLayout for horizontal arrangement
+        scorePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        scorePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        
+        //setup the button panel
+        buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
-        awayTeam = new JLabel(fixture.getAwayTeam().getName());
-        awayTeam.setForeground(new Color(0, 0, 0));
-        awayTeam.setFont(new Font(fixtureFont, Font.PLAIN, fixtureFontSize));
-
-        score = new JLabel(" vs ");
-        score.setForeground(new Color(0, 0, 0));
-        score.setFont(new Font(fixtureFont, Font.PLAIN, fixtureFontSize));
+        //setup all the labels for the score panel
+        homeTeam = setupDefaultLabel(fixture.getHomeTeam().getName());
+        awayTeam = setupDefaultLabel(fixture.getAwayTeam().getName());
+        score = setupDefaultLabel(" vs ");
 
         simulateButton = new JButton("Simulate");
         simulateButton.setFont(new Font(buttonFont, Font.BOLD, buttonFontSize));
         simulateButton.addActionListener(this);
 
-        paddingLabel = new JLabel("   ");
+        //add components to score panel
+        scorePanel.add(homeTeam);
+        scorePanel.add(score);
+        scorePanel.add(awayTeam);
 
-        //add everything
-        this.add(homeTeam);
-        this.add(score);
-        this.add(awayTeam);
+        this.add(scorePanel);
 
-        //update score text and if the button exists or not
-        if(fixture.hasPlayed()){
+        //add button to button panel if not played
+        if(!fixture.hasPlayed()){
+            buttonPanel.add(simulateButton);
+            this.add(buttonPanel);
+        }
+        //otherwise show the score and the fixture's scorers
+        else {
             score.setText(fixture.getOutcome().getScoreString());
-        }
-        else{
-            this.add(paddingLabel);
-            this.add(simulateButton);
+
+            scorersPanel = setupScorersPanel();
+            this.add(scorersPanel);
         }
 
+        //set preferred size
+        this.setPreferredSize(new Dimension(this.getPreferredSize().width, 120));
+    }
+
+    //this fixture has been played now, so remove the button and display the score and scorers
+    public void updateFixturePanel(){
+        // Remove the button
+        buttonPanel.removeAll();
+        
+        // Update the score text
+        score.setText(fixture.getOutcome().getScoreString());
+
+        scorersPanel = setupScorersPanel();
+        this.add(scorersPanel);
+        
+        // Refresh
         repaintUI();
     }
 
-    //this fixture had been played
-    public void updateFixturePanel(){
-        //remove padding between team names and the simulate button
-        this.remove(paddingLabel);
-        this.remove(simulateButton);
+    public JPanel setupScorersPanel(){
+        JPanel panel = new JPanel(new BorderLayout());
 
-        //update the score text
-        score.setText(fixture.getOutcome().getScoreString());
-
-        repaintUI();
+        return panel;
     }
 
     public void repaintUI(){
-        //revalidate and repaint ui
         this.revalidate();
         this.repaint();
     }
 
+    public JLabel setupDefaultLabel(String text){
+        JLabel label = new JLabel(text);
+        label.setForeground(new Color(0, 0, 0));
+        label.setFont(new Font(fixtureFont, Font.PLAIN, fixtureFontSize));
+
+        return label;
+    }
+
     //action listener for button
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
         if(simulateButton == e.getSource() && !fixture.hasPlayed()){
             mainWindow.simulateFixture(this, fixture);
         }

@@ -12,6 +12,7 @@ public class IOHandler {
     protected static final int AWAY_GOALS = 1;
     protected static final int SCORERS = 2;
     protected static final int ASSISTERS = 3;
+    protected static final int CLEAN_SHEETS = 4;
 
     public static void writeFixtureData(Fixture fixture){
         try{
@@ -41,13 +42,14 @@ public class IOHandler {
         }
     }
 
-    public static FixtureOutcome readFixtureOutcome(){
+    public static FixtureOutcome readFixtureOutcome(ArrayList<Player> players){
         System.out.println("Reading fixture outcome");
 
         int homeGoals = 0;
         int awayGoals = 0;
         ArrayList<String> goalScorers = new ArrayList<>();
         ArrayList<String> assisters = new ArrayList<>();
+        ArrayList<String> cleanSheets = new ArrayList<>();
 
         try{
             BufferedReader reader = new BufferedReader(new FileReader("fixtureOutcome.txt"));
@@ -71,6 +73,10 @@ public class IOHandler {
                     System.out.println("Assisters");
                     assisters = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
+                else if(i == CLEAN_SHEETS){
+                    System.out.println("Clean sheets");
+                    cleanSheets = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
 
                 line = reader.readLine();
 
@@ -84,7 +90,17 @@ public class IOHandler {
         }
         
         System.out.println("Generating FixtureOutcome object");
-        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, goalScorers, assisters);
+        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, getPlayersFromID(players, goalScorers), getPlayersFromID(players, assisters), getPlayersFromID(players, cleanSheets));
         return outcome;
+    }
+
+    private static ArrayList<Player> getPlayersFromID(ArrayList<Player> allPlayers, ArrayList<String> ids){
+        ArrayList<Player> players = new ArrayList<>();
+
+        for(String id : ids){
+            players.add(allPlayers.get(Integer.parseInt(id)));
+        }
+
+        return players;
     }
 }

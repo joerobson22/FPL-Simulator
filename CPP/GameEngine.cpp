@@ -146,6 +146,16 @@ class Team{
         }
         return output;
     }
+    string getCleanSheetDictionary(bool cleanSheet){
+        string output = "";
+        if(cleanSheet){
+            for(int i = 0; i < players.size(); i++){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
     int getGoals(){ return goals; }
     std::optional<Player> getPlayer(int id){
         for(int i = 0; i < players.size(); i++){
@@ -255,6 +265,16 @@ string getAssistersString(Team teams[]){
     return output;
 }
 
+string getCleanSheetsString(Team teams[]){
+    string output = "";
+    output += teams[0].getCleanSheetDictionary(teams[1].getGoals() == 0);
+
+    if(output != "" && teams[1].getCleanSheetDictionary(teams[0].getGoals() == 0) != "") output += ",";
+    output += teams[1].getCleanSheetDictionary(teams[0].getGoals() == 0);
+
+    return output;
+}
+
 void writeToOutputFile(Team teams[]){
     ofstream output(outputFilePath);
 
@@ -262,6 +282,7 @@ void writeToOutputFile(Team teams[]){
     output << to_string(teams[1].getGoals()) + "\n";
     output << getGoalScorersString(teams) + "\n";
     output << getAssistersString(teams) + "\n";
+    output << getCleanSheetsString(teams) + "\n";
 
     output.close();
 }
