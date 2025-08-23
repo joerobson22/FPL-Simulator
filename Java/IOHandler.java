@@ -42,6 +42,8 @@ public class IOHandler {
     }
 
     public static FixtureOutcome readFixtureOutcome(){
+        System.out.println("Reading fixture outcome");
+
         int homeGoals = 0;
         int awayGoals = 0;
         ArrayList<String> goalScorers = new ArrayList<>();
@@ -53,10 +55,22 @@ public class IOHandler {
             String line = reader.readLine();
 
             while (line != null) {
-                if(i == HOME_GOALS) homeGoals = Integer.valueOf(line);
-                else if(i == AWAY_GOALS) awayGoals = Integer.valueOf(line);
-                else if(i == SCORERS) goalScorers = new ArrayList<String>(Arrays.asList(line.split(",")));
-                else if(i == ASSISTERS) assisters = new ArrayList<String>(Arrays.asList(line.split(",")));
+                if(i == HOME_GOALS){
+                    System.out.println("Home team goals");
+                    homeGoals = Integer.valueOf(line);
+                }
+                else if(i == AWAY_GOALS){
+                    System.out.println("Away team goals");
+                    awayGoals = Integer.valueOf(line);
+                }
+                else if(i == SCORERS){
+                    System.out.println("Goal scorers");
+                    goalScorers = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
+                else if(i == ASSISTERS){
+                    System.out.println("Assisters");
+                    assisters = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
 
                 line = reader.readLine();
 
@@ -69,6 +83,7 @@ public class IOHandler {
             System.out.println(e.getStackTrace());
         }
         
+        System.out.println("Generating FixtureOutcome object");
         FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, goalScorers, assisters);
         return outcome;
     }

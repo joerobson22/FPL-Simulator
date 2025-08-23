@@ -3,11 +3,15 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <map>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
 const string inputFilePath = "../fixtureData.txt";
 const string outputFilePath = "../fixtureOutcome.txt";
+
 const int HOME_TEAM = 1;
 const int AWAY_TEAM = 2;
 const string HOME_PLAYERS_START = "HOME PLAYERS";
@@ -61,8 +65,14 @@ class Player{
         }
     }
 
-    void scored(){ goals++; }
-    void assisted(){ assists++; }
+    void scored(){ 
+        goals++;
+        cout << name + " scored!\n";
+    }
+    void assisted(){ 
+        assists++;
+        cout << name + " assisted!\n\n";
+    }
 
     int getID(){ return id; }
     int getRating(){ return rating; }
@@ -84,7 +94,8 @@ class Team{
     string name;
     int goals;
     vector<Player> players;
-
+    map<string, vector<Player>> team;
+    
     public:
     Team(){
         this->name = "";
@@ -99,19 +110,21 @@ class Team{
     void scored(Player& scorer, Player& assister){
         goals++;
 
-        bool scorerFound = false;
-        bool assisterFound = false;
-
         for(int i = 0; i < players.size(); i++){
             if(scorer.getID() == players[i].getID()){
                 players[i].scored();
             }
-            else if(assister.getID() == players[i].getID()){
+        }
+        for(int i = 0; i < players.size(); i++){
+            if(assister.getID() == players[i].getID()){
                 players[i].assisted();
             }
         }
     }
-    void addPlayer(Player& player){ players.push_back(player); }
+    void addPlayer(Player& player){ 
+        players.push_back(player);
+        team[player.getPosition()].push_back(player);
+    }
 
     string getGoalScorersDictionary(){
         string output = "";
@@ -143,12 +156,17 @@ class Team{
         //check is getPlayer.has_value()
         return std::nullopt;
     }
+
+    //temporary testing functions
     void outputTeam(){
         cout << name + "\n\n";
         for(int i = 0; i < players.size(); i++){
             players[i].outputPlayer();
             cout << "\n";
         }
+    }
+    Player& getRandomPlayer(){
+        return players[rand() % players.size()];
     }
 };
 
@@ -221,7 +239,7 @@ string getGoalScorersString(Team teams[]){
     string output = "";
     output += teams[0].getGoalScorersDictionary();
 
-    if(output != "") output += ",";
+    if(output != "" && teams[1].getGoalScorersDictionary() != "") output += ",";
     output += teams[1].getGoalScorersDictionary();
 
     return output;
@@ -231,7 +249,7 @@ string getAssistersString(Team teams[]){
     string output = "";
     output += teams[0].getAssistersDictionary();
 
-    if(output != "") output += ",";
+    if(output != "" && teams[1].getAssistersDictionary() != "") output += ",";
     output += teams[1].getAssistersDictionary();
 
     return output;
@@ -249,16 +267,44 @@ void writeToOutputFile(Team teams[]){
 }
 //----------------------------------
 
+
+
+
+//MATCH ENGINE!!!
+int simulateMatch(Team teams[]){
+    for(int i = 0; i < rand() % 5; i++){
+        teams[0].scored(teams[0].getRandomPlayer(), teams[0].getRandomPlayer());
+    }
+
+    for(int i = 0; i < rand() % 5; i++){
+        teams[1].scored(teams[1].getRandomPlayer(), teams[1].getRandomPlayer());
+    }
+
+    return 0;
+}
+
+
+
+
+
+
 int main() {
+    srand(time(NULL));
+
     cout << "GameEngine.exe running\n";
 
     Team teams[2];
+    //read the 'fixtureData.txt' file and create 2 teams with correct players
     readInputFile(teams);
 
-    teams[0].outputTeam();
-    cout << "\n";
-    teams[1].outputTeam();
+    //simulate the match
+    int errorCode = simulateMatch(teams);
+    if(errorCode != 0){
+        cout << "Match simulation failed with error" + to_string(errorCode) + ".\n";
+        return -1;
+    }
 
+    //write the match details to the 'fixtureOutcome.txt' file
     writeToOutputFile(teams);
 
     return 0;

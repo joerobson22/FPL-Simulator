@@ -152,17 +152,17 @@ public class MainWindow extends JFrame implements ActionListener{
 
 
     //fixture simulating- communication with C++ backend
-    public void simulateFixture(Fixture fixture)
+    public void simulateFixture(FixturePanel fixturePanel, Fixture fixture)
     {
         try{
-            //write fixture details to a JSON file
+            //write fixture details to a txt file
             System.out.println("Writing fixture details to text file");
             IOHandler.writeFixtureData(fixture);
 
             //call the GameEngine.exe file
             System.out.println("Calling GameEngine.exe");
 
-
+            //GET THE MATCH SIMULATOR .EXE FILE PATH
             File exeFile = new File("CPP/GameEngine.exe").getCanonicalFile();
             System.out.println("GameEngine path: " + exeFile.getAbsolutePath());
             System.out.println("File exists: " + exeFile.exists());
@@ -172,12 +172,14 @@ public class MainWindow extends JFrame implements ActionListener{
                 return;
             }
             
+            //CREATE A NEW PROCESSBUILDER TO CALL THE MATCH SIMULATOR
             ProcessBuilder pb = new ProcessBuilder(exeFile.getAbsolutePath());
             pb.redirectErrorStream(true);
 
             pb.directory(new File("CPP"));
             System.out.println("Working directory: " + pb.directory().getAbsolutePath());
             
+            //START THE MATCH SIMULATOR
             System.out.println("Calling GameEngine.exe");
             Process process = pb.start();
 
@@ -198,10 +200,16 @@ public class MainWindow extends JFrame implements ActionListener{
 
             System.out.println("GameEngine.exe exited with code " + exitCode + "!");
 
+
+
+
             //read the result of the fixture if exit code is 0
             if(exitCode == 0){
                 System.out.println("Reading game results");
+
+                //READ THE FIXTURE OUTCOME
                 fixture.playFixture(IOHandler.readFixtureOutcome());
+                fixturePanel.updateFixturePanel();
             }
             else{
                 System.out.println("Failed");
@@ -222,7 +230,6 @@ public class MainWindow extends JFrame implements ActionListener{
             System.err.println("Unexpected error: " + e.getMessage());
             e.printStackTrace();
         }
-        
     }
 
     //action listener
