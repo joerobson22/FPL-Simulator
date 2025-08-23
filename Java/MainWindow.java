@@ -5,9 +5,11 @@ import javax.swing.border.Border;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -172,10 +174,24 @@ public class MainWindow extends JFrame implements ActionListener{
             
             ProcessBuilder pb = new ProcessBuilder(exeFile.getAbsolutePath());
             pb.redirectErrorStream(true);
+
+            pb.directory(new File("CPP"));
+            System.out.println("Working directory: " + pb.directory().getAbsolutePath());
             
-            System.out.println("Starting GameEngine.exe");
+            System.out.println("Calling GameEngine.exe");
             Process process = pb.start();
 
+            // read the output stream
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            
+            String line;
+            System.out.println("=== GAME ENGINE OUTPUT ===");
+            System.out.println();
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            System.out.println();
+            System.out.println("=== END ENGINE OUTPUT ===");
 
             System.out.println("Waiting for GameEngine.exe to finish running");
             int exitCode = process.waitFor();

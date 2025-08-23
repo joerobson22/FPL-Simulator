@@ -26,6 +26,8 @@ public class FixtureOutcome {
         this.assisters = assisters;
 
         //generate clean sheeters
+
+        //allocate points
     }
 
 

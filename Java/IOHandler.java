@@ -48,7 +48,7 @@ public class IOHandler {
         ArrayList<String> assisters = new ArrayList<>();
 
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("fixtureResult.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("fixtureOutcome.txt"));
             int i = 0;
             String line = reader.readLine();
 

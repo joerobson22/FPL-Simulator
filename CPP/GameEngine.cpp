@@ -6,12 +6,14 @@
 
 using namespace std;
 
-const string filePath = "../fixtureData.txt";
+const string inputFilePath = "../fixtureData.txt";
+const string outputFilePath = "../fixtureOutcome.txt";
 const int HOME_TEAM = 1;
 const int AWAY_TEAM = 2;
 const string HOME_PLAYERS_START = "HOME PLAYERS";
 const string AWAY_PLAYERS_START = "AWAY PLAYERS";
 
+//PLAYER CLASS
 class Player{
     private:
     int id;
@@ -32,6 +34,7 @@ class Player{
         assists = 0;
     }
 
+    /*
     Player(int id, int rating, string position, string name){
         this->id = id;
         this->rating = rating;
@@ -41,6 +44,7 @@ class Player{
         goals = 0;
         assists = 0;
     }
+        */
 
     void setAttribute(pair<string, string> p){
         if(p.first == "id"){
@@ -64,6 +68,8 @@ class Player{
     int getRating(){ return rating; }
     string getPosition(){ return position; }
     string getName(){ return name; }
+    int getGoals(){ return goals; }
+    int getAssists(){ return assists; }
 
     void outputPlayer(){
         cout << "name: " + name + "\n";
@@ -72,6 +78,7 @@ class Player{
     }
 };
 
+//TEAM CLASS
 class Team{
     private:
     string name;
@@ -106,6 +113,27 @@ class Team{
     }
     void addPlayer(Player& player){ players.push_back(player); }
 
+    string getGoalScorersDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            for(int j = 0; j < players[i].getGoals(); j++){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+    string getAssistersDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            for(int j = 0; j < players[i].getAssists(); j++){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+    int getGoals(){ return goals; }
     std::optional<Player> getPlayer(int id){
         for(int i = 0; i < players.size(); i++){
             if(players[i].getID() == id){
@@ -124,6 +152,7 @@ class Team{
     }
 };
 
+//FILE INPUT FUNCTIONS
 pair<string, string> parseKeyValuePair(string section){
     string key = "";
     string value = "";
@@ -138,10 +167,9 @@ pair<string, string> parseKeyValuePair(string section){
     return make_pair(key, value);
 }
 
-
 void readInputFile(Team teams[]){
     string line;
-    ifstream reader(filePath);
+    ifstream reader(inputFilePath);
 
     int teamPlayers = -1;
 
@@ -186,7 +214,40 @@ void readInputFile(Team teams[]){
         teams[teamPlayers].addPlayer(p);
     }
 }
+//---------------------------------
 
+//FILE OUTPUT FUNCTIONS
+string getGoalScorersString(Team teams[]){
+    string output = "";
+    output += teams[0].getGoalScorersDictionary();
+
+    if(output != "") output += ",";
+    output += teams[1].getGoalScorersDictionary();
+
+    return output;
+}
+
+string getAssistersString(Team teams[]){
+    string output = "";
+    output += teams[0].getAssistersDictionary();
+
+    if(output != "") output += ",";
+    output += teams[1].getAssistersDictionary();
+
+    return output;
+}
+
+void writeToOutputFile(Team teams[]){
+    ofstream output(outputFilePath);
+
+    output << to_string(teams[0].getGoals()) + "\n";
+    output << to_string(teams[1].getGoals()) + "\n";
+    output << getGoalScorersString(teams) + "\n";
+    output << getAssistersString(teams) + "\n";
+
+    output.close();
+}
+//----------------------------------
 
 int main() {
     cout << "GameEngine.exe running\n";
@@ -194,9 +255,11 @@ int main() {
     Team teams[2];
     readInputFile(teams);
 
-    /*teams[0].outputTeam();
+    teams[0].outputTeam();
     cout << "\n";
-    teams[1].outputTeam();*/
+    teams[1].outputTeam();
+
+    writeToOutputFile(teams);
 
     return 0;
 }
