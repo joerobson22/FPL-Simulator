@@ -19,7 +19,6 @@ public class MainWindow extends JFrame implements ActionListener{
     JPanel contentPanel;
     JPanel titlePanel;
     JPanel teamSelectionPanel;
-    JPanel statsPanel;
     JPanel fixtureListPanel;
 
     Color titlePanelBackgroundColor = new Color(85, 131, 237);
@@ -29,8 +28,11 @@ public class MainWindow extends JFrame implements ActionListener{
 
     User user;
     FixtureList fixtureList;
+    StatsPanel statsPanel;
     ArrayList<Team> allTeams;
     ArrayList<Player> allPlayers;
+
+    int currentGameWeek = 0;
 
     public MainWindow(User user){
         this.user = user;
@@ -53,11 +55,11 @@ public class MainWindow extends JFrame implements ActionListener{
         teamSelectionPanel.setBackground(teamSelectionPanelBackgroundColor);
         teamSelectionPanel.setBorder(blackline);
 
-        statsPanel = new JPanel();
+        statsPanel = new StatsPanel();
         statsPanel.setBackground(statsPanelBackgroundColor);
         statsPanel.setBorder(blackline);
 
-        fixtureListPanel = new JPanel(new GridLayout(10, 1));
+        fixtureListPanel = new JPanel(new GridLayout(11, 1));
         fixtureListPanel.setBackground(fixtureListPanelBackgroundColor);
         fixtureListPanel.setBorder(blackline);
 
@@ -84,7 +86,8 @@ public class MainWindow extends JFrame implements ActionListener{
         setupTeams();
         setupFixtures();
 
-        setFixtures(0);
+        setFixtures(currentGameWeek);
+        setStats(currentGameWeek);
     }
 
     private void setupTeams(){
@@ -147,6 +150,10 @@ public class MainWindow extends JFrame implements ActionListener{
                 fixtureList.addFixture(0, new Fixture(homeTeam, allTeams.get(i)));
             }
         }
+    }
+
+    private void setStats(int gameWeek){
+        statsPanel.updateStats(gameWeek);
     }
 
     //displaying all the upcoming fixtures

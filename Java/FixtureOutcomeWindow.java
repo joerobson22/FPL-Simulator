@@ -34,7 +34,7 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
     }
 
     private void setupWindow(){
-        infoPanel = new JPanel(new GridLayout(2, 1));
+        infoPanel = new JPanel();
         setupInfoPanel();
 
         mainPanel = new JPanel(new BorderLayout());
@@ -49,8 +49,12 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
     }
 
     public void setupInfoPanel(){
-        JPanel goalContributionsPanel = new JPanel(new GridLayout(2, 1));
-        JPanel extraInfoPanel = new JPanel(new GridLayout(1, 1));
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+
+        JPanel goalContributionsPanel = new JPanel();
+        goalContributionsPanel.setLayout(new BoxLayout(goalContributionsPanel, BoxLayout.Y_AXIS));
+        JPanel extraInfoPanel = new JPanel();
+        extraInfoPanel.setLayout(new BoxLayout(extraInfoPanel, BoxLayout.Y_AXIS));
 
         goalContributionsPanel.add(setupInfoSection("Goals", fixture.getOutcome().getGoalScorers()));
         goalContributionsPanel.add(setupInfoSection("Assists", fixture.getOutcome().getAssisters()));
