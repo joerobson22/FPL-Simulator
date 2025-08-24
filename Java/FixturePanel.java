@@ -104,7 +104,7 @@ public class FixturePanel extends JPanel implements ActionListener{
     }
 
     public void viewFixtureOutcome(){
-        
+        FixtureOutcomeWindow fow = new FixtureOutcomeWindow(fixture, scorePanel);
     }
 
     //action listener for button
