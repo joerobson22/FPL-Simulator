@@ -39,4 +39,27 @@ public class Fixture {
         played = true;
         this.outcome = outcome;
     }
+
+    public void allocatePointsAndChangeStats(){
+        //allocate points for goals
+        for(Player p : outcome.getGoalScorers()){
+            p.scoreGoal();
+        }
+        //allocate points for assists
+        for(Player p : outcome.getAssisters()){
+            p.makeAssist();
+        }
+        //allocate points for clean sheets
+        for(Player p : outcome.getCleanSheets()){
+            p.keepCleanSheet();
+        }
+
+        //store weekly totals
+        for(Player p : home.getPlayers()){
+            p.addWeeklyToTotal();
+        }
+        for(Player p : away.getPlayers()){
+            p.addWeeklyToTotal();
+        }
+    }
 }

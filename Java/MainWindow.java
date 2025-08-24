@@ -237,6 +237,10 @@ public class MainWindow extends JFrame implements ActionListener{
             
 
             System.out.println("Complete!");
+
+            //ONCE a fixture is complete, allocate points to every player that played!
+            fixture.allocatePointsAndChangeStats();
+            statsPanel.updateStats(allPlayers, currentGameWeek);
         }
         catch (IOException e) {
             System.err.println("IOException occurred: " + e.getMessage());

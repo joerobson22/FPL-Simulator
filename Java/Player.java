@@ -93,6 +93,21 @@ public class Player{
     }
 
     //mutators
+    public void scoreGoal(){
+        numGoals++;
+        weeklyPoints += PointLookupTable.getPointsForGoal(position);
+    }
+
+    public void makeAssist(){
+        numAssists++;
+        weeklyPoints += PointLookupTable.getPointsForAssist();
+    }
+
+    public void keepCleanSheet(){
+        numCleanSheets++;
+        weeklyPoints += PointLookupTable.getPointsForCleanSheet(position);
+    }
+
     public void changePrice(double change){
         price += change;
     }
