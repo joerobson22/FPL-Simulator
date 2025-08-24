@@ -301,11 +301,11 @@ void writeToOutputFile(Team teams[]){
 
 //MATCH ENGINE!!!
 int simulateMatch(Team teams[]){
-    for(int i = 0; i < 0; i++){
+    for(int i = 0; i < rand() % 4; i++){
         teams[0].scored(teams[0].getRandomPlayer(), teams[0].getRandomPlayer());
     }
 
-    for(int i = 0; i < rand() % 10; i++){
+    for(int i = 0; i < rand() % 4; i++){
         teams[1].scored(teams[1].getRandomPlayer(), teams[1].getRandomPlayer());
     }
 

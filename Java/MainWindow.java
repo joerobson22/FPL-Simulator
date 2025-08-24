@@ -94,6 +94,8 @@ public class MainWindow extends JFrame implements ActionListener{
 
         Team liverpool = new Team(90, "Liverpool");
         Team manCity = new Team(85, "Man City");
+        Team nttmForest = new Team(78, "Nottingham Forest");
+        Team arsenal = new Team(88, "Arsenal");
 
         liverpool.addPlayer(new Player(0, 95, 14.5, "ATT", "Salah", liverpool));
         liverpool.addPlayer(new Player(1, 90, 8.5, "MID", "Wirtz", liverpool));
@@ -105,13 +107,25 @@ public class MainWindow extends JFrame implements ActionListener{
         manCity.addPlayer(new Player(6, 82, 6.0, "DEF", "Gvardiol", manCity));
         manCity.addPlayer(new Player(7, 80, 5.5, "GK", "Ederson", manCity));
 
+        nttmForest.addPlayer(new Player(8, 80, 7.5, "ATT", "Wood", nttmForest));
+        nttmForest.addPlayer(new Player(9, 82, 8.5, "MID", "Gibbs-White", nttmForest));
+        nttmForest.addPlayer(new Player(10, 83, 6.0, "DEF", "Murillo", nttmForest));
+        nttmForest.addPlayer(new Player(11, 80, 5.0, "GK", "Sels", nttmForest));
+
+        arsenal.addPlayer(new Player(12, 86, 9.0, "ATT", "Gyokeres", arsenal));
+        arsenal.addPlayer(new Player(13, 90, 10.0, "MID", "Saka", arsenal));
+        arsenal.addPlayer(new Player(14, 85, 6.0, "DEF", "Saliba", arsenal));
+        arsenal.addPlayer(new Player(15, 85, 5.5, "GK", "Raya", arsenal));
+
         allTeams.add(liverpool);
         allTeams.add(manCity);
+        allTeams.add(nttmForest);
+        allTeams.add(arsenal);
         /*
         allTeams.add(new Team(60, "Sunderland"));
         allTeams.add(new Team(75, "Tottenham"));
-        allTeams.add(new Team(78, "Nottingham Forest"));
-        allTeams.add(new Team(88, "Arsenal"));
+        allTeams.add();
+        allTeams.add();
         allTeams.add(new Team(56, "Leeds"));
         allTeams.add(new Team(70, "Brighton"));
         allTeams.add(new Team(65, "Fulham"));

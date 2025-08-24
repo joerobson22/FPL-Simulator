@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class FixtureOutcomeWindow extends JFrame implements ActionListener{
+    private final String fixtureFont = "SansSerif";
+    private final int fixtureFontSize = 20;
     final String font = "SansSerif";
     final int infoSectionTitleFontSize = 15;
     final int infoSectionBodyFontSize = 12;
@@ -23,12 +25,11 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
     Fixture fixture;
 
     JPanel mainPanel;
-    JPanel titlePanel;
     JPanel infoPanel;
+    JPanel scorePanel;
 
-    public FixtureOutcomeWindow(Fixture fixture, JPanel titlePanel){
+    public FixtureOutcomeWindow(Fixture fixture){
         this.fixture = fixture;
-        this.titlePanel = titlePanel;
 
         setupWindow();
     }
@@ -37,8 +38,21 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         infoPanel = new JPanel();
         setupInfoPanel();
 
+        scorePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        scorePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+        //setup all the labels for the score panel
+        JLabel homeTeam = setupDefaultScoreLabel(fixture.getHomeTeam().getName());
+        JLabel awayTeam = setupDefaultScoreLabel(fixture.getAwayTeam().getName());
+        JLabel score = setupDefaultScoreLabel(fixture.getOutcome().getScoreString());
+
+        //add components to score panel
+        scorePanel.add(homeTeam);
+        scorePanel.add(score);
+        scorePanel.add(awayTeam);
+
         mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add(titlePanel, "North");
+        mainPanel.add(scorePanel, "North");
         mainPanel.add(infoPanel, "Center");
 
         this.setContentPane(mainPanel);
@@ -147,6 +161,14 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         JLabel label = new JLabel(text);
         label.setForeground(new Color(0, 0, 0));
         label.setFont(new Font(font, Font.PLAIN, infoSectionBodyFontSize));
+
+        return label;
+    }
+
+    public JLabel setupDefaultScoreLabel(String text){
+        JLabel label = new JLabel(text);
+        label.setForeground(new Color(0, 0, 0));
+        label.setFont(new Font(fixtureFont, Font.PLAIN, fixtureFontSize));
 
         return label;
     }
