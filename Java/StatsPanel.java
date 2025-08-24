@@ -46,22 +46,31 @@ public class StatsPanel extends JPanel implements ActionListener{
         topScorerTitleLabel.setFont(new Font(topScorerFont, Font.BOLD, topScorerTitleSize));
         topScorerTitlePanel.add(topScorerTitleLabel);
         //create table of top scorers
-        topScorerContentPanel = new JPanel(new GridLayout(11, 4));
+        topScorerContentPanel = new JPanel(new GridLayout(1, 4));
 
         //setup topscorers hashmap and create new JLabels for the titles
         topScorersMap = new HashMap<>();
         for(String s : positions){
-            topScorerContentPanel.add(setupDefaultLabel(s, topScorerFont, topScorerTableSize));
+            JPanel column = new JPanel();
+            column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
+            column.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+            JLabel tableHeader = setupDefaultLabel(s, topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER);
+            //tableHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
+            column.add(tableHeader);
+
             topScorersMap.put(s, new ArrayList<>());
 
             for(int i = 1; i < 11; i++)
-                topScorersMap.get(s).add(setupDefaultLabel(String.valueOf(i), topScorerFont, topScorerTableSize));
-        }
-
-        for(int i = 0; i < 10; i++){
-            for(String s : positions){
-                topScorerContentPanel.add(topScorersMap.get(s).get(i));
+            {
+                JLabel label = setupDefaultLabel(String.valueOf(i), topScorerFont, topScorerTableSize, Font.PLAIN, SwingConstants.LEFT);
+                label.setAlignmentX(Component.LEFT_ALIGNMENT);
+                label.setMaximumSize(new Dimension(Integer.MAX_VALUE, label.getPreferredSize().height));
+                topScorersMap.get(s).add(label);
+                column.add(label);
+                column.add(Box.createVerticalStrut(4));
             }
+            topScorerContentPanel.add(column);
         }
 
         //add both sub panels to the top scorer panel
@@ -83,10 +92,10 @@ public class StatsPanel extends JPanel implements ActionListener{
         this.add(buttonsPanel);
     }
 
-    public JLabel setupDefaultLabel(String text, String font, int fontSize){
-        JLabel label = new JLabel(text, SwingConstants.CENTER);
+    public JLabel setupDefaultLabel(String text, String font, int fontSize, int fontType,  int hAlignment){
+        JLabel label = new JLabel(text, hAlignment);
         label.setForeground(new Color(0, 0, 0));
-        label.setFont(new Font(font, Font.PLAIN, fontSize));
+        label.setFont(new Font(font, fontType, fontSize));
 
         return label;
     }
