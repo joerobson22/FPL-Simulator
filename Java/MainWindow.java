@@ -87,7 +87,6 @@ public class MainWindow extends JFrame implements ActionListener{
         setupFixtures();
 
         setFixtures(currentGameWeek);
-        setStats(currentGameWeek);
     }
 
     private void setupTeams(){
@@ -135,6 +134,8 @@ public class MainWindow extends JFrame implements ActionListener{
                 allPlayers.add(p);
             }
         }
+
+        setStats(currentGameWeek);
     }
 
     private void setupFixtures(){
@@ -153,7 +154,7 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     private void setStats(int gameWeek){
-        statsPanel.updateStats(gameWeek);
+        statsPanel.updateStats(allPlayers, gameWeek);
     }
 
     //displaying all the upcoming fixtures

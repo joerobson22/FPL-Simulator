@@ -88,7 +88,7 @@ public class Player{
     }
 
     public int getGameWeekPoints(int gameWeek){
-        if(gameWeek > weeklyPointHistory.size()) return 0;
+        if(gameWeek >= weeklyPointHistory.size()) return 0;
         return weeklyPointHistory.get(gameWeek);
     }
 

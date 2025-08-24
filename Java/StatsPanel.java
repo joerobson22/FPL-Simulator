@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 public class StatsPanel extends JPanel implements ActionListener{
     private final String topScorerFont = "SansSerif";
     private final int topScorerTitleSize = 20;
-    private final int topScorerTableSize = 15;
+    private final int topScorerTableSize = 13;
 
     private JPanel topScorerPanel;
     private JPanel topScorerContentPanel;
@@ -100,8 +100,47 @@ public class StatsPanel extends JPanel implements ActionListener{
         return label;
     }
 
-    public void updateStats(int gameWeek){
+    public void updateStats(ArrayList<Player> allPlayers, int gameWeek){
+        Map<String, ArrayList<Player>> players = new HashMap<>();
 
+        for(String p : positions){
+            players.put(p, new ArrayList<>());
+        }
+        for(Player p : allPlayers){
+            players.get(p.getPosition()).add(p);
+        }
+
+        for(String p : positions){
+            ArrayList<Player> playerList = players.get(p);
+            players.put(p, bubbleSortPlayers(playerList, gameWeek));
+
+            for(int i = 1; i < Math.min(playerList.size() + 1, 11); i++){
+                Player player = playerList.get(i - 1);
+                String text = String.valueOf(player.getGameWeekPoints(gameWeek)) + "pts| " + player.getName();
+                topScorersMap.get(p).get(i - 1).setText(text);
+            }
+        }
+    }
+
+    public ArrayList<Player> bubbleSortPlayers(ArrayList<Player> players, int gameWeek){
+        boolean swaps = true;
+        while(swaps){
+            swaps = false;
+            int n = players.size();
+            for(int i = 1; i < n; i++){
+                if(players.get(i).getGameWeekPoints(gameWeek) > players.get(i - 1).getGameWeekPoints(gameWeek)){
+                    //swap the players
+                    Player temp = players.get(i);
+                    players.set(i, players.get(i - 1));
+                    players.set(i - 1, temp);
+
+                    swaps = true;
+                }
+            }
+            n--;
+        }
+
+        return players;
     }
 
     public void actionPerformed(ActionEvent e){
