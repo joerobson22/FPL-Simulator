@@ -57,7 +57,7 @@ public class MainWindow extends JFrame implements ActionListener{
         statsPanel.setBackground(statsPanelBackgroundColor);
         statsPanel.setBorder(blackline);
 
-        fixtureListPanel = new JPanel();
+        fixtureListPanel = new JPanel(new GridLayout(10, 1));
         fixtureListPanel.setBackground(fixtureListPanelBackgroundColor);
         fixtureListPanel.setBorder(blackline);
 
@@ -154,8 +154,12 @@ public class MainWindow extends JFrame implements ActionListener{
         fixtureListPanel.removeAll();
 
         for(Fixture f : fixtureList.getFixtures(gameWeek)){
-            fixtureListPanel.add(new FixturePanel(this, f));
+            FixturePanel fp = new FixturePanel(this, f);
+            fixtureListPanel.add(fp);
         }
+
+        fixtureListPanel.revalidate();
+        fixtureListPanel.repaint();
     }
 
 

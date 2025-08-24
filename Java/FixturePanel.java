@@ -74,6 +74,8 @@ public class FixturePanel extends JPanel implements ActionListener{
 
         //set preferred size
         this.setPreferredSize(new Dimension(this.getPreferredSize().width, 120));
+
+        this.setBackground(new Color(0, 0, 0));
     }
 
     //this fixture has been played now, so remove the button and display the score and scorers
