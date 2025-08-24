@@ -1,5 +1,7 @@
 package Java;
 import javax.swing.*;
+import javax.swing.border.Border;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.concurrent.Flow;
@@ -17,11 +19,14 @@ public class FixturePanel extends JPanel implements ActionListener{
     JPanel scorersPanel;
 
     JButton actionButton;
+    boolean buttonPressed = false;
     JLabel homeTeam;
     JLabel awayTeam;
     JLabel score;
 
     Fixture fixture;
+
+    Border blackline = BorderFactory.createLineBorder(Color.black);
     
     //constructor
     public FixturePanel(MainWindow mainWindow, Fixture fixture){
@@ -74,8 +79,6 @@ public class FixturePanel extends JPanel implements ActionListener{
 
         //set preferred size
         this.setPreferredSize(new Dimension(this.getPreferredSize().width, 120));
-
-        this.setBackground(new Color(0, 0, 0));
     }
 
     //this fixture has been played now, so remove the button and display the score and scorers
@@ -112,6 +115,9 @@ public class FixturePanel extends JPanel implements ActionListener{
         if(actionButton == e.getSource()){
             //if the action button is meant to trigger the simulation, simulate!
             if(!fixture.hasPlayed()){
+                if(buttonPressed) return;
+
+                buttonPressed = true;
                 mainWindow.simulateFixture(this, fixture);
                 return;
             }

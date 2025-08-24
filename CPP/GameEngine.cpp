@@ -153,7 +153,6 @@ class Team{
             for(int i = 0; i < players.size(); i++){
                 if(output != "") output += ",";
                 output += to_string(players[i].getID());
-                cout << output + "\n";
             }
         }
         return output;
@@ -295,11 +294,11 @@ void writeToOutputFile(Team teams[]){
 
 //MATCH ENGINE!!!
 int simulateMatch(Team teams[]){
-    for(int i = 0; i < rand() % 5; i++){
+    for(int i = 0; i < (rand() % 10) + 3; i++){
         teams[0].scored(teams[0].getRandomPlayer(), teams[0].getRandomPlayer());
     }
 
-    for(int i = 0; i < rand() % 5; i++){
+    for(int i = 0; i < (rand() % 10) + 3; i++){
         teams[1].scored(teams[1].getRandomPlayer(), teams[1].getRandomPlayer());
     }
 
