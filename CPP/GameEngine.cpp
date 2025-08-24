@@ -149,9 +149,11 @@ class Team{
     string getCleanSheetDictionary(bool cleanSheet){
         string output = "";
         if(cleanSheet){
+            cout << "CLEAN SHEET!\n";
             for(int i = 0; i < players.size(); i++){
                 if(output != "") output += ",";
                 output += to_string(players[i].getID());
+                cout << output + "\n";
             }
         }
         return output;
@@ -280,9 +282,9 @@ void writeToOutputFile(Team teams[]){
 
     output << to_string(teams[0].getGoals()) + "\n";
     output << to_string(teams[1].getGoals()) + "\n";
-    output << getGoalScorersString(teams) + "\n";
-    output << getAssistersString(teams) + "\n";
-    output << getCleanSheetsString(teams) + "\n";
+    output << "GOAL SCORERS," + getGoalScorersString(teams) + "\n";
+    output << "ASSISTERS," + getAssistersString(teams) + "\n";
+    output << "CLEAN SHEETS," + getCleanSheetsString(teams) + "\n";
 
     output.close();
 }

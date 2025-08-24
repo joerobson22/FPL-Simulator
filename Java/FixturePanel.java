@@ -2,6 +2,7 @@ package Java;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.Flow;
 
 public class FixturePanel extends JPanel implements ActionListener{
     private final String fixtureFont = "SansSerif";
@@ -15,7 +16,7 @@ public class FixturePanel extends JPanel implements ActionListener{
     JPanel buttonPanel;
     JPanel scorersPanel;
 
-    JButton simulateButton;
+    JButton actionButton;
     JLabel homeTeam;
     JLabel awayTeam;
     JLabel score;
@@ -48,9 +49,9 @@ public class FixturePanel extends JPanel implements ActionListener{
         awayTeam = setupDefaultLabel(fixture.getAwayTeam().getName());
         score = setupDefaultLabel(" vs ");
 
-        simulateButton = new JButton("Simulate");
-        simulateButton.setFont(new Font(buttonFont, Font.BOLD, buttonFontSize));
-        simulateButton.addActionListener(this);
+        actionButton = new JButton("Simulate");
+        actionButton.setFont(new Font(buttonFont, Font.BOLD, buttonFontSize));
+        actionButton.addActionListener(this);
 
         //add components to score panel
         scorePanel.add(homeTeam);
@@ -61,15 +62,14 @@ public class FixturePanel extends JPanel implements ActionListener{
 
         //add button to button panel if not played
         if(!fixture.hasPlayed()){
-            buttonPanel.add(simulateButton);
+            buttonPanel.add(actionButton);
             this.add(buttonPanel);
         }
         //otherwise show the score and the fixture's scorers
         else {
             score.setText(fixture.getOutcome().getScoreString());
 
-            scorersPanel = setupScorersPanel();
-            this.add(scorersPanel);
+            actionButton.setText("View >>");
         }
 
         //set preferred size
@@ -81,22 +81,13 @@ public class FixturePanel extends JPanel implements ActionListener{
     //this fixture has been played now, so remove the button and display the score and scorers
     public void updateFixturePanel(){
         // Remove the button
-        buttonPanel.removeAll();
+        actionButton.setText("View >>");
         
         // Update the score text
         score.setText(fixture.getOutcome().getScoreString());
-
-        scorersPanel = setupScorersPanel();
-        this.add(scorersPanel);
         
         // Refresh
         repaintUI();
-    }
-
-    public JPanel setupScorersPanel(){
-        JPanel panel = new JPanel(new BorderLayout());
-
-        return panel;
     }
 
     public void repaintUI(){
@@ -112,10 +103,20 @@ public class FixturePanel extends JPanel implements ActionListener{
         return label;
     }
 
+    public void viewFixtureOutcome(){
+        
+    }
+
     //action listener for button
     public void actionPerformed(ActionEvent e) {
-        if(simulateButton == e.getSource() && !fixture.hasPlayed()){
-            mainWindow.simulateFixture(this, fixture);
+        if(actionButton == e.getSource()){
+            //if the action button is meant to trigger the simulation, simulate!
+            if(!fixture.hasPlayed()){
+                mainWindow.simulateFixture(this, fixture);
+                return;
+            }
+            //otherwise open a new fixture outcome window
+            viewFixtureOutcome();
         }
     }
 }

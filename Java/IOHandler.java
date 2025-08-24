@@ -98,7 +98,8 @@ public class IOHandler {
         ArrayList<Player> players = new ArrayList<>();
 
         for(String id : ids){
-            players.add(allPlayers.get(Integer.parseInt(id)));
+            if(!id.equals("") && !id.equals("GOAL SCORERS") && !id.equals("ASSISTERS") && !id.equals("CLEAN SHEETS")) 
+                players.add(allPlayers.get(Integer.parseInt(id)));
         }
 
         return players;
