@@ -118,7 +118,7 @@ public class FixturePanel extends JPanel implements ActionListener{
                 if(buttonPressed) return;
 
                 buttonPressed = true;
-                mainWindow.simulateFixture(this, fixture);
+                mainWindow.simulateFixture(this, fixture, false);
                 return;
             }
             //otherwise open a new fixture outcome window

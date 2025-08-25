@@ -12,10 +12,13 @@ using namespace std;
 const string inputFilePath = "../fixtureData.txt";
 const string outputFilePath = "../fixtureOutcome.txt";
 
+const int SEED = 0;
 const int HOME_TEAM = 1;
 const int AWAY_TEAM = 2;
 const string HOME_PLAYERS_START = "HOME PLAYERS";
 const string AWAY_PLAYERS_START = "AWAY PLAYERS";
+
+int seed;
 
 bool validCleanSheetPosition(string position){
     return position == "GK" | position == "DEF" | position == "MID";
@@ -209,11 +212,17 @@ void readInputFile(Team teams[]){
 
     int teamPlayers = -1;
 
-    int i = 0;
+    int i = -1;
     while(getline(reader, line)){
         i++;
         //different specific cases
-        if(i == HOME_TEAM){
+        if(i == SEED){
+            seed = stoi(line);
+            cout << "\n\n-----------SEED----------\n" + line + "\n\n";
+            srand(static_cast<unsigned int>(seed));
+            continue;
+        }
+        else if(i == HOME_TEAM){
             teams[0] = Team(line);
             continue;
         }
@@ -318,8 +327,6 @@ int simulateMatch(Team teams[]){
 
 
 int main() {
-    srand(time(NULL));
-
     cout << "GameEngine.exe running\n";
 
     Team teams[2];

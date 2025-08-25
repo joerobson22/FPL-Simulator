@@ -14,9 +14,12 @@ public class IOHandler {
     protected static final int ASSISTERS = 3;
     protected static final int CLEAN_SHEETS = 4;
 
-    public static void writeFixtureData(Fixture fixture){
+    public static void writeFixtureData(Fixture fixture, int seed){
         try{
             FileWriter writer = new FileWriter("fixtureData.txt");
+
+            //seed
+            writer.write(String.valueOf(seed) + "\n");
 
             //home team
             writer.write(fixture.getHomeTeam().getName() + "\n");

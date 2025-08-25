@@ -1,5 +1,7 @@
 package Java;
 import java.util.ArrayList;
+import java.util.Random;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 
@@ -12,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import java.lang.Math;
 
 public class MainWindow extends JFrame implements ActionListener{
 
@@ -32,7 +36,10 @@ public class MainWindow extends JFrame implements ActionListener{
     ArrayList<Team> allTeams;
     ArrayList<Player> allPlayers;
 
+    JButton simAllButton;
+
     int currentGameWeek = 0;
+    int viewingGameWeek = 0;
 
     public MainWindow(User user){
         this.user = user;
@@ -86,7 +93,7 @@ public class MainWindow extends JFrame implements ActionListener{
         setupTeams();
         setupFixtures();
 
-        setFixtures(currentGameWeek);
+        setFixtures(viewingGameWeek);
     }
 
     private void setupTeams(){
@@ -294,18 +301,37 @@ public class MainWindow extends JFrame implements ActionListener{
             fixtureListPanel.add(fp);
         }
 
+        if(currentGameWeek == viewingGameWeek){
+            simAllButton = new JButton("Simulate All");
+            simAllButton.addActionListener(this);
+            fixtureListPanel.add(simAllButton);
+        }
+
         fixtureListPanel.revalidate();
         fixtureListPanel.repaint();
     }
 
+    public void simulateAllFixtures(){
+        int i = 0;
+        for(Fixture f : fixtureList.getFixtures(currentGameWeek)){
+            if(!f.hasPlayed()){
+                simulateFixture((FixturePanel)fixtureListPanel.getComponent(i), f, true);
+            }
+            i++;
+        }
+
+        statsPanel.updateStats(allPlayers, currentGameWeek);
+        nextGameWeek();
+    }
+
 
     //fixture simulating- communication with C++ backend
-    public void simulateFixture(FixturePanel fixturePanel, Fixture fixture)
+    public void simulateFixture(FixturePanel fixturePanel, Fixture fixture, boolean simulatingAll)
     {
         try{
             //write fixture details to a txt file
             System.out.println("Writing fixture details to text file");
-            IOHandler.writeFixtureData(fixture);
+            IOHandler.writeFixtureData(fixture, new Random().nextInt());
 
             //call the GameEngine.exe file
             System.out.println("Calling GameEngine.exe");
@@ -368,7 +394,16 @@ public class MainWindow extends JFrame implements ActionListener{
 
             //ONCE a fixture is complete, allocate points to every player that played!
             fixture.allocatePointsAndChangeStats();
-            statsPanel.updateStats(allPlayers, currentGameWeek);
+
+            if(!simulatingAll){
+                statsPanel.updateStats(allPlayers, currentGameWeek);
+                if(isGameWeekFinished(currentGameWeek)){
+                    nextGameWeek();
+                }
+            }
+            
+
+
         }
         catch (IOException e) {
             System.err.println("IOException occurred: " + e.getMessage());
@@ -384,9 +419,25 @@ public class MainWindow extends JFrame implements ActionListener{
         }
     }
 
+
+    public boolean isGameWeekFinished(int gameWeek){
+        for(Fixture f : fixtureList.getFixtures(gameWeek)){
+            if(!f.hasPlayed()) return false;
+        }
+        return true;
+    }
+
+    public void nextGameWeek(){
+        currentGameWeek++;
+        simAllButton.setVisible(false);
+    }
+
+
     //action listener
     public void actionPerformed(ActionEvent e)
     {
-        
+        if(simAllButton == e.getSource()){
+            simulateAllFixtures();
+        }
     }
 }
