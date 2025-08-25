@@ -37,6 +37,8 @@ public class MainWindow extends JFrame implements ActionListener{
     ArrayList<Player> allPlayers;
 
     JButton simAllButton;
+    JButton prevGWButton;
+    JButton nextGWButton;
 
     int currentGameWeek = 0;
     int viewingGameWeek = 0;
@@ -46,17 +48,26 @@ public class MainWindow extends JFrame implements ActionListener{
 
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
-        titlePanel = new JPanel();
-        titlePanel.setAlignmentY(CENTER_ALIGNMENT);
+        titlePanel = new JPanel(new BorderLayout());
 
-        JLabel titleLabel = new JLabel(user.getName());
+        // left button
+        prevGWButton = new JButton("<");
+        prevGWButton.addActionListener(this);
+        titlePanel.add(prevGWButton, BorderLayout.WEST);
+
+        // center label
+        JLabel titleLabel = new JLabel(user.getName(), SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 40));
         titleLabel.setForeground(new Color(255, 255, 255));
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
 
-        titlePanel.add(titleLabel);
+        // right button
+        nextGWButton = new JButton(">");
+        nextGWButton.addActionListener(this);
+        titlePanel.add(nextGWButton, BorderLayout.EAST);
+
         titlePanel.setBackground(titlePanelBackgroundColor);
         titlePanel.setBorder(blackline);
-
 
         teamSelectionPanel = new JPanel();
         teamSelectionPanel.setBackground(teamSelectionPanelBackgroundColor);
@@ -93,7 +104,22 @@ public class MainWindow extends JFrame implements ActionListener{
         setupTeams();
         setupFixtures();
 
+        updateAllVisuals();
+    }
+
+    public void updateAllVisuals(){
         setFixtures(viewingGameWeek);
+        setStats(viewingGameWeek);
+
+        showAndHideButtons();
+    }
+
+    public void showAndHideButtons(){
+        if(viewingGameWeek == 0) prevGWButton.setVisible(false);
+        else prevGWButton.setVisible(true);
+
+        if(viewingGameWeek == 37) nextGWButton.setVisible(false);
+        else nextGWButton.setVisible(true);
     }
 
     private void setupTeams(){
@@ -286,6 +312,17 @@ public class MainWindow extends JFrame implements ActionListener{
                 fixtureList.addFixture(0, new Fixture(homeTeam, allTeams.get(i)));
             }
         }
+
+        Team awayTeam = null;
+        for(int i = 0; i < allTeams.size(); i++)
+        {
+            if(i % 2 == 0){
+                awayTeam = allTeams.get(i);
+            }
+            else{
+                fixtureList.addFixture(1, new Fixture(allTeams.get(i), awayTeam));
+            }
+        }
     }
 
     private void setStats(int gameWeek){
@@ -297,7 +334,7 @@ public class MainWindow extends JFrame implements ActionListener{
         fixtureListPanel.removeAll();
 
         for(Fixture f : fixtureList.getFixtures(gameWeek)){
-            FixturePanel fp = new FixturePanel(this, f);
+            FixturePanel fp = new FixturePanel(this, f, currentGameWeek == viewingGameWeek);
             fixtureListPanel.add(fp);
         }
 
@@ -430,6 +467,10 @@ public class MainWindow extends JFrame implements ActionListener{
     public void nextGameWeek(){
         currentGameWeek++;
         simAllButton.setVisible(false);
+
+        for(Player p : allPlayers){
+            p.resetWeeklyPoints();
+        }
     }
 
 
@@ -438,6 +479,14 @@ public class MainWindow extends JFrame implements ActionListener{
     {
         if(simAllButton == e.getSource()){
             simulateAllFixtures();
+        }
+        else if(prevGWButton == e.getSource() && viewingGameWeek > 0){
+            viewingGameWeek--;
+            updateAllVisuals();
+        }
+        else if(nextGWButton == e.getSource() && viewingGameWeek < 37){
+            viewingGameWeek++;
+            updateAllVisuals();
         }
     }
 }

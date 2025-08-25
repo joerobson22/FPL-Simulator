@@ -24,14 +24,16 @@ public class FixturePanel extends JPanel implements ActionListener{
     JLabel awayTeam;
     JLabel score;
 
+    boolean canSimulate;
     Fixture fixture;
 
     Border blackline = BorderFactory.createLineBorder(Color.black);
     
     //constructor
-    public FixturePanel(MainWindow mainWindow, Fixture fixture){
+    public FixturePanel(MainWindow mainWindow, Fixture fixture, boolean canSimluate){
         this.mainWindow = mainWindow;
         this.fixture = fixture;
+        this.canSimulate = canSimluate;
 
         setup();
     }
@@ -66,12 +68,13 @@ public class FixturePanel extends JPanel implements ActionListener{
         this.add(scorePanel);
 
         //add button to button panel if not played
-        if(!fixture.hasPlayed()){
+        if(canSimulate | fixture.hasPlayed()){
             buttonPanel.add(actionButton);
             this.add(buttonPanel);
         }
         //otherwise show the score and the fixture's scorers
-        else {
+        
+        if(fixture.hasPlayed()){
             score.setText(fixture.getOutcome().getScoreString());
 
             actionButton.setText("View >>");

@@ -25,7 +25,7 @@ public class FixtureList {
 
     //mutators
     public void addFixture(int gameWeek, Fixture fixture){
-        if(fixtureList.size() == 0) fixtureList.add(new ArrayList<Fixture>());
+        if(fixtureList.size() <= gameWeek) fixtureList.add(new ArrayList<Fixture>());
 
         fixtureList.get(gameWeek).add(fixture);
     }
