@@ -124,56 +124,38 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     private void setupTeams(){
-        allTeams = new ArrayList<>();
+        allTeams = IOHandler.readAllTeamData();
 
-        Team liverpool = new Team(90, "Liverpool", "LIV");
-        Team manCity = new Team(85, "Man City", "MCI");
-        Team nttmForest = new Team(78, "Nottingham Forest", "NFO");
-        Team arsenal = new Team(88, "Arsenal", "ARS");
+        allTeams.get(0).addPlayer(new Player(0, 95, 14.5, "ATT", "Salah", allTeams.get(0)));
+        allTeams.get(0).addPlayer(new Player(1, 90, 8.5, "MID", "Wirtz", allTeams.get(0)));
+        allTeams.get(0).addPlayer(new Player(2, 85, 6.0, "DEF", "Van Dijk", allTeams.get(0)));
+        allTeams.get(0).addPlayer(new Player(3, 85, 5.5, "GK", "Alisson", allTeams.get(0)));
 
-        liverpool.addPlayer(new Player(0, 95, 14.5, "ATT", "Salah", liverpool));
-        liverpool.addPlayer(new Player(1, 90, 8.5, "MID", "Wirtz", liverpool));
-        liverpool.addPlayer(new Player(2, 85, 6.0, "DEF", "Van Dijk", liverpool));
-        liverpool.addPlayer(new Player(3, 85, 5.5, "GK", "Alisson", liverpool));
+        allTeams.get(1).addPlayer(new Player(4, 92, 14.0, "ATT", "Haaland", allTeams.get(1)));
+        allTeams.get(1).addPlayer(new Player(5, 84, 8.5, "MID", "Reijnders", allTeams.get(1)));
+        allTeams.get(1).addPlayer(new Player(6, 82, 6.0, "DEF", "Gvardiol", allTeams.get(1)));
+        allTeams.get(1).addPlayer(new Player(7, 80, 5.5, "GK", "Ederson", allTeams.get(1)));
 
-        manCity.addPlayer(new Player(4, 92, 14.0, "ATT", "Haaland", manCity));
-        manCity.addPlayer(new Player(5, 84, 8.5, "MID", "Reijnders", manCity));
-        manCity.addPlayer(new Player(6, 82, 6.0, "DEF", "Gvardiol", manCity));
-        manCity.addPlayer(new Player(7, 80, 5.5, "GK", "Ederson", manCity));
+        allTeams.get(2).addPlayer(new Player(8, 80, 7.5, "ATT", "Wood", allTeams.get(2)));
+        allTeams.get(2).addPlayer(new Player(9, 82, 8.5, "MID", "Gibbs-White", allTeams.get(2)));
+        allTeams.get(2).addPlayer(new Player(10, 83, 6.0, "DEF", "Murillo", allTeams.get(2)));
+        allTeams.get(2).addPlayer(new Player(11, 80, 5.0, "GK", "Sels", allTeams.get(2)));
 
-        nttmForest.addPlayer(new Player(8, 80, 7.5, "ATT", "Wood", nttmForest));
-        nttmForest.addPlayer(new Player(9, 82, 8.5, "MID", "Gibbs-White", nttmForest));
-        nttmForest.addPlayer(new Player(10, 83, 6.0, "DEF", "Murillo", nttmForest));
-        nttmForest.addPlayer(new Player(11, 80, 5.0, "GK", "Sels", nttmForest));
+        allTeams.get(3).addPlayer(new Player(12, 86, 9.0, "ATT", "Gyokeres", allTeams.get(3)));
+        allTeams.get(3).addPlayer(new Player(13, 90, 10.0, "MID", "Saka", allTeams.get(3)));
+        allTeams.get(3).addPlayer(new Player(14, 85, 6.0, "DEF", "Saliba", allTeams.get(3)));
+        allTeams.get(3).addPlayer(new Player(15, 85, 5.5, "GK", "Raya", allTeams.get(3)));
 
-        arsenal.addPlayer(new Player(12, 86, 9.0, "ATT", "Gyokeres", arsenal));
-        arsenal.addPlayer(new Player(13, 90, 10.0, "MID", "Saka", arsenal));
-        arsenal.addPlayer(new Player(14, 85, 6.0, "DEF", "Saliba", arsenal));
-        arsenal.addPlayer(new Player(15, 85, 5.5, "GK", "Raya", arsenal));
+        /*
+        allTeams.get(4).addPlayer(new Player(16, 88, 12.0, "ATT", "Palmer", chelsea));
+        allTeams.get(4).addPlayer(new Player(17, 85, 9.5, "MID", "Fernandez", chelsea));
+        allTeams.get(4).addPlayer(new Player(18, 83, 7.0, "DEF", "James", chelsea));
+        allTeams.get(4).addPlayer(new Player(19, 82, 5.0, "GK", "Petrovic", chelsea));
 
-        allTeams.add(liverpool);
-        allTeams.add(manCity);
-        allTeams.add(nttmForest);
-        allTeams.add(arsenal);
-        
-        Team chelsea = new Team(84, "Chelsea", "CHE");
-        Team tottenham = new Team(83, "Tottenham", "TOT");
-        Team astonVilla = new Team(82, "Aston Villa", "AVL");
-        Team newcastle = new Team(83, "Newcastle", "NEW");
-        Team brighton = new Team(80, "Brighton", "BHA");
-        Team westHam = new Team(79, "West Ham", "WHU");
-
-        // Chelsea Players
-        chelsea.addPlayer(new Player(16, 88, 12.0, "ATT", "Palmer", chelsea));
-        chelsea.addPlayer(new Player(17, 85, 9.5, "MID", "Fernandez", chelsea));
-        chelsea.addPlayer(new Player(18, 83, 7.0, "DEF", "James", chelsea));
-        chelsea.addPlayer(new Player(19, 82, 5.0, "GK", "Petrovic", chelsea));
-
-        // Tottenham Players
-        tottenham.addPlayer(new Player(20, 89, 13.0, "ATT", "Son", tottenham));
-        tottenham.addPlayer(new Player(21, 86, 9.0, "MID", "Maddison", tottenham));
-        tottenham.addPlayer(new Player(22, 82, 6.5, "DEF", "Romero", tottenham));
-        tottenham.addPlayer(new Player(23, 81, 5.0, "GK", "Vicario", tottenham));
+        allTeams.get(5).addPlayer(new Player(20, 89, 13.0, "ATT", "Son", tottenham));
+        allTeams.get(5).addPlayer(new Player(21, 86, 9.0, "MID", "Maddison", tottenham));
+        allTeams.get(5).addPlayer(new Player(22, 82, 6.5, "DEF", "Romero", tottenham));
+        allTeams.get(5).addPlayer(new Player(23, 81, 5.0, "GK", "Vicario", tottenham));
 
         // Aston Villa Players
         astonVilla.addPlayer(new Player(24, 87, 11.5, "ATT", "Watkins", astonVilla));
@@ -198,25 +180,6 @@ public class MainWindow extends JFrame implements ActionListener{
         westHam.addPlayer(new Player(37, 83, 7.5, "MID", "Paqueta", westHam));
         westHam.addPlayer(new Player(38, 81, 5.0, "DEF", "Aguerd", westHam));
         westHam.addPlayer(new Player(39, 79, 4.0, "GK", "Areola", westHam));
-
-        // Add all new teams to the list
-        allTeams.add(chelsea);
-        allTeams.add(tottenham);
-        allTeams.add(astonVilla);
-        allTeams.add(newcastle);
-        allTeams.add(brighton);
-        allTeams.add(westHam);
-
-        Team manUnited = new Team(83, "Man United", "MNU");
-        Team crystalPalace = new Team(78, "Crystal Palace", "CRY");
-        Team fulham = new Team(77, "Fulham", "FUL");
-        Team bournemouth = new Team(76, "Bournemouth", "BOU");
-        Team wolves = new Team(77, "Wolves", "WOL");
-        Team everton = new Team(76, "Everton", "EVE");
-        Team brentford = new Team(76, "Brentford", "BRE");
-        Team southampton = new Team(75, "Southampton", "SOU");
-        Team leicester = new Team(75, "Leicester", "LEI");
-        Team ipswich = new Team(74, "Ipswich", "IPS");
 
         // Man United Players
         manUnited.addPlayer(new Player(40, 87, 13.0, "ATT", "Højlund", manUnited));
@@ -276,19 +239,7 @@ public class MainWindow extends JFrame implements ActionListener{
         ipswich.addPlayer(new Player(76, 78, 6.5, "ATT", "Moore", ipswich));
         ipswich.addPlayer(new Player(77, 77, 5.5, "MID", "Luongo", ipswich));
         ipswich.addPlayer(new Player(78, 75, 4.0, "DEF", "Burgess", ipswich));
-        ipswich.addPlayer(new Player(79, 74, 3.0, "GK", "Hladky", ipswich));
-
-        // Add all new teams to the list
-        allTeams.add(manUnited);
-        allTeams.add(crystalPalace);
-        allTeams.add(fulham);
-        allTeams.add(bournemouth);
-        allTeams.add(wolves);
-        allTeams.add(everton);
-        allTeams.add(brentford);
-        allTeams.add(southampton);
-        allTeams.add(leicester);
-        allTeams.add(ipswich);
+        ipswich.addPlayer(new Player(79, 74, 3.0, "GK", "Hladky", ipswich));*/
 
         allPlayers = new ArrayList<Player>();
         for(Team t : allTeams){
@@ -304,7 +255,7 @@ public class MainWindow extends JFrame implements ActionListener{
         fixtureList = new FixtureList();
 
         Team homeTeam = null;
-        for(int i = 0; i < allTeams.size(); i++)
+        for(int i = 0; i < 4; i++)
         {
             if(i % 2 == 0){
                 homeTeam = allTeams.get(i);
@@ -315,7 +266,7 @@ public class MainWindow extends JFrame implements ActionListener{
         }
 
         Team awayTeam = null;
-        for(int i = 0; i < allTeams.size(); i++)
+        for(int i = 0; i < 4; i++)
         {
             if(i % 2 == 0){
                 awayTeam = allTeams.get(i);

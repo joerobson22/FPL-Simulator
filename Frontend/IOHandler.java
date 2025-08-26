@@ -107,4 +107,28 @@ public class IOHandler {
 
         return players;
     }
+
+    public static ArrayList<Team> readAllTeamData(){
+        ArrayList<Team> teams = new ArrayList<>();
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader("allTeams.txt"));
+            String line = reader.readLine();
+
+            while(line != null)
+            {
+                ArrayList<String> lineInfo = new ArrayList<String>(Arrays.asList(line.split(",")));
+
+                String name = lineInfo.get(0);
+                String abbrv = lineInfo.get(1);
+
+                teams.add(new Team(0, name, abbrv));
+                line = reader.readLine();
+            }
+        }
+        catch(IOException e){
+            System.out.println(e.getStackTrace());
+        }
+
+        return teams;
+    }
 }
