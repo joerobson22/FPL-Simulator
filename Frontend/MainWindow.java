@@ -126,10 +126,10 @@ public class MainWindow extends JFrame implements ActionListener{
     private void setupTeams(){
         allTeams = new ArrayList<>();
 
-        Team liverpool = new Team(90, "Liverpool");
-        Team manCity = new Team(85, "Man City");
-        Team nttmForest = new Team(78, "Nottingham Forest");
-        Team arsenal = new Team(88, "Arsenal");
+        Team liverpool = new Team(90, "Liverpool", "LIV");
+        Team manCity = new Team(85, "Man City", "MCI");
+        Team nttmForest = new Team(78, "Nottingham Forest", "NFO");
+        Team arsenal = new Team(88, "Arsenal", "ARS");
 
         liverpool.addPlayer(new Player(0, 95, 14.5, "ATT", "Salah", liverpool));
         liverpool.addPlayer(new Player(1, 90, 8.5, "MID", "Wirtz", liverpool));
@@ -156,12 +156,12 @@ public class MainWindow extends JFrame implements ActionListener{
         allTeams.add(nttmForest);
         allTeams.add(arsenal);
         
-        Team chelsea = new Team(84, "Chelsea");
-        Team tottenham = new Team(83, "Tottenham");
-        Team astonVilla = new Team(82, "Aston Villa");
-        Team newcastle = new Team(83, "Newcastle");
-        Team brighton = new Team(80, "Brighton");
-        Team westHam = new Team(79, "West Ham");
+        Team chelsea = new Team(84, "Chelsea", "CHE");
+        Team tottenham = new Team(83, "Tottenham", "TOT");
+        Team astonVilla = new Team(82, "Aston Villa", "AVL");
+        Team newcastle = new Team(83, "Newcastle", "NEW");
+        Team brighton = new Team(80, "Brighton", "BHA");
+        Team westHam = new Team(79, "West Ham", "WHU");
 
         // Chelsea Players
         chelsea.addPlayer(new Player(16, 88, 12.0, "ATT", "Palmer", chelsea));
@@ -207,16 +207,16 @@ public class MainWindow extends JFrame implements ActionListener{
         allTeams.add(brighton);
         allTeams.add(westHam);
 
-        Team manUnited = new Team(83, "Man United");
-        Team crystalPalace = new Team(78, "Crystal Palace");
-        Team fulham = new Team(77, "Fulham");
-        Team bournemouth = new Team(76, "Bournemouth");
-        Team wolves = new Team(77, "Wolves");
-        Team everton = new Team(76, "Everton");
-        Team brentford = new Team(76, "Brentford");
-        Team southampton = new Team(75, "Southampton");
-        Team leicester = new Team(75, "Leicester");
-        Team ipswich = new Team(74, "Ipswich");
+        Team manUnited = new Team(83, "Man United", "MNU");
+        Team crystalPalace = new Team(78, "Crystal Palace", "CRY");
+        Team fulham = new Team(77, "Fulham", "FUL");
+        Team bournemouth = new Team(76, "Bournemouth", "BOU");
+        Team wolves = new Team(77, "Wolves", "WOL");
+        Team everton = new Team(76, "Everton", "EVE");
+        Team brentford = new Team(76, "Brentford", "BRE");
+        Team southampton = new Team(75, "Southampton", "SOU");
+        Team leicester = new Team(75, "Leicester", "LEI");
+        Team ipswich = new Team(74, "Ipswich", "IPS");
 
         // Man United Players
         manUnited.addPlayer(new Player(40, 87, 13.0, "ATT", "Højlund", manUnited));
