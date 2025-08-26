@@ -1,4 +1,4 @@
-package Java;
+package Frontend;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.lang.Math;
 
 public class MainWindow extends JFrame implements ActionListener{
+    private final String GAME_ENGINE_PATH = "Backend/GameEngine.exe";
 
     JPanel mainPanel;
     JPanel contentPanel;
@@ -374,7 +375,7 @@ public class MainWindow extends JFrame implements ActionListener{
             System.out.println("Calling GameEngine.exe");
 
             //GET THE MATCH SIMULATOR .EXE FILE PATH
-            File exeFile = new File("CPP/GameEngine.exe").getCanonicalFile();
+            File exeFile = new File(GAME_ENGINE_PATH).getCanonicalFile();
             System.out.println("GameEngine path: " + exeFile.getAbsolutePath());
             System.out.println("File exists: " + exeFile.exists());
             
@@ -387,7 +388,7 @@ public class MainWindow extends JFrame implements ActionListener{
             ProcessBuilder pb = new ProcessBuilder(exeFile.getAbsolutePath());
             pb.redirectErrorStream(true);
 
-            pb.directory(new File("CPP"));
+            pb.directory(new File("Backend"));
             System.out.println("Working directory: " + pb.directory().getAbsolutePath());
             
             //START THE MATCH SIMULATOR

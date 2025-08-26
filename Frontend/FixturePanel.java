@@ -1,4 +1,4 @@
-package Java;
+package Frontend;
 import javax.swing.*;
 import javax.swing.border.Border;
 

@@ -1,9 +1,10 @@
-package Java;
+package Frontend;
 import java.util.ArrayList;
 
 public class Team {
     private int rating;
     private String name;
+    private String abbrv;
 
     private int totalPoints;
     private int goalDifference;
@@ -11,7 +12,7 @@ public class Team {
     private ArrayList<Player> players;
 
     //constructor
-    public Team(int rating, String name){
+    public Team(int rating, String name, String abbrv){
         this.rating = rating;
         this.name = name;
 

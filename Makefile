@@ -1,14 +1,9 @@
-#THIS IS A SEPERATE MAKEFILE to the one in CPP because
-#idk i installed gcc on my windows machine and it doesn't reliably compile my .cpp file into an executable
-#therefore i have 2 makefiles, one to run in git bash and one to run in the MSYS2 MINGW64 Shell
-
-
 # Tools
 JAVAC = javac
 JAVA = java
 
 # Java sources and classes
-JAVA_SRCS = $(wildcard Java/*.java)
+JAVA_SRCS = $(wildcard Frontend/*.java)
 JAVA_CLASSES = $(JAVA_SRCS:.java=.class)
 
 # Targets
@@ -18,13 +13,13 @@ all: java_build run
 java_build: $(JAVA_CLASSES)
 
 # Rule: compile .java to .class only if needed
-Java/%.class: Java/%.java
+Frontend/%.class: Frontend/%.java
 	$(JAVAC) $<
 
 # Run Java frontend
 run:
-	$(JAVA) Java.Main
+	$(JAVA) -cp . Frontend.Main
 
-#clean
+# Clean
 clean:
-	rm -f Java/*.class
+	rm -f Frontend/*.class
