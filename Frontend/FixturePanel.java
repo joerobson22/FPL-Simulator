@@ -52,8 +52,8 @@ public class FixturePanel extends JPanel implements ActionListener{
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
         //setup all the labels for the score panel
-        homeTeam = setupDefaultLabel(fixture.getHomeTeam().getName());
-        awayTeam = setupDefaultLabel(fixture.getAwayTeam().getName());
+        homeTeam = setupDefaultLabel(fixture.getHomeTeam().getAbbrv());
+        awayTeam = setupDefaultLabel(fixture.getAwayTeam().getAbbrv());
         score = setupDefaultLabel(" vs ");
 
         actionButton = new JButton("Simulate");

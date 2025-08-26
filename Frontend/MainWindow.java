@@ -252,29 +252,7 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     private void setupFixtures(){
-        fixtureList = new FixtureList();
-
-        Team homeTeam = null;
-        for(int i = 0; i < 4; i++)
-        {
-            if(i % 2 == 0){
-                homeTeam = allTeams.get(i);
-            }
-            else{
-                fixtureList.addFixture(0, new Fixture(homeTeam, allTeams.get(i)));
-            }
-        }
-
-        Team awayTeam = null;
-        for(int i = 0; i < 4; i++)
-        {
-            if(i % 2 == 0){
-                awayTeam = allTeams.get(i);
-            }
-            else{
-                fixtureList.addFixture(1, new Fixture(allTeams.get(i), awayTeam));
-            }
-        }
+        fixtureList = IOHandler.readAllFixtures(allTeams);
     }
 
     private void setStats(int gameWeek){

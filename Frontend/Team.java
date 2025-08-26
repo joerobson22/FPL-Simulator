@@ -15,6 +15,7 @@ public class Team {
     public Team(int rating, String name, String abbrv){
         this.rating = rating;
         this.name = name;
+        this.abbrv = abbrv;
 
         totalPoints = 0;
         goalDifference = 0;
@@ -29,6 +30,10 @@ public class Team {
 
     public String getName(){
         return name;
+    }
+
+    public String getAbbrv(){
+        return abbrv;
     }
 
     public int getTotalPoints(){

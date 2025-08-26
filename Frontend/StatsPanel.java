@@ -29,6 +29,8 @@ public class StatsPanel extends JPanel implements ActionListener{
     private JButton viewLeagueButton;
     private JButton viewLeaderboardButton;
 
+    private JLabel topScorerTitleLabel;
+
     private Map<String, ArrayList<JLabel>> topScorersMap;
 
     String[] positions = {"GK", "DEF", "MID", "ATT"};
@@ -42,7 +44,7 @@ public class StatsPanel extends JPanel implements ActionListener{
         //create title panel
         topScorerPanel = new JPanel(new BorderLayout());
         JPanel topScorerTitlePanel = new JPanel();
-        JLabel topScorerTitleLabel = new JLabel("Weekly Top Scorers");
+        topScorerTitleLabel = new JLabel("Weekly Top Scorers");
         topScorerTitleLabel.setFont(new Font(topScorerFont, Font.BOLD, topScorerTitleSize));
         topScorerTitlePanel.add(topScorerTitleLabel);
         //create table of top scorers
@@ -102,6 +104,8 @@ public class StatsPanel extends JPanel implements ActionListener{
 
     public void updateStats(ArrayList<Player> allPlayers, int gameWeek){
         Map<String, ArrayList<Player>> players = new HashMap<>();
+
+        topScorerTitleLabel.setText("Gameweek " + String.valueOf(gameWeek + 1) + " Top Scorers");
 
         for(String p : positions){
             players.put(p, new ArrayList<>());

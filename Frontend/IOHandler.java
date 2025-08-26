@@ -124,11 +124,59 @@ public class IOHandler {
                 teams.add(new Team(0, name, abbrv));
                 line = reader.readLine();
             }
+
+            reader.close();
         }
         catch(IOException e){
             System.out.println(e.getStackTrace());
         }
 
         return teams;
+    }
+
+    public static FixtureList readAllFixtures(ArrayList<Team> allTeams){
+        FixtureList fixtureList = new FixtureList();
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader("allFixtures.txt"));
+            String line = reader.readLine();
+
+            int i = 0;
+            int gameWeek = 0;
+
+            while(line != null)
+            {
+                ArrayList<String> lineInfo = new ArrayList<String>(Arrays.asList(line.split(",")));
+
+                String home = lineInfo.get(0);
+                String away = lineInfo.get(1);
+
+                Team homeTeam = findTeam(home, allTeams);
+                Team awayTeam = findTeam(away, allTeams);
+                
+                fixtureList.addFixture(gameWeek, new Fixture(homeTeam, awayTeam));
+                i++;
+
+                if(i >= 10){
+                    i = 0;
+                    gameWeek++;
+                }
+
+                line = reader.readLine();
+            }
+
+            reader.close();
+        }
+        catch(IOException e){
+            System.out.println(e.getStackTrace());
+        }
+
+        return fixtureList;
+    }
+
+    private static Team findTeam(String name, ArrayList<Team> allTeams){
+        for(Team t : allTeams){
+            if(t.getName().equals(name)) return t;
+        }
+        return new Team(0, "NULL", "NULL");
     }
 }
