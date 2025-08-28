@@ -137,7 +137,7 @@ public class StatsPanel extends JPanel implements ActionListener{
                     Player temp = players.get(i);
                     players.set(i, players.get(i - 1));
                     players.set(i - 1, temp);
-
+                    
                     swaps = true;
                 }
             }

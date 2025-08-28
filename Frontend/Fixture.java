@@ -1,9 +1,12 @@
 package Frontend;
 import java.util.ArrayList;
 
+
 public class Fixture {
     private Team home;
     private Team away;
+    private ArrayList<Player> homeLineup;
+    private ArrayList<Player> awayLineup;
     private FixtureOutcome outcome;
     private boolean played;
 
@@ -40,26 +43,61 @@ public class Fixture {
         this.outcome = outcome;
     }
 
+    public void setHomeLineup(ArrayList<Player> players){
+        homeLineup = players;
+    }
+
+    public void setAwayLineup(ArrayList<Player> players){
+        awayLineup = players;
+    }
+
     public void allocatePointsAndChangeStats(){
+        System.out.println("Allocating points");
+
+        
+        System.out.println("Goals conceded");
+        //allocate manager favour for any goals conceded
+        for(Player p : homeLineup){
+            p.concedeGoals(outcome.getAwayGoals());
+        }
+        for(Player p : awayLineup){
+            p.concedeGoals(outcome.getHomeGoals());
+        }
+        
+        System.out.println("Goals scored");
         //allocate points for goals
         for(Player p : outcome.getGoalScorers()){
             p.scoreGoal();
         }
+        System.out.println("Assists");
         //allocate points for assists
         for(Player p : outcome.getAssisters()){
             p.makeAssist();
         }
+        System.out.println("Clean sheets");
         //allocate points for clean sheets
         for(Player p : outcome.getCleanSheets()){
             p.keepCleanSheet();
         }
 
+        System.out.println("Store weekly totals");
         //store weekly totals
         for(Player p : home.getPlayers()){
             p.addWeeklyToTotal();
         }
         for(Player p : away.getPlayers()){
             p.addWeeklyToTotal();
+        }
+
+        System.out.println("Manager favour for blanks");
+        //allocate manager favour for any blanks
+        for(Player p : homeLineup){
+            if(outcome.getGoalScorers().contains(p) || outcome.getAssisters().contains(p)) continue;
+            p.blank();
+        }
+        for(Player p : awayLineup){
+            if(outcome.getGoalScorers().contains(p) || outcome.getAssisters().contains(p)) continue;
+            p.blank();
         }
     }
 }

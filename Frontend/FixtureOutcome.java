@@ -25,8 +25,6 @@ public class FixtureOutcome {
         this.goalScorers = goalScorers;
         this.assisters = assisters;
         this.cleanSheets = cleanSheets;
-
-        //allocate points
     }
 
 

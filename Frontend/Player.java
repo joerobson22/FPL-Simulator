@@ -133,12 +133,14 @@ public class Player{
     }
 
     public void scoreGoal(){
+        //System.out.println("I am " + name + " and I scored!");
         numGoals++;
         weeklyPoints += PointLookupTable.getPointsForGoal(generalPosition);
         changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForGoal(generalPosition));
     }
 
     public void makeAssist(){
+        //System.out.println("I am " + name + " and I assisted!");
         numAssists++;
         weeklyPoints += PointLookupTable.getPointsForAssist();
         changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForAssist(generalPosition));

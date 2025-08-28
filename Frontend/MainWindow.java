@@ -124,9 +124,9 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     private void setupTeams(){
-        allTeams = IOHandler.readAllTeamData();
+        allTeams = IOHandler.readAllTeamData(allTeams);
 
-        allPlayers = IOHandler.readAllPlayerData(allTeams);
+        allPlayers = IOHandler.readAllPlayerData(allTeams, allPlayers);
 
         setStats(currentGameWeek);
     }
@@ -222,7 +222,7 @@ public class MainWindow extends JFrame implements ActionListener{
             System.out.println("GameEngine.exe exited with code " + exitCode + "!");
 
 
-
+            System.out.println("Complete!");
 
             //read the result of the fixture if exit code is 0
             if(exitCode == 0){
@@ -237,18 +237,20 @@ public class MainWindow extends JFrame implements ActionListener{
             }
             
 
-            System.out.println("Complete!");
+            
 
+            System.out.println("Allocating points");
             //ONCE a fixture is complete, allocate points to every player that played!
             fixture.allocatePointsAndChangeStats();
 
             if(!simulatingAll){
+                System.out.println("Update stats");
                 statsPanel.updateStats(allPlayers, currentGameWeek);
                 if(isGameWeekFinished(currentGameWeek)){
                     nextGameWeek();
                 }
             }
-            
+        
 
 
         }

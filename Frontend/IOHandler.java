@@ -18,6 +18,11 @@ public class IOHandler {
         try{
             FileWriter writer = new FileWriter("fixtureData.txt");
 
+            ArrayList<Player> homeLineup = fixture.getHomeTeam().getStartingXI();
+            ArrayList<Player> awayLineup = fixture.getAwayTeam().getStartingXI();
+            fixture.setHomeLineup(homeLineup);
+            fixture.setAwayLineup(awayLineup);
+
             //seed
             writer.write(String.valueOf(seed) + "\n");
 
@@ -29,12 +34,12 @@ public class IOHandler {
 
             //all players
             writer.write("HOME PLAYERS\n");
-            for(Player p : fixture.getHomeTeam().getStartingXI()){
+            for(Player p : homeLineup){
                 writer.write(p.toDictionaryString() + "\n");
             }
 
             writer.write("AWAY PLAYERS\n");
-            for(Player p : fixture.getAwayTeam().getStartingXI()){
+            for(Player p : awayLineup){
                 writer.write(p.toDictionaryString() + "\n");
             }
 
@@ -101,15 +106,18 @@ public class IOHandler {
         ArrayList<Player> players = new ArrayList<>();
 
         for(String id : ids){
-            if(!id.equals("") && !id.equals("GOAL SCORERS") && !id.equals("ASSISTERS") && !id.equals("CLEAN SHEETS")) 
-                players.add(allPlayers.get(Integer.parseInt(id)));
+            if(!id.equals("") && !id.equals("GOAL SCORERS") && !id.equals("ASSISTERS") && !id.equals("CLEAN SHEETS")){
+                Player p = allPlayers.get(Integer.parseInt(id));
+                System.out.println("Found player " + p.getName() + " with id " + id);
+                players.add(p);
+            }
         }
 
         return players;
     }
 
-    public static ArrayList<Team> readAllTeamData(){
-        ArrayList<Team> teams = new ArrayList<>();
+    public static ArrayList<Team> readAllTeamData(ArrayList<Team> allTeams){
+        allTeams = new ArrayList<>();
         try{
             BufferedReader reader = new BufferedReader(new FileReader("allTeams.txt"));
             String line = reader.readLine();
@@ -121,7 +129,7 @@ public class IOHandler {
                 String name = lineInfo.get(0);
                 String abbrv = lineInfo.get(1);
 
-                teams.add(new Team(0, name, abbrv));
+                allTeams.add(new Team(0, name, abbrv));
                 line = reader.readLine();
             }
 
@@ -131,7 +139,7 @@ public class IOHandler {
             System.out.println(e.getStackTrace());
         }
 
-        return teams;
+        return allTeams;
     }
 
     public static FixtureList readAllFixtures(ArrayList<Team> allTeams){
@@ -180,14 +188,14 @@ public class IOHandler {
         return new Team(0, "NULL", "NULL");
     }
 
-    public static ArrayList<Player> readAllPlayerData(ArrayList<Team> allTeams){
-        ArrayList<Player> allPlayers = new ArrayList<>();
+    public static ArrayList<Player> readAllPlayerData(ArrayList<Team> allTeams, ArrayList<Player> allPlayers){
+        allPlayers = new ArrayList<>();
 
         try{
             BufferedReader reader = new BufferedReader(new FileReader("allPlayers.txt"));
             String line = reader.readLine();
 
-            ArrayList<String> columns = new ArrayList<String>(Arrays.asList(line.split("\t")));
+            //ArrayList<String> columns = new ArrayList<String>(Arrays.asList(line.split("\t")));
 
             int id = 0;
             line = reader.readLine();

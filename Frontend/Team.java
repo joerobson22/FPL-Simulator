@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Team {
-    private static Map<String, Integer[]> minMaxPositions = Map.of(
-        "GK", new Integer[]{1, 1},
-        "DEF", new Integer[]{3, 5},
-        "MID", new Integer[]{3, 6},
-        "ATT", new Integer[]{1, 2}
+    private static Map<String, Integer> maxPositions = Map.of(
+        "GK", 1,
+        "DEF", 5,
+        "MID", 6,
+        "ATT", 2
     );
 
     private int rating;
@@ -59,7 +59,8 @@ public class Team {
 
     public ArrayList<Player> getStartingXI(){
         //FIRST sort all players in order of manager favour
-        ArrayList<Player> starting = bubbleSortPlayersMAR(players);
+        ArrayList<Player> tempPlayers = bubbleSortPlayersMAR(players);
+        ArrayList<Player> starting = new ArrayList<>();
 
         //SECOND run through each position in minMaxPositions
         Map<String, Integer> formation = new HashMap<>(Map.of(
@@ -72,18 +73,30 @@ public class Team {
         int totalPlayers = 0;
 
         while(totalPlayers < 11){
-            for(String key : minMaxPositions.keySet()){
-                if(formation.get(key) >= minMaxPositions.get(key)[1]) continue;
+            for(String key : maxPositions.keySet()){
+                System.out.println("looking at position: " + key);
+
+                if(formation.get(key) >= maxPositions.get(key)){
+                    System.out.println("Never mind, we already have " + String.valueOf(formation.get(key)) + " " + key + "s");
+                    continue;
+                }
 
                 for(Player p : players){
                     if(!p.getGeneralPosition().equals(key)) continue;
+                    if(starting.contains(p)) continue;
+
+                    System.out.println("We found " + p.getName() + "(" + p.getGeneralPosition() + ")!");
+                    System.out.println();
 
                     starting.add(p);
                     formation.merge(key, 1, Integer::sum);
+                    totalPlayers++;
+
+                    tempPlayers.remove(p);
+                    break;
                 }
             }
         }
-        
 
         return starting;
     }
@@ -106,7 +119,12 @@ public class Team {
             n--;
         }
 
-        return players;
+        ArrayList<Player> duplicateArray = new ArrayList<>();
+        for(Player p : players){
+            duplicateArray.add(p);
+        }
+
+        return duplicateArray;
     }
 
     //mutators
