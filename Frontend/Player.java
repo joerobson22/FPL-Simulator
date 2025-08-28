@@ -6,6 +6,7 @@ public class Player{
     private int playerID;
 
     private int rating;
+    private int managerApprovalRating;
     private double price;
 
     private String specificPosition;
@@ -34,6 +35,7 @@ public class Player{
         this.playerID = id;
         this.name = name;
         this.rating = rating;
+        managerApprovalRating = rating * 10;
         this.specificPosition = specificPosition;
         this.teamPosition = teamPosition;
         this.team = team;
@@ -66,6 +68,10 @@ public class Player{
 
     public int getRating(){
         return rating;
+    }
+
+    public int getManagerApprovalRating(){
+        return managerApprovalRating;
     }
 
     public double getPrice(){
@@ -122,19 +128,34 @@ public class Player{
     }
 
     //mutators
+    public void changeManagerApprovalRating(int amount){
+        managerApprovalRating += amount;
+    }
+
     public void scoreGoal(){
         numGoals++;
         weeklyPoints += PointLookupTable.getPointsForGoal(generalPosition);
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForGoal(generalPosition));
     }
 
     public void makeAssist(){
         numAssists++;
         weeklyPoints += PointLookupTable.getPointsForAssist();
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForAssist(generalPosition));
+    }
+
+    public void blank(){
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForBlank(generalPosition));
     }
 
     public void keepCleanSheet(){
         numCleanSheets++;
         weeklyPoints += PointLookupTable.getPointsForCleanSheet(generalPosition);
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForCleanSheet(generalPosition));
+    }
+
+    public void concedeGoals(int numGoals){
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForGoalConceded(generalPosition) * numGoals);
     }
 
     public void setPrice(double price){
