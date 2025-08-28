@@ -30,7 +30,8 @@ class Player{
     private:
     int id;
     int rating;
-    string position;
+    string specificPosition;
+    string generalPosition;
     string name;
     int goals;
     int assists;
@@ -65,8 +66,11 @@ class Player{
         else if(p.first == "rating"){
             rating = stoi(p.second);
         }
-        else if(p.first == "position"){
-            position = p.second;
+        else if(p.first == "specificPosition"){
+            specificPosition = p.second;
+        }
+        else if(p.first == "generalPosition"){
+            generalPosition = p.second;
         }
         else if(p.first == "name"){
             name = p.second;
@@ -84,7 +88,8 @@ class Player{
 
     int getID(){ return id; }
     int getRating(){ return rating; }
-    string getPosition(){ return position; }
+    string getSpecificPosition(){ return specificPosition; }
+    string getGeneralPosition(){ return generalPosition; }
     string getName(){ return name; }
     int getGoals(){ return goals; }
     int getAssists(){ return assists; }
@@ -92,7 +97,7 @@ class Player{
     void outputPlayer(){
         cout << "name: " + name + "\n";
         cout << "rating: " + to_string(rating);
-        cout << "\nposition: " + position + "\n";
+        cout << "\nposition: " + specificPosition + "\n";
     }
 };
 
@@ -131,7 +136,7 @@ class Team{
     }
     void addPlayer(Player& player){ 
         players.push_back(player);
-        team[player.getPosition()].push_back(player);
+        team[player.getGeneralPosition()].push_back(player);
     }
 
     string getGoalScorersDictionary(){
@@ -159,7 +164,7 @@ class Team{
         if(cleanSheet){
             cout << "CLEAN SHEET!\n";
             for(int i = 0; i < players.size(); i++){
-                if(!validCleanSheetPosition(players[i].getPosition())) continue;
+                if(!validCleanSheetPosition(players[i].getGeneralPosition())) continue;
                 if(output != "") output += ",";
 
                 output += to_string(players[i].getID());

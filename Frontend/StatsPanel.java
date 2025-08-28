@@ -111,7 +111,7 @@ public class StatsPanel extends JPanel implements ActionListener{
             players.put(p, new ArrayList<>());
         }
         for(Player p : allPlayers){
-            players.get(p.getPosition()).add(p);
+            players.get(p.getGeneralPosition()).add(p);
         }
 
         for(String p : positions){

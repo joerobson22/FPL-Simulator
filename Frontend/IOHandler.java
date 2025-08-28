@@ -29,12 +29,12 @@ public class IOHandler {
 
             //all players
             writer.write("HOME PLAYERS\n");
-            for(Player p : fixture.getHomeTeam().getPlayers()){
+            for(Player p : fixture.getHomeTeam().getStartingXI()){
                 writer.write(p.toDictionaryString() + "\n");
             }
 
             writer.write("AWAY PLAYERS\n");
-            for(Player p : fixture.getAwayTeam().getPlayers()){
+            for(Player p : fixture.getAwayTeam().getStartingXI()){
                 writer.write(p.toDictionaryString() + "\n");
             }
 
@@ -178,5 +178,56 @@ public class IOHandler {
             if(t.getName().equals(name)) return t;
         }
         return new Team(0, "NULL", "NULL");
+    }
+
+    public static ArrayList<Player> readAllPlayerData(ArrayList<Team> allTeams){
+        ArrayList<Player> allPlayers = new ArrayList<>();
+
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader("allPlayers.txt"));
+            String line = reader.readLine();
+
+            ArrayList<String> columns = new ArrayList<String>(Arrays.asList(line.split("\t")));
+
+            int id = 0;
+            line = reader.readLine();
+
+            while(line != null)
+            {
+                ArrayList<String> lineInfo = new ArrayList<String>(Arrays.asList(line.split("\t")));
+
+                String name = lineInfo.get(1);
+                String teamName = lineInfo.get(2);
+                String specificPosition = new ArrayList<String>(Arrays.asList(lineInfo.get(3).split(","))).get(0);
+                String teamPosition = lineInfo.get(4);
+                int rating = Integer.parseInt(lineInfo.get(5));
+                
+                ArrayList<Integer> attributes = new ArrayList<>();
+
+                if(!specificPosition.equals("GK")){
+                    for(int i = 6; i < lineInfo.size(); i++){
+                        attributes.add((int) Double.parseDouble(lineInfo.get(i)));
+                    }
+                }
+
+                Team playerTeam = findTeam(teamName, allTeams);
+                if(!playerTeam.getName().equals("NULL")){
+                    Player newPlayer = new Player(id++, name, rating, specificPosition, teamPosition, playerTeam, attributes);
+                    playerTeam.addPlayer(newPlayer);
+                    allPlayers.add(newPlayer);
+                }
+
+                
+            
+                line = reader.readLine();
+            }
+
+            reader.close();
+        }
+        catch(IOException e){
+            System.out.println(e.getStackTrace());
+        }
+
+        return allPlayers;
     }
 }

@@ -8,9 +8,18 @@ public class Player{
     private int rating;
     private double price;
 
-    private String position;
+    private String specificPosition;
+    private String generalPosition;
+    private String teamPosition;
     private String name;
     private Team team;
+
+    private int pace;
+    private int shooting;
+    private int passing;
+    private int dribbling;
+    private int defending;
+    private int physical;
 
     private int totalPoints;
     private int weeklyPoints;
@@ -20,23 +29,35 @@ public class Player{
     private ArrayList<Integer> weeklyPointHistory;
 
     //constructor
-    public Player(int id, int rating, double price, String position, String name, Team team)
+    public Player(int id, String name, int rating, String specificPosition, String teamPosition, Team team, ArrayList<Integer> attributes)
     {
         this.playerID = id;
-
-        this.rating = rating;
-        this.price = price;
-        this.position = position;
         this.name = name;
+        this.rating = rating;
+        this.specificPosition = specificPosition;
+        this.teamPosition = teamPosition;
         this.team = team;
-        weeklyPointHistory = new ArrayList<>();
 
+        if(!specificPosition.equals("GK")) setAttributes(attributes);
+        generalPosition = PositionLookupTable.getGeneralPosition(specificPosition);
+
+        price = 0;
+
+        weeklyPointHistory = new ArrayList<>();
         totalPoints = 0;
         numGoals = 0;
         numAssists = 0;
         numCleanSheets = 0;
     }
 
+    private void setAttributes(ArrayList<Integer> attributes){
+        this.pace = attributes.get(0);
+        this.shooting = attributes.get(1);
+        this.passing = attributes.get(2);
+        this.dribbling = attributes.get(3);
+        this.defending = attributes.get(4);
+        this.physical = attributes.get(5);
+    }
 
     //accessors
     public int getID(){
@@ -51,8 +72,16 @@ public class Player{
         return price;
     }
 
-    public String getPosition(){
-        return position;
+    public String getSpecificPosition(){
+        return specificPosition;
+    }
+
+    public String getGeneralPosition(){
+        return generalPosition;
+    }
+
+    public String getTeamPosition(){
+        return teamPosition;
     }
 
     public String getName(){
@@ -84,7 +113,7 @@ public class Player{
     }
 
     public String toDictionaryString(){
-        return String.format("id:%d,rating:%d,position:%s,name:%s", playerID, rating, position, name);
+        return String.format("id:%d,rating:%d,specificPosition:%s,generalPosition:%s,name:%s", playerID, rating, specificPosition, generalPosition, name);
     }
 
     public int getGameWeekPoints(int gameWeek){
@@ -95,7 +124,7 @@ public class Player{
     //mutators
     public void scoreGoal(){
         numGoals++;
-        weeklyPoints += PointLookupTable.getPointsForGoal(position);
+        weeklyPoints += PointLookupTable.getPointsForGoal(generalPosition);
     }
 
     public void makeAssist(){
@@ -105,7 +134,11 @@ public class Player{
 
     public void keepCleanSheet(){
         numCleanSheets++;
-        weeklyPoints += PointLookupTable.getPointsForCleanSheet(position);
+        weeklyPoints += PointLookupTable.getPointsForCleanSheet(generalPosition);
+    }
+
+    public void setPrice(double price){
+        this.price = price;
     }
 
     public void changePrice(double change){
@@ -127,17 +160,5 @@ public class Player{
 
     public void changeWeeklyPoints(int change){
         weeklyPoints += change;
-    }
-
-    public void increaseNumGoals(int increase){
-        numGoals += Math.abs(increase);
-    }
-
-    public void increaseNumAssists(int increase){
-        numAssists += Math.abs(increase);
-    }
-
-    public void increaseNumCleanSheets(){
-        numCleanSheets++;
     }
 }

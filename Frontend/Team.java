@@ -48,6 +48,47 @@ public class Team {
         return players;
     }
 
+    public ArrayList<Player> getStartingXI(){
+        ArrayList<Player> starting = new ArrayList<Player>();
+        for(Player p : players){
+            String pos = p.getTeamPosition();
+            System.out.println(pos);
+
+            if (pos == null || pos.isBlank()) continue;
+            if(pos.equals("SUB") || pos.equals("RES")) continue;
+
+            System.out.println("Added!");
+            starting.add(p);
+        }
+
+        starting = bubbleSortPlayers(starting);
+        ArrayList<Player> finalXI = new ArrayList<Player>();
+
+        for(int i = 0; i < 11; i++) finalXI.add(starting.get(i));
+
+        return finalXI;
+    }
+
+    public ArrayList<Player> bubbleSortPlayers(ArrayList<Player> players){
+        boolean swaps = true;
+        while(swaps){
+            swaps = false;
+            int n = players.size();
+            for(int i = 1; i < n; i++){
+                if(players.get(i).getRating() > players.get(i - 1).getRating()){
+                    //swap the players
+                    Player temp = players.get(i);
+                    players.set(i, players.get(i - 1));
+                    players.set(i - 1, temp);
+
+                    swaps = true;
+                }
+            }
+            n--;
+        }
+
+        return players;
+    }
 
     //mutators
     public void increaseTotalPoints(int increase){
