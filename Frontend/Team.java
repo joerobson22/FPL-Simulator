@@ -98,6 +98,8 @@ public class Team {
             }
         }
 
+        starting = bubbleSortPlayersPosition(starting);
+
         return starting;
     }
 
@@ -108,6 +110,32 @@ public class Team {
             int n = players.size();
             for(int i = 1; i < n; i++){
                 if(players.get(i).getManagerApprovalRating() > players.get(i - 1).getManagerApprovalRating()){
+                    //swap the players
+                    Player temp = players.get(i);
+                    players.set(i, players.get(i - 1));
+                    players.set(i - 1, temp);
+
+                    swaps = true;
+                }
+            }
+            n--;
+        }
+
+        ArrayList<Player> duplicateArray = new ArrayList<>();
+        for(Player p : players){
+            duplicateArray.add(p);
+        }
+
+        return duplicateArray;
+    }
+
+    public ArrayList<Player> bubbleSortPlayersPosition(ArrayList<Player> players){
+        boolean swaps = true;
+        while(swaps){
+            swaps = false;
+            int n = players.size();
+            for(int i = 1; i < n; i++){
+                if(players.get(i).getPositionIndex() < players.get(i - 1).getPositionIndex()){
                     //swap the players
                     Player temp = players.get(i);
                     players.set(i, players.get(i - 1));

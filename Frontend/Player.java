@@ -2,6 +2,8 @@ package Frontend;
 
 import java.util.ArrayList;
 
+import javax.swing.text.Position;
+
 public class Player{
     private int playerID;
 
@@ -11,6 +13,7 @@ public class Player{
 
     private String specificPosition;
     private String generalPosition;
+    private int positionIndex;
     private String teamPosition;
     private String name;
     private Team team;
@@ -42,6 +45,7 @@ public class Player{
 
         if(!specificPosition.equals("GK")) setAttributes(attributes);
         generalPosition = PositionLookupTable.getGeneralPosition(specificPosition);
+        positionIndex = PositionLookupTable.getPositionIndex(specificPosition);
 
         price = 0;
 
@@ -85,6 +89,10 @@ public class Player{
 
     public String getGeneralPosition(){
         return generalPosition;
+    }
+
+    public int getPositionIndex(){
+        return positionIndex;
     }
 
     public String getTeamPosition(){
