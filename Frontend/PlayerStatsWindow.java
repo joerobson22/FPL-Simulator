@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class PlayerStatsWindow extends JFrame{
 
@@ -145,7 +144,7 @@ public class PlayerStatsWindow extends JFrame{
             else if(title == "Assists") quantity = p.getNumAssists();
             else if(title == "Clean Sheets") quantity = p.getNumCleanSheets();
 
-            String text = String.valueOf(quantity) + " " + "| " + p.getName() + " - " + p.getTeam().getAbbrv() + " (" + p.getGeneralPosition() + ")";
+            String text = String.valueOf(quantity) + " " + "| " + p.getTeam().getAbbrv() + " (" + p.getGeneralPosition() + ")  " + p.getName();
             JLabel entryLabel = LabelCreator.createJLabel(padding + text, font, columnBodySize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK);
 
             panel.add(entryLabel);
