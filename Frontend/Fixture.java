@@ -51,6 +51,9 @@ public class Fixture {
     public void playFixture(FixtureOutcome outcome){
         played = true;
         this.outcome = outcome;
+
+        home.calculateThisOutcome(this);
+        away.calculateThisOutcome(this);
     }
 
     public void setHomeLineup(ArrayList<Player> players){

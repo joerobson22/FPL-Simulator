@@ -2,7 +2,7 @@ package Frontend;
 
 public class PositionLookupTable {
     private static String[] gk = {"gk"};
-    private static String[] def = {"lwb", "rwb", "lb", "lcb", "cb", "rcb", "rb"};
+    private static String[] def = {"lwb", "rwb", "lb", "rb", "lcb", "cb", "rcb"};
     private static String[] mid = { "ldm", "cdm", "rdm",  "lm", "lcm", "cm", "rcm", "rm", "lam", "cam", "ram", "lw", "rw"};
     private static String[] att = {"ls", "rs", "lf", "cf", "rf", "st"};
 

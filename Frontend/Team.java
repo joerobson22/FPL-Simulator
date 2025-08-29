@@ -7,7 +7,7 @@ public class Team {
     private static Map<String, Integer> maxPositions = Map.of(
         "GK", 1,
         "DEF", 5,
-        "MID", 6,
+        "MID", 7,
         "ATT", 2
     );
 
@@ -103,7 +103,7 @@ public class Team {
         return starting;
     }
 
-    public ArrayList<Player> bubbleSortPlayersMAR(ArrayList<Player> players){
+    private ArrayList<Player> bubbleSortPlayersMAR(ArrayList<Player> players){
         boolean swaps = true;
         while(swaps){
             swaps = false;
@@ -129,7 +129,7 @@ public class Team {
         return duplicateArray;
     }
 
-    public ArrayList<Player> bubbleSortPlayersPosition(ArrayList<Player> players){
+    private ArrayList<Player> bubbleSortPlayersPosition(ArrayList<Player> players){
         boolean swaps = true;
         while(swaps){
             swaps = false;
@@ -156,11 +156,31 @@ public class Team {
     }
 
     //mutators
-    public void increaseTotalPoints(int increase){
+    public void calculateThisOutcome(Fixture fixture){
+        boolean home = fixture.getHomeTeam() == this;
+        int homeGoals = fixture.getOutcome().getHomeGoals();
+        int awayGoals = fixture.getOutcome().getAwayGoals();
+        int goalDifferenceChange = 0;
+
+        //calculate change in gd
+        if(home) goalDifferenceChange = homeGoals - awayGoals;
+        else goalDifferenceChange = awayGoals - homeGoals;
+
+        //if positive, we won
+        if(goalDifferenceChange > 0) increaseTotalPoints(3);
+        //if neutral, we drew
+        else if (goalDifferenceChange == 0) increaseTotalPoints(1);
+        //otherwise we lost, no point change
+
+        //change goal difference
+        changeGoalDifference(goalDifferenceChange);
+    }
+
+    private void increaseTotalPoints(int increase){
         totalPoints += Math.abs(increase);
     }
 
-    public void changeGoalDifference(int change){
+    private void changeGoalDifference(int change){
         goalDifference += change;
     }
 
