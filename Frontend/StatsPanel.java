@@ -32,7 +32,7 @@ public class StatsPanel extends JPanel implements ActionListener{
 
     private JPanel leagueTablePanel;
 
-    private JButton viewLeagueButton;
+    private JButton viewPlayerStatsButton;
     private JButton viewLeaderboardButton;
 
     private JLabel topScorerTitleLabel;
@@ -118,10 +118,12 @@ public class StatsPanel extends JPanel implements ActionListener{
         //create buttons panel
         buttonsPanel = new JPanel();
         //create associated buttons
-        viewLeagueButton = new JButton("League >>");
+        viewPlayerStatsButton = new JButton("Player Stats >>");
+        viewPlayerStatsButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
         viewLeaderboardButton = new JButton("Leaderboards >>");
+        viewLeaderboardButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
         //add to button panel
-        buttonsPanel.add(viewLeagueButton);
+        buttonsPanel.add(viewPlayerStatsButton);
         buttonsPanel.add(viewLeaderboardButton);
 
         //add both top scorer panel and buttons panel to the stats panel
