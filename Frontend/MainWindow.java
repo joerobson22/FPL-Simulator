@@ -45,6 +45,8 @@ public class MainWindow extends JFrame implements ActionListener{
     int viewingGameWeek = 0;
 
     public MainWindow(User user){
+        setupTeams();
+
         this.user = user;
 
         Border blackline = BorderFactory.createLineBorder(Color.black);
@@ -74,7 +76,7 @@ public class MainWindow extends JFrame implements ActionListener{
         teamSelectionPanel.setBackground(teamSelectionPanelBackgroundColor);
         teamSelectionPanel.setBorder(blackline);
 
-        statsPanel = new StatsPanel();
+        statsPanel = new StatsPanel(allTeams);
         statsPanel.setBackground(statsPanelBackgroundColor);
         statsPanel.setBorder(blackline);
 
@@ -102,9 +104,7 @@ public class MainWindow extends JFrame implements ActionListener{
 
         fixtureList = new FixtureList();
 
-        setupTeams();
         setupFixtures();
-
         updateAllVisuals();
     }
 
@@ -127,8 +127,6 @@ public class MainWindow extends JFrame implements ActionListener{
         allTeams = IOHandler.readAllTeamData(allTeams);
 
         allPlayers = IOHandler.readAllPlayerData(allTeams, allPlayers);
-
-        setStats(currentGameWeek);
     }
 
     private void setupFixtures(){
@@ -242,6 +240,8 @@ public class MainWindow extends JFrame implements ActionListener{
             System.out.println("Allocating points");
             //ONCE a fixture is complete, allocate points to every player that played!
             fixture.allocatePointsAndChangeStats(currentGameWeek);
+
+            statsPanel.sortLeagueTable();
 
             if(!simulatingAll){
                 System.out.println("Update stats");

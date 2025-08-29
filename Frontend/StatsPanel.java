@@ -36,10 +36,12 @@ public class StatsPanel extends JPanel implements ActionListener{
     private JLabel topScorerTitleLabel;
 
     private Map<String, ArrayList<JLabel>> topScorersMap;
+    ArrayList<Team> teams;
+    ArrayList<LeagueTableTeamPanel> leagueTable;
 
     String[] positions = {"GK", "DEF", "MID", "ATT"};
 
-    public StatsPanel(){
+    public StatsPanel(ArrayList<Team> teams){
         //set this panel's layout
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -84,6 +86,20 @@ public class StatsPanel extends JPanel implements ActionListener{
         topScorerPanel.add(topScorerContentPanel, "Center");
 
 
+        this.teams = teams;
+        leagueTable = new ArrayList<>();
+        leagueTablePanel = new JPanel();
+        leagueTablePanel.setLayout(new BoxLayout(leagueTablePanel, BoxLayout.Y_AXIS));
+
+        for(int i = 0; i < teams.size(); i++){
+            leagueTable.add(new LeagueTableTeamPanel(teams.get(i), i + 1));
+        }
+
+        for(LeagueTableTeamPanel panel : leagueTable){
+            leagueTablePanel.add(panel);
+        }
+
+
         //create buttons panel
         buttonsPanel = new JPanel();
         //create associated buttons
@@ -95,6 +111,7 @@ public class StatsPanel extends JPanel implements ActionListener{
 
         //add both top scorer panel and buttons panel to the stats panel
         this.add(topScorerPanel);
+        this.add(leagueTablePanel);
         this.add(buttonsPanel);
     }
 
@@ -107,6 +124,7 @@ public class StatsPanel extends JPanel implements ActionListener{
     }
 
     public void updateStats(ArrayList<Player> allPlayers, int gameWeek){
+        //SORT ALL PLAYERS BY POINTS SCORED THIS GAMEWEEK
         Map<String, ArrayList<Player>> players = new HashMap<>();
 
         topScorerTitleLabel.setText("Gameweek " + String.valueOf(gameWeek + 1) + " Top Scorers");
@@ -130,6 +148,15 @@ public class StatsPanel extends JPanel implements ActionListener{
         }
     }
 
+    public void sortLeagueTable(){
+        //SORT THE LEAGUE TABLE
+        bubbleSortLeagueTable();
+        //update the league table visuals
+        for(LeagueTableTeamPanel panel : leagueTable){
+            panel.update();
+        }
+    }
+
     public ArrayList<Player> bubbleSortPlayers(ArrayList<Player> players, int gameWeek){
         boolean swaps = true;
         while(swaps){
@@ -149,6 +176,20 @@ public class StatsPanel extends JPanel implements ActionListener{
         }
 
         return players;
+    }
+
+    public void bubbleSortLeagueTable(){
+        boolean swaps = true;
+        while(swaps){
+            swaps = false;
+            for(int i = 1; i < leagueTable.size(); i++){
+                LeagueTableTeamPanel current = leagueTable.get(i);
+                LeagueTableTeamPanel prev = leagueTable.get(i - 1);
+                if(current.checkSwapWith(prev)){
+                    current.swapTeamWith(prev);
+                }
+            }
+        }
     }
 
     public void actionPerformed(ActionEvent e){

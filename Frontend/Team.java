@@ -15,6 +15,9 @@ public class Team {
     private String name;
     private String abbrv;
 
+    private int numWins;
+    private int numDraws;
+    private int numLosses;
     private int totalPoints;
     private int goalDifference;
 
@@ -26,6 +29,9 @@ public class Team {
         this.name = name;
         this.abbrv = abbrv;
 
+        numWins = 0;
+        numDraws = 0;
+        numLosses = 0;
         totalPoints = 0;
         goalDifference = 0;
         players = new ArrayList<Player>();
@@ -43,6 +49,18 @@ public class Team {
 
     public String getAbbrv(){
         return abbrv;
+    }
+
+    public int getNumWins(){
+        return numWins;
+    }
+
+    public int getNumDraws(){
+        return numDraws;
+    }
+
+    public int getNumLosses(){
+        return numLosses;
     }
 
     public int getTotalPoints(){
@@ -167,13 +185,28 @@ public class Team {
         else goalDifferenceChange = awayGoals - homeGoals;
 
         //if positive, we won
-        if(goalDifferenceChange > 0) increaseTotalPoints(3);
+        if(goalDifferenceChange > 0) win();
         //if neutral, we drew
-        else if (goalDifferenceChange == 0) increaseTotalPoints(1);
+        else if (goalDifferenceChange == 0) draw();
         //otherwise we lost, no point change
+        else lose();
 
         //change goal difference
         changeGoalDifference(goalDifferenceChange);
+    }
+
+    private void win(){
+        numWins++;
+        increaseTotalPoints(3);
+    }
+
+    private void draw(){
+        numDraws++;
+        increaseTotalPoints(1);
+    }
+
+    private void lose(){
+        numLosses++;
     }
 
     private void increaseTotalPoints(int increase){
