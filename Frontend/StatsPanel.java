@@ -186,6 +186,7 @@ public class StatsPanel extends JPanel implements ActionListener{
                 LeagueTableTeamPanel current = leagueTable.get(i);
                 LeagueTableTeamPanel prev = leagueTable.get(i - 1);
                 if(current.checkSwapWith(prev)){
+                    swaps = true;
                     current.swapTeamWith(prev);
                 }
             }
