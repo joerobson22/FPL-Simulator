@@ -5,19 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOError;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class StatsPanel extends JPanel implements ActionListener{
+    MainWindow mainWindow;
+
     private final String topScorerFont = "SansSerif";
     private final int topScorerTitleSize = 25;
     private final int topScorerTableSize = 11;
@@ -43,7 +37,9 @@ public class StatsPanel extends JPanel implements ActionListener{
 
     String[] positions = {"GK", "DEF", "MID", "ATT"};
 
-    public StatsPanel(ArrayList<Team> teams){
+    public StatsPanel(MainWindow mainWindow, ArrayList<Team> teams){
+        this.mainWindow = mainWindow;
+
         //set this panel's layout
         this.setLayout(new BorderLayout());
 
@@ -120,8 +116,10 @@ public class StatsPanel extends JPanel implements ActionListener{
         //create associated buttons
         viewPlayerStatsButton = new JButton("Player Stats >>");
         viewPlayerStatsButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        viewPlayerStatsButton.addActionListener(this);
         viewLeaderboardButton = new JButton("Leaderboards >>");
         viewLeaderboardButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        viewLeaderboardButton.addActionListener(this);
         //add to button panel
         buttonsPanel.add(viewPlayerStatsButton);
         buttonsPanel.add(viewLeaderboardButton);
@@ -203,6 +201,8 @@ public class StatsPanel extends JPanel implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent e){
-
+        if(viewPlayerStatsButton == e.getSource()){
+            mainWindow.viewPlayerStats();
+        }
     }
 }

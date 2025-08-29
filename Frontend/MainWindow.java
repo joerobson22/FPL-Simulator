@@ -9,13 +9,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import java.lang.Math;
 
 public class MainWindow extends JFrame implements ActionListener{
     private final String GAME_ENGINE_PATH = "Backend/GameEngine.exe";
@@ -81,7 +76,7 @@ public class MainWindow extends JFrame implements ActionListener{
         teamSelectionPanel.setBackground(teamSelectionPanelBackgroundColor);
         teamSelectionPanel.setBorder(blackline);
 
-        statsPanel = new StatsPanel(allTeams);
+        statsPanel = new StatsPanel(this, allTeams);
         statsPanel.setBackground(statsPanelBackgroundColor);
         statsPanel.setBorder(blackline);
 
@@ -289,6 +284,10 @@ public class MainWindow extends JFrame implements ActionListener{
         for(Player p : allPlayers){
             p.resetWeeklyPoints();
         }
+    }
+
+    public void viewPlayerStats(){
+        PlayerStatsWindow psw = new PlayerStatsWindow(allPlayers);
     }
 
 
