@@ -35,6 +35,8 @@ class Player{
     string name;
     int goals;
     int assists;
+    int minsPlayed;
+    bool sub;
 
     public:
     Player(vector<pair<string, string>> pairs){
@@ -45,6 +47,9 @@ class Player{
 
         goals = 0;
         assists = 0;
+        minsPlayed = 90;
+        sub = false;
+
     }
 
     /*
@@ -85,6 +90,9 @@ class Player{
         assists++;
         cout << name + " assisted!\n\n";
     }
+    void playMinute(){
+        if(!sub) minsPlayed++;
+    }
 
     int getID(){ return id; }
     int getRating(){ return rating; }
@@ -93,6 +101,7 @@ class Player{
     string getName(){ return name; }
     int getGoals(){ return goals; }
     int getAssists(){ return assists; }
+    int getMinsPlayed(){ return minsPlayed; }
 
     void outputPlayer(){
         cout << "name: " + name + "\n";
@@ -167,6 +176,16 @@ class Team{
                 if(!validCleanSheetPosition(players[i].getGeneralPosition())) continue;
                 if(output != "") output += ",";
 
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+    string get60MinDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            if(players[i].getMinsPlayed() >= 60){
+                if(output != "") output += ",";
                 output += to_string(players[i].getID());
             }
         }
@@ -297,6 +316,16 @@ string getCleanSheetsString(Team teams[]){
     return output;
 }
 
+string get60MinString(Team teams[]){
+    string output = "";
+    output += teams[0].get60MinDictionary();
+
+    if(output != "" && teams[1].get60MinDictionary() != "") output += ",";
+    output += teams[1].get60MinDictionary();
+
+    return output;
+}
+
 void writeToOutputFile(Team teams[]){
     ofstream output(outputFilePath);
 
@@ -305,6 +334,7 @@ void writeToOutputFile(Team teams[]){
     output << "GOAL SCORERS," + getGoalScorersString(teams) + "\n";
     output << "ASSISTERS," + getAssistersString(teams) + "\n";
     output << "CLEAN SHEETS," + getCleanSheetsString(teams) + "\n";
+    output << "60 MINS," + get60MinString(teams) + "\n";
 
     output.close();
 }

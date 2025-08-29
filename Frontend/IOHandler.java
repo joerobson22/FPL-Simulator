@@ -13,6 +13,9 @@ public class IOHandler {
     protected static final int SCORERS = 2;
     protected static final int ASSISTERS = 3;
     protected static final int CLEAN_SHEETS = 4;
+    protected static final int SIXTY_MINUTES = 5;
+
+    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS"};
 
     public static void writeFixtureData(Fixture fixture, int seed){
         try{
@@ -58,6 +61,7 @@ public class IOHandler {
         ArrayList<String> goalScorers = new ArrayList<>();
         ArrayList<String> assisters = new ArrayList<>();
         ArrayList<String> cleanSheets = new ArrayList<>();
+        ArrayList<String> sixtyMins = new ArrayList<>();
 
         try{
             BufferedReader reader = new BufferedReader(new FileReader("fixtureOutcome.txt"));
@@ -85,6 +89,10 @@ public class IOHandler {
                     System.out.println("Clean sheets");
                     cleanSheets = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
+                else if(i == SIXTY_MINUTES){
+                    System.out.println("60 mins");
+                    sixtyMins = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
 
                 line = reader.readLine();
 
@@ -98,7 +106,7 @@ public class IOHandler {
         }
         
         System.out.println("Generating FixtureOutcome object");
-        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, getPlayersFromID(players, goalScorers), getPlayersFromID(players, assisters), getPlayersFromID(players, cleanSheets));
+        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, getPlayersFromID(players, goalScorers), getPlayersFromID(players, assisters), getPlayersFromID(players, cleanSheets), getPlayersFromID(players, sixtyMins));
         return outcome;
     }
 
@@ -106,11 +114,18 @@ public class IOHandler {
         ArrayList<Player> players = new ArrayList<>();
 
         for(String id : ids){
-            if(!id.equals("") && !id.equals("GOAL SCORERS") && !id.equals("ASSISTERS") && !id.equals("CLEAN SHEETS")){
-                Player p = allPlayers.get(Integer.parseInt(id));
-                System.out.println("Found player " + p.getName() + " with id " + id);
-                players.add(p);
+            boolean valid = true;
+            for(String ignore : IGNORE_STRINGS){
+                if(ignore.equals(id)){
+                    valid = false;
+                    break;
+                }
             }
+            if(!valid) continue;
+
+            Player p = allPlayers.get(Integer.parseInt(id));
+            System.out.println("Found player " + p.getName() + " with id " + id);
+            players.add(p);
         }
 
         return players;

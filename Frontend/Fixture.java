@@ -79,14 +79,21 @@ public class Fixture {
         for(Player p : outcome.getCleanSheets()){
             p.keepCleanSheet();
         }
+        System.out.println("60 mins");
+        //allocate points for playing 60 mins
+        for(Player p : outcome.get60Mins()){
+            p.play60Mins();
+        }
 
         System.out.println("Manager favour for blanks");
         //allocate manager favour for any blanks
         for(Player p : homeLineup){
+            p.inStartingLineup();
             if(outcome.getGoalScorers().contains(p) || outcome.getAssisters().contains(p)) continue;
             p.blank();
         }
         for(Player p : awayLineup){
+            p.inStartingLineup();
             if(outcome.getGoalScorers().contains(p) || outcome.getAssisters().contains(p)) continue;
             p.blank();
         }

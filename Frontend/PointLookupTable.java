@@ -18,7 +18,13 @@ public class PointLookupTable {
     );
     private static int pointsForAssist = 3;
 
-    //2 goals conceded  : -1
+    private static Map<String, Integer> pointsFor2GoalsConceded = Map.of(
+        "GK", -1,
+        "DEF", -1
+    );
+
+
+    //2 goals conceded  : -1 (only gk and def)
     //3 saves           : 1
     //penalty save      : 5
     //penalty miss      : -2
@@ -39,5 +45,12 @@ public class PointLookupTable {
 
     public static int getPointsForAssist(){
         return pointsForAssist;
+    }
+
+    public static int getPointsForGoalsConceded(String position, int numGoals){
+        if(numGoals == 0 || position.equals("ATT") || position.equals("MID")) return 0;
+
+        int multi = numGoals / 2;
+        return pointsFor2GoalsConceded.get(position) * multi;
     }
 }

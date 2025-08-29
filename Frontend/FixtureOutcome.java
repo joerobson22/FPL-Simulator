@@ -8,6 +8,7 @@ public class FixtureOutcome {
     private ArrayList<Player> goalScorers;
     private ArrayList<Player> assisters;
     private ArrayList<Player> cleanSheets;
+    private ArrayList<Player> sixtyMins;
 
     //constructors
     public FixtureOutcome(){
@@ -19,12 +20,13 @@ public class FixtureOutcome {
         cleanSheets = new ArrayList<>();
     }
 
-    public FixtureOutcome(int homeGoals, int awayGoals, ArrayList<Player> goalScorers, ArrayList<Player> assisters, ArrayList<Player> cleanSheets){
+    public FixtureOutcome(int homeGoals, int awayGoals, ArrayList<Player> goalScorers, ArrayList<Player> assisters, ArrayList<Player> cleanSheets, ArrayList<Player> sixtyMins){
         this.homeGoals = homeGoals;
         this.awayGoals = awayGoals;
         this.goalScorers = goalScorers;
         this.assisters = assisters;
         this.cleanSheets = cleanSheets;
+        this.sixtyMins = sixtyMins;
     }
 
 
@@ -47,6 +49,10 @@ public class FixtureOutcome {
 
     public ArrayList<Player> getCleanSheets(){
         return cleanSheets;
+    }
+
+    public ArrayList<Player> get60Mins(){
+        return sixtyMins;
     }
 
     public String getScoreString(){

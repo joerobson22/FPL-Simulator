@@ -28,6 +28,8 @@ public class StatsPanel extends JPanel implements ActionListener{
     private JPanel topScorerContentPanel;
     private JPanel buttonsPanel;
 
+    private JPanel leagueTablePanel;
+
     private JButton viewLeagueButton;
     private JButton viewLeaderboardButton;
 

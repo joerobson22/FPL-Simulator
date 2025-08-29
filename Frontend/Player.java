@@ -159,6 +159,15 @@ public class Player{
 
     public void concedeGoals(int numGoals){
         changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForGoalConceded(generalPosition) * numGoals);
+        weeklyPoints += PointLookupTable.getPointsForGoalsConceded(generalPosition, numGoals);
+    }
+
+    public void inStartingLineup(){
+        weeklyPoints++;
+    }
+
+    public void play60Mins(){
+        weeklyPoints++;
     }
 
     public void setPrice(double price){
