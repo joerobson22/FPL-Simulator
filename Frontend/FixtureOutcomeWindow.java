@@ -2,17 +2,9 @@ package Frontend;
 
 import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.Border;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOError;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class FixtureOutcomeWindow extends JFrame implements ActionListener{
     private final String fixtureFont = "SansSerif";
@@ -57,13 +49,16 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
 
         this.setContentPane(mainPanel);
         this.setVisible(true);
-        this.setSize(500, 500);
+        this.setSize(500,750);
         this.setTitle(fixture.getHomeTeam().getName() + " vs " + fixture.getAwayTeam().getName());
         this.setResizable(false);
     }
 
     public void setupInfoPanel(){
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+
+        JPanel startingLineupPanel = new JPanel();
+        startingLineupPanel.add(setupInfoSection("Lineups", fixture.getLineups()));
 
         JPanel goalContributionsPanel = new JPanel();
         goalContributionsPanel.setLayout(new BoxLayout(goalContributionsPanel, BoxLayout.Y_AXIS));
@@ -75,6 +70,7 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
 
         extraInfoPanel.add(setupInfoSection("Clean Sheets", fixture.getOutcome().getCleanSheets()));
 
+        infoPanel.add(startingLineupPanel);
         infoPanel.add(goalContributionsPanel);
         infoPanel.add(extraInfoPanel);
     }

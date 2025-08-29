@@ -17,6 +17,9 @@ public class Fixture {
 
         outcome = new FixtureOutcome();
         played = false;
+
+        homeLineup = new ArrayList<>();
+        awayLineup = new ArrayList<>();
     }
 
 
@@ -27,6 +30,13 @@ public class Fixture {
 
     public Team getAwayTeam(){
         return away;
+    }
+
+    public ArrayList<Player> getLineups(){
+        ArrayList<Player> lineups = new ArrayList<>();
+        for(Player p : homeLineup) lineups.add(p);
+        for(Player p : awayLineup) lineups.add(p);
+        return lineups;
     }
 
     public FixtureOutcome getOutcome(){
