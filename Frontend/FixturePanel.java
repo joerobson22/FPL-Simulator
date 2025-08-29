@@ -52,12 +52,12 @@ public class FixturePanel extends JPanel implements ActionListener{
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
         //setup all the labels for the score panel
-        homeTeam = setupDefaultLabel(fixture.getHomeTeam().getAbbrv());
-        awayTeam = setupDefaultLabel(fixture.getAwayTeam().getAbbrv());
-        score = setupDefaultLabel(" vs ");
+        homeTeam = LabelCreator.createJLabel(fixture.getHomeTeam().getAbbrv(), fixtureFont, fixtureFontSize, Font.BOLD, SwingConstants.LEFT, Color.BLACK);
+        awayTeam = LabelCreator.createJLabel(fixture.getAwayTeam().getAbbrv(), fixtureFont, fixtureFontSize, Font.BOLD, SwingConstants.LEFT, Color.BLACK);
+        score = LabelCreator.createJLabel(" vs ", fixtureFont, fixtureFontSize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK);
 
         actionButton = new JButton("Simulate");
-        actionButton.setFont(new Font(buttonFont, Font.BOLD, buttonFontSize));
+        actionButton.setFont(new Font("SansSerif", Font.BOLD, buttonFontSize));
         actionButton.addActionListener(this);
 
         //add components to score panel
@@ -99,14 +99,6 @@ public class FixturePanel extends JPanel implements ActionListener{
     public void repaintUI(){
         this.revalidate();
         this.repaint();
-    }
-
-    public JLabel setupDefaultLabel(String text){
-        JLabel label = new JLabel(text);
-        label.setForeground(new Color(0, 0, 0));
-        label.setFont(new Font(fixtureFont, Font.PLAIN, fixtureFontSize));
-
-        return label;
     }
 
     public void viewFixtureOutcome(){

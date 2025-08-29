@@ -20,6 +20,13 @@ import java.lang.Math;
 public class MainWindow extends JFrame implements ActionListener{
     private final String GAME_ENGINE_PATH = "Backend/GameEngine.exe";
 
+    private final int WINDOW_WIDTH = 1500;
+    private final int WINDOW_HEIGHT = 1000;
+
+    private final String titleLabelFont = "SansSerif";
+    private final int titleLabelSize = 40;
+    private final Color titleLabelColor = new Color(255, 255, 255);
+
     JPanel mainPanel;
     JPanel contentPanel;
     JPanel titlePanel;
@@ -59,10 +66,8 @@ public class MainWindow extends JFrame implements ActionListener{
         titlePanel.add(prevGWButton, BorderLayout.WEST);
 
         // center label
-        JLabel titleLabel = new JLabel(user.getName(), SwingConstants.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 40));
-        titleLabel.setForeground(new Color(255, 255, 255));
-        titlePanel.add(titleLabel, BorderLayout.CENTER);
+        JLabel titleLabel = LabelCreator.createJLabel(user.getName(), titleLabelFont, titleLabelSize, Font.BOLD, SwingConstants.CENTER, titleLabelColor);
+        titlePanel.add(titleLabel, "Center");
 
         // right button
         nextGWButton = new JButton(">");
@@ -97,7 +102,7 @@ public class MainWindow extends JFrame implements ActionListener{
 
         this.setContentPane(mainPanel);
         this.setVisible(true);
-        this.setSize(1500, 1000);
+        this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.setTitle("FPL Simulator");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
@@ -148,6 +153,7 @@ public class MainWindow extends JFrame implements ActionListener{
 
         if(currentGameWeek == viewingGameWeek){
             simAllButton = new JButton("Simulate All");
+            simAllButton.setFont(new Font("SansSerif", Font.BOLD, 18));
             simAllButton.addActionListener(this);
             fixtureListPanel.add(simAllButton);
         }

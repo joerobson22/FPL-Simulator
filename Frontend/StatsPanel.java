@@ -23,6 +23,8 @@ public class StatsPanel extends JPanel implements ActionListener{
     private final int topScorerTableSize = 11;
     private final int rowGaps = 8;
     private final int padding = 10;
+    private final int leagueTableStatHeaderSize = 13;
+    private final int leagueTablePointHeaderSize = 15;
 
     private JPanel topScorerPanel;
     private JPanel topScorerContentPanel;
@@ -43,16 +45,16 @@ public class StatsPanel extends JPanel implements ActionListener{
 
     public StatsPanel(ArrayList<Team> teams){
         //set this panel's layout
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setLayout(new BorderLayout());
 
 
         //setup weekly top scorer panel
         //create title panel
         topScorerPanel = new JPanel(new BorderLayout());
         JPanel topScorerTitlePanel = new JPanel();
-        topScorerTitleLabel = new JLabel("Weekly Top Scorers");
-        topScorerTitleLabel.setFont(new Font(topScorerFont, Font.BOLD, topScorerTitleSize));
+        topScorerTitleLabel = LabelCreator.createJLabel("Weekly Top Scorers", topScorerFont, topScorerTitleSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         topScorerTitlePanel.add(topScorerTitleLabel);
+        
         //create table of top scorers
         topScorerContentPanel = new JPanel(new GridLayout(1, 4));
 
@@ -63,7 +65,7 @@ public class StatsPanel extends JPanel implements ActionListener{
             column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
             column.setBorder(BorderFactory.createEmptyBorder(10, padding, 10, padding));
 
-            JLabel tableHeader = setupDefaultLabel(s, topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER);
+            JLabel tableHeader = LabelCreator.createJLabel(s, topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
             //tableHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
             column.add(tableHeader);
 
@@ -71,7 +73,7 @@ public class StatsPanel extends JPanel implements ActionListener{
 
             for(int i = 1; i < 11; i++)
             {
-                JLabel label = setupDefaultLabel(String.valueOf(i), topScorerFont, topScorerTableSize, Font.PLAIN, SwingConstants.LEFT);
+                JLabel label = LabelCreator.createJLabel(String.valueOf(i), topScorerFont, topScorerTableSize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK);
                 label.setAlignmentX(Component.LEFT_ALIGNMENT);
                 label.setMaximumSize(new Dimension(Integer.MAX_VALUE, label.getPreferredSize().height));
                 topScorersMap.get(s).add(label);
@@ -95,11 +97,11 @@ public class StatsPanel extends JPanel implements ActionListener{
         JPanel headerPanel = new JPanel(new GridLayout(1, 2));
         headerPanel.add(new JLabel(""));
         JPanel headerPanel2 = new JPanel(new GridLayout(1, 5));
-        headerPanel2.add(setupDefaultLabel("W", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
-        headerPanel2.add(setupDefaultLabel("D", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
-        headerPanel2.add(setupDefaultLabel("L", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
-        headerPanel2.add(setupDefaultLabel("GD", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
-        headerPanel2.add(setupDefaultLabel("PTS", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
+        headerPanel2.add(LabelCreator.createJLabel("W", topScorerFont, leagueTableStatHeaderSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        headerPanel2.add(LabelCreator.createJLabel("D", topScorerFont, leagueTableStatHeaderSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        headerPanel2.add(LabelCreator.createJLabel("L", topScorerFont, leagueTableStatHeaderSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        headerPanel2.add(LabelCreator.createJLabel("GD", topScorerFont, leagueTableStatHeaderSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        headerPanel2.add(LabelCreator.createJLabel("PTS", topScorerFont, leagueTablePointHeaderSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
         headerPanel.add(headerPanel2);
 
         leagueTablePanel.add(headerPanel);
@@ -123,17 +125,9 @@ public class StatsPanel extends JPanel implements ActionListener{
         buttonsPanel.add(viewLeaderboardButton);
 
         //add both top scorer panel and buttons panel to the stats panel
-        this.add(topScorerPanel);
-        this.add(leagueTablePanel);
-        this.add(buttonsPanel);
-    }
-
-    public JLabel setupDefaultLabel(String text, String font, int fontSize, int fontType,  int hAlignment){
-        JLabel label = new JLabel(text, hAlignment);
-        label.setForeground(new Color(0, 0, 0));
-        label.setFont(new Font(font, fontType, fontSize));
-
-        return label;
+        this.add(topScorerPanel, "North");
+        this.add(leagueTablePanel, "Center");
+        this.add(buttonsPanel, "South");
     }
 
     public void updateStats(ArrayList<Player> allPlayers, int gameWeek){
