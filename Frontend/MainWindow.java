@@ -46,6 +46,8 @@ public class MainWindow extends JFrame implements ActionListener{
     int currentGameWeek = 0;
     int viewingGameWeek = 0;
 
+    boolean simulating = false;
+
     public MainWindow(User user){
         setupTeams();
 
@@ -174,6 +176,7 @@ public class MainWindow extends JFrame implements ActionListener{
     //fixture simulating- communication with C++ backend
     public void simulateFixture(FixturePanel fixturePanel, Fixture fixture, boolean simulatingAll)
     {
+        simulating = true;
         try{
             //write fixture details to a txt file
             System.out.println("Writing fixture details to text file");
@@ -267,6 +270,7 @@ public class MainWindow extends JFrame implements ActionListener{
             System.err.println("Unexpected error: " + e.getMessage());
             e.printStackTrace();
         }
+        simulating = false;
     }
 
 
@@ -294,6 +298,8 @@ public class MainWindow extends JFrame implements ActionListener{
     //action listener
     public void actionPerformed(ActionEvent e)
     {
+        if(simulating) return;
+        
         if(simAllButton == e.getSource()){
             simulateAllFixtures();
         }

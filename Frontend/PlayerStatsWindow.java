@@ -132,7 +132,8 @@ public class PlayerStatsWindow extends JFrame{
     public JPanel setupColumnPanel(String title, ArrayList<Player> top10){
         JPanel panel = new JPanel(new GridLayout(11, 1));
         panel.setBorder(blackline);
-        JLabel titleLabel = LabelCreator.createJLabel(padding + title, font, columnTitleSize, Font.BOLD, SwingConstants.LEFT, Color.BLACK);
+        JLabel titleLabel = LabelCreator.createJLabel(title, font, columnTitleSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        titleLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
         panel.add(titleLabel);
 
         for(int i = 0; i < 10; i++){
