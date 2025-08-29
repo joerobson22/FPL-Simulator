@@ -91,6 +91,19 @@ public class StatsPanel extends JPanel implements ActionListener{
         leagueTablePanel = new JPanel();
         leagueTablePanel.setLayout(new BoxLayout(leagueTablePanel, BoxLayout.Y_AXIS));
 
+        //create headers
+        JPanel headerPanel = new JPanel(new GridLayout(1, 2));
+        headerPanel.add(new JLabel(""));
+        JPanel headerPanel2 = new JPanel(new GridLayout(1, 5));
+        headerPanel2.add(setupDefaultLabel("W", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
+        headerPanel2.add(setupDefaultLabel("D", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
+        headerPanel2.add(setupDefaultLabel("L", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
+        headerPanel2.add(setupDefaultLabel("GD", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
+        headerPanel2.add(setupDefaultLabel("PTS", topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER));
+        headerPanel.add(headerPanel2);
+
+        leagueTablePanel.add(headerPanel);
+
         for(int i = 0; i < teams.size(); i++){
             leagueTable.add(new LeagueTableTeamPanel(teams.get(i), i + 1));
         }
