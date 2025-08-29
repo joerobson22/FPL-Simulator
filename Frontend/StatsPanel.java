@@ -19,8 +19,10 @@ import java.nio.file.Paths;
 
 public class StatsPanel extends JPanel implements ActionListener{
     private final String topScorerFont = "SansSerif";
-    private final int topScorerTitleSize = 20;
-    private final int topScorerTableSize = 13;
+    private final int topScorerTitleSize = 25;
+    private final int topScorerTableSize = 11;
+    private final int rowGaps = 8;
+    private final int padding = 10;
 
     private JPanel topScorerPanel;
     private JPanel topScorerContentPanel;
@@ -55,7 +57,7 @@ public class StatsPanel extends JPanel implements ActionListener{
         for(String s : positions){
             JPanel column = new JPanel();
             column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
-            column.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+            column.setBorder(BorderFactory.createEmptyBorder(10, padding, 10, padding));
 
             JLabel tableHeader = setupDefaultLabel(s, topScorerFont, topScorerTableSize, Font.BOLD, SwingConstants.CENTER);
             //tableHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -70,7 +72,7 @@ public class StatsPanel extends JPanel implements ActionListener{
                 label.setMaximumSize(new Dimension(Integer.MAX_VALUE, label.getPreferredSize().height));
                 topScorersMap.get(s).add(label);
                 column.add(label);
-                column.add(Box.createVerticalStrut(4));
+                column.add(Box.createVerticalStrut(rowGaps));
             }
             topScorerContentPanel.add(column);
         }

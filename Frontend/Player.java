@@ -46,6 +46,7 @@ public class Player{
         price = 0;
 
         weeklyPointHistory = new ArrayList<>();
+        for(int i = 0; i < 38; i++) weeklyPointHistory.add(0);
         totalPoints = 0;
         numGoals = 0;
         numAssists = 0;
@@ -172,9 +173,9 @@ public class Player{
         team = newTeam;
     }
 
-    public void addWeeklyToTotal(){
+    public void addWeeklyToTotal(int gameWeek){
         totalPoints += weeklyPoints;
-        weeklyPointHistory.add(weeklyPoints);
+        weeklyPointHistory.set(gameWeek, weeklyPoints);
     }
 
     public void resetWeeklyPoints(){

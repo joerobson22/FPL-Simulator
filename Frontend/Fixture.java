@@ -51,7 +51,7 @@ public class Fixture {
         awayLineup = players;
     }
 
-    public void allocatePointsAndChangeStats(){
+    public void allocatePointsAndChangeStats(int gameWeek){
         System.out.println("Allocating points");
 
         
@@ -80,15 +80,6 @@ public class Fixture {
             p.keepCleanSheet();
         }
 
-        System.out.println("Store weekly totals");
-        //store weekly totals
-        for(Player p : home.getPlayers()){
-            p.addWeeklyToTotal();
-        }
-        for(Player p : away.getPlayers()){
-            p.addWeeklyToTotal();
-        }
-
         System.out.println("Manager favour for blanks");
         //allocate manager favour for any blanks
         for(Player p : homeLineup){
@@ -98,6 +89,16 @@ public class Fixture {
         for(Player p : awayLineup){
             if(outcome.getGoalScorers().contains(p) || outcome.getAssisters().contains(p)) continue;
             p.blank();
+        }
+
+
+        System.out.println("Store weekly totals");
+        //store weekly totals
+        for(Player p : home.getPlayers()){
+            p.addWeeklyToTotal(gameWeek);
+        }
+        for(Player p : away.getPlayers()){
+            p.addWeeklyToTotal(gameWeek);
         }
     }
 }

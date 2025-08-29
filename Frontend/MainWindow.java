@@ -241,7 +241,7 @@ public class MainWindow extends JFrame implements ActionListener{
 
             System.out.println("Allocating points");
             //ONCE a fixture is complete, allocate points to every player that played!
-            fixture.allocatePointsAndChangeStats();
+            fixture.allocatePointsAndChangeStats(currentGameWeek);
 
             if(!simulatingAll){
                 System.out.println("Update stats");
