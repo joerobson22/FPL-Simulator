@@ -36,6 +36,7 @@ public class MainWindow extends JFrame implements ActionListener{
     User user;
     FixtureList fixtureList;
     StatsPanel statsPanel;
+    FPLPanel fplPanel;
     ArrayList<Team> allTeams;
     ArrayList<Player> allPlayers;
 
@@ -81,6 +82,9 @@ public class MainWindow extends JFrame implements ActionListener{
         statsPanel = new StatsPanel(this, allTeams);
         statsPanel.setBackground(statsPanelBackgroundColor);
         statsPanel.setBorder(blackline);
+
+        fplPanel = new FPLPanel(this, allPlayers);
+        teamSelectionPanel.add(fplPanel);
 
         fixtureListPanel = new JPanel(new GridLayout(11, 1));
         fixtureListPanel.setBackground(fixtureListPanelBackgroundColor);

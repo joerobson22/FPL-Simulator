@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.border.Border;
 
 public class StatsPanel extends JPanel implements ActionListener{
     MainWindow mainWindow;
@@ -43,6 +44,7 @@ public class StatsPanel extends JPanel implements ActionListener{
         //set this panel's layout
         this.setLayout(new BorderLayout());
 
+        Border blackLine = BorderFactory.createLineBorder(Color.BLACK);
 
         //setup weekly top scorer panel
         //create title panel
@@ -88,6 +90,7 @@ public class StatsPanel extends JPanel implements ActionListener{
         leagueTable = new ArrayList<>();
         leagueTablePanel = new JPanel();
         leagueTablePanel.setLayout(new BoxLayout(leagueTablePanel, BoxLayout.Y_AXIS));
+        leagueTablePanel.setBorder(blackLine);
 
         //create headers
         JPanel headerPanel = new JPanel(new GridLayout(1, 2));
