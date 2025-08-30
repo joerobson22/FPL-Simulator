@@ -33,7 +33,7 @@ public class PlayerPanel extends JButton implements ActionListener {
 
         this.position = position;
         positionLabel = LabelCreator.createJLabel(position, "SansSerif", 10, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
-        nameLabel = LabelCreator.createJLabel("Bruno Fernandes", "SansSerif", 10, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        nameLabel = LabelCreator.createJLabel("+", "SansSerif", 10, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         fixturePointsLabel = LabelCreator.createJLabel("-", "SansSerif", 14, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
 
         panel.add(positionLabel, "North");
@@ -58,6 +58,7 @@ public class PlayerPanel extends JButton implements ActionListener {
 
     public void setPlayer(Player p){
         player = p;
+        updateVisuals();
     }
 
     public Player getPlayer(){

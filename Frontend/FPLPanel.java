@@ -19,18 +19,15 @@ public class FPLPanel extends JPanel implements ActionListener{
     private Image backgroundImage;
     private final String imagePath = "Frontend/assets/pitch.png";
 
-    private BackgroundPanel topPanel; //contains a display for all the players
+    private JPanel topPanel; //contains a display for all the players
     private JPanel bottomPanel; //contains bench, input buttons and transfer panel
 
+    private JPanel titleScorePanel;
     private JPanel teamPanel;
     private JPanel benchPanel;
     private JScrollPane transferScrollPanel;
     private JPanel transferPanel;
-
-    private JButton captainButton;
-    private JButton viceCaptainButton;
-    private JButton subButton; //click player, click sub, click player to sub with
-    private JButton transferButton; //turns into confirm transfer button -> click player, click transfer, click new player, click confirm
+    private JLabel scoreLabel;
 
     private final String[] positions = {"GK", "DEF", "MID", "ATT"};
 
@@ -63,8 +60,15 @@ public class FPLPanel extends JPanel implements ActionListener{
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
         //create top and bottom panels
-        topPanel = new BackgroundPanel(imagePath);
-        int targetHeight = topPanel.getTargetHeight();
+        topPanel = new JPanel(new BorderLayout());
+        BackgroundPanel pitchPanel = new BackgroundPanel(imagePath);
+        int targetHeight = pitchPanel.getTargetHeight();
+        JPanel titlePanel = new JPanel();
+        scoreLabel = LabelCreator.createJLabel("0 pts", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        titlePanel.add(scoreLabel);
+
+        topPanel.add(pitchPanel, "Center");
+        topPanel.add(titlePanel, "North");
 
         bottomPanel = new JPanel(new BorderLayout());
 
@@ -86,11 +90,11 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         //top panel add background image
 
-        topPanel.add(teamPanel);
+        pitchPanel.add(teamPanel);
         bottomPanel.add(benchPanel, "North");
         bottomPanel.add(transferPanel, "Center");
 
-        topPanel.setBorder(blackline);
+        pitchPanel.setBorder(blackline);
         bottomPanel.setBorder(blackline);
         //teamPanel.setBorder(blackline);
         benchPanel.setBorder(blackline);
