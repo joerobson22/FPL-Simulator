@@ -33,7 +33,7 @@ public class MainWindow extends JFrame implements ActionListener{
     Color statsPanelBackgroundColor = new Color(255, 255, 255);
     Color fixtureListPanelBackgroundColor = new Color(255, 255, 255);
 
-    User user;
+    FantasyTeam fantasyTeam;
     FixtureList fixtureList;
     StatsPanel statsPanel;
     FPLPanel fplPanel;
@@ -49,10 +49,10 @@ public class MainWindow extends JFrame implements ActionListener{
 
     boolean simulating = false;
 
-    public MainWindow(User user){
+    public MainWindow(FantasyTeam fantasyTeam){
         setupTeams();
 
-        this.user = user;
+        this.fantasyTeam = fantasyTeam;
 
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
@@ -64,7 +64,7 @@ public class MainWindow extends JFrame implements ActionListener{
         titlePanel.add(prevGWButton, BorderLayout.WEST);
 
         // center label
-        JLabel titleLabel = LabelCreator.createJLabel(user.getName(), titleLabelFont, titleLabelSize, Font.BOLD, SwingConstants.CENTER, titleLabelColor);
+        JLabel titleLabel = LabelCreator.createJLabel(fantasyTeam.getName(), titleLabelFont, titleLabelSize, Font.BOLD, SwingConstants.CENTER, titleLabelColor);
         titlePanel.add(titleLabel, "Center");
 
         // right button
@@ -83,7 +83,7 @@ public class MainWindow extends JFrame implements ActionListener{
         statsPanel.setBackground(statsPanelBackgroundColor);
         statsPanel.setBorder(blackline);
 
-        fplPanel = new FPLPanel(this, allPlayers);
+        fplPanel = new FPLPanel(this, fantasyTeam, allPlayers);
         teamSelectionPanel.add(fplPanel);
 
         fixtureListPanel = new JPanel(new GridLayout(11, 1));

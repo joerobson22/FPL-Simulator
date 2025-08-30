@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class StartWindow extends JFrame implements ActionListener{
-    User user;
+    FantasyTeam fantasyTeam;
     MainWindow mainWindow;
 
     JPanel mainPanel;
@@ -46,9 +46,9 @@ public class StartWindow extends JFrame implements ActionListener{
     {
         if(goButton == e.getSource() && textEditBox.getText().length() > 0)
         {
-            user = new User(textEditBox.getText());
+            fantasyTeam = new FantasyTeam(textEditBox.getText());
 
-            mainWindow = new MainWindow(user);
+            mainWindow = new MainWindow(fantasyTeam);
             this.setVisible(false);
         }
     }

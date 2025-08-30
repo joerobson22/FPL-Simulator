@@ -1,17 +1,19 @@
 package Frontend;
 import java.util.ArrayList;
 
-public class User {
+public class FantasyTeam {
     private String name;
 
     private ArrayList<Player> players;
+    private ArrayList<Player> bench;
+
     private double budget;
     private int totalPoints;
     private int weeklyPoints;
     private int freeTransfers;
 
     //constructor
-    public User(String name){
+    public FantasyTeam(String name){
         this.name = name;
 
         players = new ArrayList<Player>();
@@ -29,6 +31,10 @@ public class User {
 
     public ArrayList<Player> getPlayers(){
         return players;
+    }
+
+    public ArrayList<Player> getBench(){
+        return bench;
     }
 
     public double getBudget(){
@@ -57,6 +63,38 @@ public class User {
     private void removePlayer(Player player){
         budget += player.getPrice();
         players.remove(player);
+    }
+
+    public void swapPlayers(Player player1, Player player2){
+        boolean player1Bench = false;
+        boolean player2Bench = false;
+
+        int index1 = findPlayer(player1, players);
+        player1Bench = index1 == -1;
+        if(player1Bench) index1 = findPlayer(player1, bench);
+
+        int index2 = findPlayer(player2, players);
+        player2Bench = index2 == -1;
+        if(player2Bench) index2 = findPlayer(player2, bench);
+
+
+        ArrayList<Player> player1List;
+        ArrayList<Player> player2List;
+
+        if(player1Bench) player1List = players;
+        else player1List = bench;
+        if(player2Bench) player2List = players;
+        else player2List = bench;
+
+        player1List.set(index1, player2);
+        player2List.set(index2, player1);
+    }
+
+    private int findPlayer(Player p, ArrayList<Player> list){
+        for(int i = 0; i < list.size(); i++){
+            if(list.get(i) == p) return i;
+        }
+        return -1;
     }
 
     public void changeWeeklyPoints(int change){
