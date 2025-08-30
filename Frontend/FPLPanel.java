@@ -52,7 +52,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     FantasyTeam fantasyTeam;
 
     public FPLPanel(MainWindow mainWindow, FantasyTeam fantasyTeam, ArrayList<Player> allPlayers){
-        this.setLayout(new GridLayout(2, 1));
+        this.setLayout(new BorderLayout());
         this.mainWindow = mainWindow;
         this.fantasyTeam = fantasyTeam;
         this.allPlayers = allPlayers;
@@ -67,8 +67,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         scoreLabel = LabelCreator.createJLabel("0 pts", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         titlePanel.add(scoreLabel);
 
-        topPanel.add(pitchPanel, "Center");
-        topPanel.add(titlePanel, "North");
+        
 
         bottomPanel = new JPanel(new BorderLayout());
 
@@ -80,29 +79,27 @@ public class FPLPanel extends JPanel implements ActionListener{
         teamPanel.setMaximumSize(new Dimension(fixedPitchWidth, targetHeight));
 
         benchPanel = new JPanel();
-        transferPanel = new JPanel();
+        transferPanel = new JPanel(new BorderLayout());
         transferPanel.setLayout(new BoxLayout(transferPanel, BoxLayout.Y_AXIS));
+        JPanel transferTitlePanel = new JPanel();
+        transferTitlePanel.add(LabelCreator.createJLabel("Transfers", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
         transferScrollPanel = new JScrollPane();
 
-        transferScrollPanel.add(transferPanel);
-
-        
-
-        //top panel add background image
-
+        transferPanel.add(transferScrollPanel, "Center");
+        transferPanel.add(transferTitlePanel, "North");
         pitchPanel.add(teamPanel);
-        bottomPanel.add(benchPanel, "North");
+        topPanel.add(pitchPanel, "Center");
+        topPanel.add(titlePanel, "North");
+        topPanel.add(benchPanel, "South");
         bottomPanel.add(transferPanel, "Center");
 
         pitchPanel.setBorder(blackline);
         bottomPanel.setBorder(blackline);
-        //teamPanel.setBorder(blackline);
         benchPanel.setBorder(blackline);
-
         transferPanel.setBorder(blackline);
 
-        this.add(topPanel);
-        this.add(bottomPanel);
+        this.add(topPanel, "North");
+        this.add(bottomPanel, "Center");
 
         playerPanels = new ArrayList<>();
         teamSections = new HashMap<>();
@@ -141,6 +138,10 @@ public class FPLPanel extends JPanel implements ActionListener{
         for(String pos : positions){
             teamPanel.add(teamSections.get(pos));
         }
+    }
+
+    public void updateVisuals(){
+
     }
 
     public void actionPerformed(ActionEvent e){
