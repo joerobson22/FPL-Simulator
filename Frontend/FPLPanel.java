@@ -11,18 +11,19 @@ import java.awt.event.*;
 
 public class FPLPanel extends JPanel implements ActionListener{
 
+    private final int fixedPitchWidth = 500;
+
     private MainWindow mainWindow;
     private ArrayList<Player> allPlayers;
 
     private Image backgroundImage;
     private final String imagePath = "Frontend/assets/pitch.png";
 
-    private JPanel topPanel; //contains a display for all the players
+    private BackgroundPanel topPanel; //contains a display for all the players
     private JPanel bottomPanel; //contains bench, input buttons and transfer panel
 
     private JPanel teamPanel;
     private JPanel benchPanel;
-    private JPanel inputButtonPanel;
     private JScrollPane transferScrollPanel;
     private JPanel transferPanel;
 
@@ -49,7 +50,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         "ATT", 2
     );
 
-    private ArrayList<PlayerButton> playerButtons;
+    private ArrayList<PlayerPanel> playerPanels;
 
     FantasyTeam fantasyTeam;
 
@@ -63,52 +64,43 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         //create top and bottom panels
         topPanel = new BackgroundPanel(imagePath);
+        int targetHeight = topPanel.getTargetHeight();
+
         bottomPanel = new JPanel(new BorderLayout());
 
         //create every panel
         teamPanel = new JPanel(new GridLayout(4, 1));
         teamPanel.setOpaque(false);
+        teamPanel.setPreferredSize(new Dimension(fixedPitchWidth, targetHeight));
+        teamPanel.setMinimumSize(new Dimension(fixedPitchWidth, targetHeight));
+        teamPanel.setMaximumSize(new Dimension(fixedPitchWidth, targetHeight));
+
         benchPanel = new JPanel();
-        inputButtonPanel = new JPanel(new BorderLayout());
         transferPanel = new JPanel();
         transferPanel.setLayout(new BoxLayout(transferPanel, BoxLayout.Y_AXIS));
         transferScrollPanel = new JScrollPane();
 
         transferScrollPanel.add(transferPanel);
 
-        JPanel captainPanel = new JPanel();
-        captainButton = new JButton("C");
-        viceCaptainButton = new JButton("V");
-        JPanel teamSelectionPanel = new JPanel();
-        subButton = new JButton("Sub");
-        transferButton = new JButton("Transfer");
-
-        captainPanel.add(captainButton);
-        captainPanel.add(viceCaptainButton);
-        teamSelectionPanel.add(subButton);
-        teamSelectionPanel.add(transferButton);
-
-        inputButtonPanel.add(captainPanel, "West");
-        inputButtonPanel.add(teamSelectionPanel, "Center");
+        
 
         //top panel add background image
 
         topPanel.add(teamPanel);
         bottomPanel.add(benchPanel, "North");
-        //bottomPanel.add(inputButtonPanel, "North");
         bottomPanel.add(transferPanel, "Center");
 
         topPanel.setBorder(blackline);
         bottomPanel.setBorder(blackline);
-        teamPanel.setBorder(blackline);
+        //teamPanel.setBorder(blackline);
         benchPanel.setBorder(blackline);
-        inputButtonPanel.setBorder(blackline);
+
         transferPanel.setBorder(blackline);
 
         this.add(topPanel);
         this.add(bottomPanel);
 
-        playerButtons = new ArrayList<>();
+        playerPanels = new ArrayList<>();
         teamSections = new HashMap<>();
 
         setupInitialTeam();
@@ -121,7 +113,7 @@ public class FPLPanel extends JPanel implements ActionListener{
             teamSections.get(pos).setOpaque(false);
 
             for(int i = 0; i < num; i++){
-                playerButtons.add(new PlayerButton(this, pos));
+                playerPanels.add(new PlayerPanel(this, pos));
             }
         }
 
@@ -131,7 +123,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         positionCounts.put("MID", 0);
         positionCounts.put("ATT", 0);
 
-        for(PlayerButton p : playerButtons){
+        for(PlayerPanel p : playerPanels){
             String pos = p.getPosition();
             if(positionCounts.get(pos) >= startFormation.get(pos)){
                 benchPanel.add(p);
@@ -153,15 +145,34 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     private class BackgroundPanel extends JPanel {
         private Image backgroundImage;
+        private int targetHeight;
 
         public BackgroundPanel(String imagePath) {
             backgroundImage = new ImageIcon(imagePath).getImage();
+
+            int imgWidth = backgroundImage.getWidth(null);
+            int imgHeight = backgroundImage.getHeight(null);
+
+            targetHeight = (int) ((double) fixedPitchWidth / imgWidth * imgHeight);
+            this.setPreferredSize(new Dimension(fixedPitchWidth, targetHeight));
+            this.setMinimumSize(new Dimension(fixedPitchWidth, targetHeight));
+            this.setMaximumSize(new Dimension(fixedPitchWidth, targetHeight));
+        }
+
+        public int getTargetHeight(){
+            return targetHeight;
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            
+            int imgWidth = backgroundImage.getWidth(null);
+            int imgHeight = backgroundImage.getHeight(null);
+
+            int targetHeight = (int) ((double) fixedPitchWidth / imgWidth * imgHeight);
+
+            g.drawImage(backgroundImage, 0, 0, fixedPitchWidth, targetHeight, this);
         }
     }
 }
