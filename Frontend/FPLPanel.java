@@ -25,7 +25,8 @@ public class FPLPanel extends JPanel implements ActionListener{
     private JPanel titleScorePanel;
     private JPanel teamPanel;
     private JPanel benchPanel;
-    private JScrollPane transferScrollPanel;
+    private JPanel transferScrollPanel;
+    private JScrollPane transferScrollWrapper;
     private JPanel transferPanel;
     private JLabel scoreLabel;
 
@@ -80,12 +81,18 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         benchPanel = new JPanel();
         transferPanel = new JPanel(new BorderLayout());
-        transferPanel.setLayout(new BoxLayout(transferPanel, BoxLayout.Y_AXIS));
         JPanel transferTitlePanel = new JPanel();
         transferTitlePanel.add(LabelCreator.createJLabel("Transfers", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
-        transferScrollPanel = new JScrollPane();
+        transferScrollPanel = new JPanel();
+        transferScrollPanel.setLayout(new BoxLayout(transferScrollPanel, BoxLayout.Y_AXIS));
 
-        transferPanel.add(transferScrollPanel, "Center");
+        transferScrollWrapper = new JScrollPane(transferScrollPanel,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        transferScrollWrapper.setViewportView(transferScrollPanel);
+        transferScrollWrapper.setPreferredSize(new Dimension(500, 330));
+
+        transferPanel.add(transferScrollWrapper, "Center");
         transferPanel.add(transferTitlePanel, "North");
         pitchPanel.add(teamPanel);
         topPanel.add(pitchPanel, "Center");
@@ -105,6 +112,8 @@ public class FPLPanel extends JPanel implements ActionListener{
         teamSections = new HashMap<>();
 
         setupInitialTeam();
+
+        updateTransferVisuals("MID");
     }
 
     public void setupInitialTeam(){
@@ -140,8 +149,20 @@ public class FPLPanel extends JPanel implements ActionListener{
         }
     }
 
-    public void updateVisuals(){
+    public void updateTeamVisuals(int gameWeek){
 
+    }
+
+    public void updateTransferVisuals(String position){
+        transferScrollPanel.removeAll();
+        for(Player p : allPlayers){
+            if(!p.getGeneralPosition().equals(position)) continue;
+
+            transferScrollPanel.add(new PlayerTransferPanel(p));
+        }
+
+        transferScrollPanel.revalidate();
+        transferScrollPanel.repaint();
     }
 
     public void actionPerformed(ActionEvent e){
