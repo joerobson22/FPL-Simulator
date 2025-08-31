@@ -6,6 +6,9 @@ import java.awt.event.*;
 
 public class PlayerTransferPanel extends JPanel implements ActionListener {
     
+    private FPLPanel fplPanel;
+    private Player player;
+
     private final int playerNameTextSize = 12;
     private final int playerClubAndPosTextSize = 10;
     private final int playerInfoTextSize = 11;
@@ -19,11 +22,15 @@ public class PlayerTransferPanel extends JPanel implements ActionListener {
     JPanel actionButtonPanel;
     JButton transferInButton;
 
-    public PlayerTransferPanel(Player p){
+    
+
+    public PlayerTransferPanel(Player p, FPLPanel fplPanel, boolean transferrable){
         this.setLayout(new GridLayout(1, 3));
         this.setPreferredSize(new Dimension(fixedWidth, fixedHeight));
         this.setMinimumSize(new Dimension(fixedWidth, fixedHeight));
         this.setMaximumSize(new Dimension(fixedWidth, fixedHeight));
+        this.fplPanel = fplPanel;
+        this.player = p;
 
         playerInfoPanel = new JPanel(new GridLayout(1, 2));
         upcomingFixturesPanel = new JPanel(new GridLayout(1, 3));
@@ -45,6 +52,7 @@ public class PlayerTransferPanel extends JPanel implements ActionListener {
         transferInButton.setFont(new Font("SansSerif", Font.BOLD, transferInButtonTextSize));
         transferInButton.addActionListener(this);
         actionButtonPanel.add(transferInButton);
+        transferInButton.setVisible(transferrable);
 
         this.add(playerInfoPanel);
         this.add(upcomingFixturesPanel);
@@ -58,6 +66,8 @@ public class PlayerTransferPanel extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e){
-
+        if(this.transferInButton == e.getSource()){
+            fplPanel.transferInPlayer(player);
+        }
     }
 }

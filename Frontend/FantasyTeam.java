@@ -5,7 +5,13 @@ public class FantasyTeam {
     private String name;
 
     private ArrayList<Player> players;
+    private ArrayList<Player> startingXI;
     private ArrayList<Player> bench;
+
+    private Player captain;
+    private Player viceCaptain;
+
+    private ArrayList<Integer> gameWeekPointsHistory;
 
     private double budget;
     private int totalPoints;
@@ -17,6 +23,10 @@ public class FantasyTeam {
         this.name = name;
 
         players = new ArrayList<Player>();
+        startingXI = new ArrayList<>();
+        bench = new ArrayList<>();
+
+        gameWeekPointsHistory = new ArrayList<>();
         budget = 100.0;
         weeklyPoints = 0;
         totalPoints = 0;
@@ -53,6 +63,10 @@ public class FantasyTeam {
         return freeTransfers;
     }
 
+    public String getFreeTransferString(){
+        if(freeTransfers == -1) return "INF";
+        return String.valueOf(freeTransfers);
+    }
 
     //mutators
     private void addPlayer(Player player){
@@ -61,33 +75,17 @@ public class FantasyTeam {
     }
 
     private void removePlayer(Player player){
+        if(player == null) return;
         budget += player.getPrice();
         players.remove(player);
     }
 
     public void swapPlayers(Player player1, Player player2){
-        boolean player1Bench = false;
-        boolean player2Bench = false;
-
         int index1 = findPlayer(player1, players);
-        player1Bench = index1 == -1;
-        if(player1Bench) index1 = findPlayer(player1, bench);
-
         int index2 = findPlayer(player2, players);
-        player2Bench = index2 == -1;
-        if(player2Bench) index2 = findPlayer(player2, bench);
 
-
-        ArrayList<Player> player1List;
-        ArrayList<Player> player2List;
-
-        if(player1Bench) player1List = players;
-        else player1List = bench;
-        if(player2Bench) player2List = players;
-        else player2List = bench;
-
-        player1List.set(index1, player2);
-        player2List.set(index2, player1);
+        players.set(index1, player2);
+        players.set(index2, player1);
     }
 
     private int findPlayer(Player p, ArrayList<Player> list){
@@ -103,12 +101,30 @@ public class FantasyTeam {
 
     public void addWeeklyToTotal(){
         totalPoints += weeklyPoints;
+    }
+
+    public void resetWeeklyTotal(){
         weeklyPoints = 0;
     }
 
-    public void makeTransfer(Player oldPlayer, Player newPlayer){
+    public boolean makeTransfer(Player oldPlayer, Player newPlayer){
+        if(players.contains(newPlayer)) return false;
+
         addPlayer(newPlayer);
         removePlayer(oldPlayer);
+
+        if(freeTransfers > -1 && freeTransfers > 0) freeTransfers--;
+        else changeWeeklyPoints(PointLookupTable.getPointsForTransfer());
+
+        return true;
+    }
+
+    public void makeCaptain(Player p){
+        captain = p;
+    }
+
+    public void makeViceCaptain(Player p){
+        viceCaptain = p;
     }
 
     public boolean confirmTransfers(){

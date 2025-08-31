@@ -11,6 +11,15 @@ import java.awt.event.*;
 
 public class FPLPanel extends JPanel implements ActionListener{
 
+    public final int NEUTRAL_STATUS = 0;
+    public final int SUBSTITUTE_STATUS = 1;
+    public final int TRANSFER_STATUS = 2;
+    public final int CAPTAIN_STATUS = 3;
+    public final int VICE_CAPTAIN_STATUS = 4;
+
+    private int status;
+    private PlayerPanel focusPlayer;
+
     private final int fixedPitchWidth = 500;
 
     private MainWindow mainWindow;
@@ -29,6 +38,10 @@ public class FPLPanel extends JPanel implements ActionListener{
     private JScrollPane transferScrollWrapper;
     private JPanel transferPanel;
     private JLabel scoreLabel;
+    private JLabel budgetLabel;
+    private JLabel freeTransfersLabel;
+
+    private JButton cancelButton;
 
     private final String[] positions = {"GK", "DEF", "MID", "ATT"};
 
@@ -58,15 +71,30 @@ public class FPLPanel extends JPanel implements ActionListener{
         this.fantasyTeam = fantasyTeam;
         this.allPlayers = allPlayers;
 
+        status = 0;
+
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
         //create top and bottom panels
         topPanel = new JPanel(new BorderLayout());
         BackgroundPanel pitchPanel = new BackgroundPanel(imagePath);
         int targetHeight = pitchPanel.getTargetHeight();
-        JPanel titlePanel = new JPanel();
+        JPanel titlePanel = new JPanel(new GridLayout(1, 3));
         scoreLabel = LabelCreator.createJLabel("0 pts", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        JPanel otherPanel = new JPanel(new BorderLayout());
+        budgetLabel = LabelCreator.createJLabel("£" + String.valueOf(fantasyTeam.getBudget()) + "m", "SansSerif", 14, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
+        freeTransfersLabel = LabelCreator.createJLabel(fantasyTeam.getFreeTransferString() + " Transfers", "SansSerif", 10, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
+        cancelButton = new JButton("Cancel");
+        cancelButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        cancelButton.setVisible(false);
+        cancelButton.addActionListener(this);
+        otherPanel.add(freeTransfersLabel, "East");
+        otherPanel.add(cancelButton, "Center");
+
+        titlePanel.add(otherPanel);
         titlePanel.add(scoreLabel);
+        titlePanel.add(budgetLabel);
+
 
         
 
@@ -112,8 +140,6 @@ public class FPLPanel extends JPanel implements ActionListener{
         teamSections = new HashMap<>();
 
         setupInitialTeam();
-
-        updateTransferVisuals("MID");
     }
 
     public void setupInitialTeam(){
@@ -158,7 +184,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         for(Player p : allPlayers){
             if(!p.getGeneralPosition().equals(position)) continue;
 
-            transferScrollPanel.add(new PlayerTransferPanel(p));
+            transferScrollPanel.add(new PlayerTransferPanel(p, this, true));
         }
 
         transferScrollPanel.revalidate();
@@ -166,7 +192,105 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent e){
+        if(cancelButton == e.getSource()){
+            status = NEUTRAL_STATUS;
+            focusPlayer = null;
+            updateTransferVisuals("");
+            cancelButton.setVisible(false);
+        }
+    }
 
+    public void makeChoice(PlayerPanel p){
+        System.out.println("make choice");
+        PlayerChoiceWindow pcw = new PlayerChoiceWindow(p.getPlayer(), this, CAPTAIN_STATUS, VICE_CAPTAIN_STATUS, SUBSTITUTE_STATUS, TRANSFER_STATUS);
+    }
+
+    public void choiceMade(int flag){
+        System.out.println("choice made");
+        System.out.println(flag);
+        if(status != NEUTRAL_STATUS) return;
+
+        status = flag;
+
+        if(status == CAPTAIN_STATUS){
+            System.out.println("captain!");
+            setCaptain(focusPlayer);
+        }
+        else if(status == VICE_CAPTAIN_STATUS){
+            System.out.println("vice!");
+            setViceCaptain(focusPlayer);
+        }
+        else if(status == SUBSTITUTE_STATUS){
+
+        }
+        else if(status  == TRANSFER_STATUS){
+            System.out.println("transfer!");
+            transferOutPlayer(focusPlayer);
+        }
+    }
+
+    public void setCaptain(PlayerPanel p){
+        for(PlayerPanel playerPanel : playerPanels){
+            if(playerPanel.isCaptain()){
+                playerPanel.unmakeCV();
+                break;
+            }
+        }
+
+        fantasyTeam.makeCaptain(p.getPlayer());
+        p.makeCaptain();
+        p = null;
+        status = NEUTRAL_STATUS;
+    }
+
+    public void setViceCaptain(PlayerPanel p){
+        for(PlayerPanel playerPanel : playerPanels){
+            if(playerPanel.isViceCaptain()){
+                playerPanel.unmakeCV();
+                break;
+            }
+        }
+
+        fantasyTeam.makeViceCaptain(p.getPlayer());
+        p.makeViceCaptain();
+        p = null;
+        status = NEUTRAL_STATUS;
+    }
+
+    public void transferOutPlayer(PlayerPanel p){
+        if(status == NEUTRAL_STATUS || status == TRANSFER_STATUS){
+            status = TRANSFER_STATUS;
+            focusPlayer = p;
+
+            updateTransferVisuals(focusPlayer.getPosition());
+
+            cancelButton.setVisible(true);
+        }
+    }
+
+    public void transferInPlayer(Player p){
+        if(status != TRANSFER_STATUS) return;
+
+        status = NEUTRAL_STATUS;
+
+        Player playerOut = focusPlayer.getPlayer();
+        Player playerIn = p;
+
+        if(!p.getGeneralPosition().equals(focusPlayer.getPosition())){
+            focusPlayer = null;
+            return;
+        }
+
+        if(!fantasyTeam.makeTransfer(playerOut, playerIn)){
+            status = TRANSFER_STATUS;
+            return;
+        }
+
+        focusPlayer.setPlayer(playerIn);
+        budgetLabel.setText("£" + String.valueOf(fantasyTeam.getBudget()) + "m");
+        freeTransfersLabel.setText(fantasyTeam.getFreeTransferString() + " Transfers");
+        cancelButton.setVisible(false);
+        updateTransferVisuals("");
     }
 
     private class BackgroundPanel extends JPanel {

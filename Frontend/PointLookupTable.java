@@ -23,6 +23,8 @@ public class PointLookupTable {
         "DEF", -1
     );
 
+    private static int pointsForTransfer = -4;
+
 
     //2 goals conceded  : -1 (only gk and def)
     //3 saves           : 1
@@ -52,5 +54,9 @@ public class PointLookupTable {
 
         int multi = numGoals / 2;
         return pointsFor2GoalsConceded.get(position) * multi;
+    }
+
+    public static int getPointsForTransfer(){
+        return pointsForTransfer;
     }
 }

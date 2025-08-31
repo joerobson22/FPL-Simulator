@@ -47,7 +47,7 @@ public class Player{
         generalPosition = PositionLookupTable.getGeneralPosition(specificPosition);
         positionIndex = PositionLookupTable.getPositionIndex(specificPosition);
 
-        price = 0;
+        price = 1.0;
 
         weeklyPointHistory = new ArrayList<>();
         for(int i = 0; i < 38; i++) weeklyPointHistory.add(0);
