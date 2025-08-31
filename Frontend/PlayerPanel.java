@@ -1,16 +1,20 @@
 package Frontend;
 
-import java.awt.BorderLayout;
 import java.awt.event.*;
-import java.awt.Font;
-import java.awt.Color;
+
 import javax.swing.*;
+import java.awt.image.*;
+import java.io.File;
+import java.awt.*;
 
 public class PlayerPanel extends JButton implements ActionListener {
     
     //the entire team panel gets 500px -> 400px wide pitch, therefore 400 / 5 (5 at most in any pos) -> 80
     private final int fixedWidth = 95;
     private final int fixedHeight = 60;
+
+    private final int imageWidth = 70;
+    private final int imageHeight = 70;
 
     private final int positionLabelTextSize = 10;
     private final int nameLabelTextSize = 10;
@@ -19,6 +23,7 @@ public class PlayerPanel extends JButton implements ActionListener {
     private FPLPanel FPLPanel;
 
     private Player player;
+    private String logoPath;
     private String position;
 
     private JPanel panel;
@@ -46,7 +51,7 @@ public class PlayerPanel extends JButton implements ActionListener {
         panel.setMaximumSize(new java.awt.Dimension(fixedWidth, fixedHeight));
 
         this.position = position;
-        positionLabel = LabelCreator.createJLabel(position, "SansSerif", positionLabelTextSize, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
+        positionLabel = LabelCreator.createJLabel(position, "SansSerif", positionLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         nameLabel = LabelCreator.createJLabel("+", "SansSerif", nameLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         fixturePointsLabel = LabelCreator.createJLabel("-", "SansSerif", fixturePointsLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
 
@@ -78,7 +83,6 @@ public class PlayerPanel extends JButton implements ActionListener {
         panel.setPlayer(player);
         panel.updateVisuals();
         setPlayer(player2);
-        updateVisuals();
     }
 
     public void updateVisuals(){
@@ -94,10 +98,46 @@ public class PlayerPanel extends JButton implements ActionListener {
 
         nameLabel.setText(nameLabelText);
         fixturePointsLabel.setText("-");
+
+        if(player != null && player.getTeam() != null && logoPath != null && !logoPath.isEmpty()){
+            this.setIcon(getTransparentIcon(logoPath, imageWidth, imageHeight, 0.3f));
+        }
     }
+
+    private ImageIcon getTransparentIcon(String logoPath, int width, int height, float alpha) {
+        System.out.println("Loading logo from: " + logoPath);
+        File f = new File(logoPath);
+        System.out.println("Exists? " + f.exists());
+
+        ImageIcon icon = new ImageIcon(logoPath);
+    
+        // Force-load into a BufferedImage first
+        BufferedImage original = new BufferedImage(
+            icon.getIconWidth(),
+            icon.getIconHeight(),
+            BufferedImage.TYPE_INT_ARGB
+        );
+        Graphics2D g = original.createGraphics();
+        g.drawImage(icon.getImage(), 0, 0, null);
+        g.dispose();
+
+        // Scale into target size
+        Image scaled = original.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+        // Create transparent buffer
+        BufferedImage transparentImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = transparentImg.createGraphics();
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        g2d.drawImage(scaled, 0, 0, null);
+        g2d.dispose();
+
+        return new ImageIcon(transparentImg);
+    }
+
 
     public void setPlayer(Player p){
         player = p;
+        logoPath = player.getTeam().getLogoPath();
         updateVisuals();
     }
 

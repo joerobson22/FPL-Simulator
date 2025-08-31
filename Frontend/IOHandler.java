@@ -139,12 +139,13 @@ public class IOHandler {
 
             while(line != null)
             {
-                ArrayList<String> lineInfo = new ArrayList<String>(Arrays.asList(line.split(",")));
+                ArrayList<String> lineInfo = new ArrayList<String>(Arrays.asList(line.split("\t")));
 
                 String name = lineInfo.get(0);
                 String abbrv = lineInfo.get(1);
+                String logoPath = "teamLogos/" + name.replace(' ', '_').replace('/', '_') + ".png";
 
-                allTeams.add(new Team(0, name, abbrv));
+                allTeams.add(new Team(0, name, abbrv, logoPath));
                 line = reader.readLine();
             }
 
@@ -200,7 +201,7 @@ public class IOHandler {
         for(Team t : allTeams){
             if(t.getName().equals(name)) return t;
         }
-        return new Team(0, "NULL", "NULL");
+        return new Team(0, "NULL", "NULL", "NULL");
     }
 
     public static ArrayList<Player> readAllPlayerData(ArrayList<Team> allTeams, ArrayList<Player> allPlayers){
