@@ -61,6 +61,13 @@ public class FPLPanel extends JPanel implements ActionListener{
         "ATT", 2
     );
 
+    private final Map<String, Integer> positionMins = Map.of(
+        "GK", 1,
+        "DEF", 3,
+        "MID", 3,
+        "ATT", 1
+    );
+
     private ArrayList<PlayerPanel> playerPanels;
 
     FantasyTeam fantasyTeam;
@@ -149,7 +156,9 @@ public class FPLPanel extends JPanel implements ActionListener{
             teamSections.get(pos).setOpaque(false);
 
             for(int i = 0; i < num; i++){
-                playerPanels.add(new PlayerPanel(this, pos));
+                PlayerPanel p = new PlayerPanel(this, pos, false);
+                //p.setPlayer(allPlayers.get(0)); <- TESTING
+                playerPanels.add(p);
             }
         }
 
@@ -163,6 +172,7 @@ public class FPLPanel extends JPanel implements ActionListener{
             String pos = p.getPosition();
             if(positionCounts.get(pos) >= startFormation.get(pos)){
                 benchPanel.add(p);
+                p.putOnBench();
                 continue;
             }
 
@@ -201,12 +211,17 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void makeChoice(PlayerPanel p){
-        System.out.println("make choice");
-        PlayerChoiceWindow pcw = new PlayerChoiceWindow(p.getPlayer(), this, CAPTAIN_STATUS, VICE_CAPTAIN_STATUS, SUBSTITUTE_STATUS, TRANSFER_STATUS);
+        if(status == SUBSTITUTE_STATUS){
+            System.out.println("substitute " + p.getPlayer().getName() + " and " + focusPlayer.getPlayer().getName());
+            substitutePlayers(p);
+        }
+        else if (status == NEUTRAL_STATUS) {
+            focusPlayer = p;
+            PlayerChoiceWindow pcw = new PlayerChoiceWindow(p.getPlayer(), this, CAPTAIN_STATUS, VICE_CAPTAIN_STATUS, SUBSTITUTE_STATUS, TRANSFER_STATUS);
+        }
     }
 
     public void choiceMade(int flag){
-        System.out.println("choice made");
         System.out.println(flag);
         if(status != NEUTRAL_STATUS) return;
 
@@ -221,7 +236,8 @@ public class FPLPanel extends JPanel implements ActionListener{
             setViceCaptain(focusPlayer);
         }
         else if(status == SUBSTITUTE_STATUS){
-
+            System.out.println("substituting...");
+            cancelButton.setVisible(true);
         }
         else if(status  == TRANSFER_STATUS){
             System.out.println("transfer!");
@@ -255,6 +271,91 @@ public class FPLPanel extends JPanel implements ActionListener{
         p.makeViceCaptain();
         p = null;
         status = NEUTRAL_STATUS;
+    }
+
+    public void substitutePlayers(PlayerPanel p){
+        PlayerPanel panel1 = focusPlayer;
+        PlayerPanel panel2 = p;
+
+        //obviously can't swap with yourself, so return but dont reset status
+        if(panel1 == panel2 || (!panel1.isBenched() && !panel2.isBenched())){
+            System.out.println("panels are equal or they are both on the pitch");
+            return;
+        }
+        //if both benched, then we can swap just fine, no problems
+        if(panel1.isBenched() && panel2.isBenched()){
+            System.out.println("swap players casually");
+            panel1.swapPlayers(panel2);
+        }
+        //if one is benched, swap their players
+        //unbench the benched one, bench the unbenched one
+        //add player panels to correct panels
+        else if(panel1.isBenched() && !panel2.isBenched()){
+            String panel1Pos = panel1.getPosition();
+            String panel2Pos = panel2.getPosition();
+
+            //CHECK THIS FORMATION WILL BE VALID
+            if(!panel1Pos.equals(panel2Pos)){
+                System.out.println("they are not the same position");
+                int panel2SectionNumPlayers = teamSections.get(panel2Pos).getComponentCount();
+                //if number of players left in a section is less than allowed, then give up
+                if(panel2SectionNumPlayers - 1 < positionMins.get(panel2Pos)){
+                    System.out.println("would result in invalid formation");
+                    return;
+                }
+                //PANEL 1 IS ON THE BENCH IN THIS SCENARIO
+                panel1.takeOffBench();
+                panel2.putOnBench();
+                
+                teamSections.get(panel1Pos).add(panel1);
+                teamSections.get(panel2Pos).remove(panel2);
+                benchPanel.add(panel2);
+            }
+            else
+            {
+                panel1.swapPlayers(panel2);
+            }
+        }
+        //and vice versa
+        else if(!panel1.isBenched() && panel2.isBenched()){
+            System.out.println("panel2 benched, panel1 not benched");
+            String panel1Pos = panel1.getPosition();
+            String panel2Pos = panel2.getPosition();
+
+            //CHECK THIS FORMATION WILL BE VALID
+            if(!panel1Pos.equals(panel2Pos)){
+                System.out.println("they are not the same position");
+                int panel1SectionNumPlayers = teamSections.get(panel1Pos).getComponentCount();
+                //if number of players left in a section is less than allowed, then give up
+                if(panel1SectionNumPlayers - 1 < positionMins.get(panel1Pos)){
+                    System.out.println("would result in invalid formation");
+                    return;
+                }
+                //PANEL 1 IS ON THE BENCH IN THIS SCENARIO
+                panel2.takeOffBench();
+                panel2.putOnBench();
+                
+                teamSections.get(panel2Pos).add(panel2);
+                teamSections.get(panel1Pos).remove(panel1);
+                benchPanel.add(panel1);
+            }
+            else{
+                panel2.swapPlayers(panel1);
+            }
+        }
+
+        System.out.println("done!");
+
+        focusPlayer = null;
+        status = NEUTRAL_STATUS;
+
+        teamPanel.revalidate();
+        teamPanel.repaint();
+        benchPanel.revalidate();
+        benchPanel.repaint();
+        this.revalidate();
+        this.repaint();
+        cancelButton.setVisible(false);
     }
 
     public void transferOutPlayer(PlayerPanel p){

@@ -9,7 +9,7 @@ import javax.swing.*;
 public class PlayerPanel extends JButton implements ActionListener {
     
     //the entire team panel gets 500px -> 400px wide pitch, therefore 400 / 5 (5 at most in any pos) -> 80
-    private final int fixedWidth = 100;
+    private final int fixedWidth = 95;
     private final int fixedHeight = 60;
 
     private final int positionLabelTextSize = 10;
@@ -26,11 +26,15 @@ public class PlayerPanel extends JButton implements ActionListener {
     private JLabel nameLabel;
     private JLabel fixturePointsLabel;
 
-    private boolean captain = false;
-    private boolean viceCaptain = false;
+    private boolean captain;
+    private boolean viceCaptain;
+    private boolean benched;
 
-    public PlayerPanel(FPLPanel FPLpanel, String position){
+    public PlayerPanel(FPLPanel FPLpanel, String position, boolean benched){
         this.FPLPanel = FPLpanel;
+        this.benched = benched;
+        captain = false;
+        viceCaptain = false;
 
         this.setPreferredSize(new java.awt.Dimension(fixedWidth, fixedHeight));
         this.setMinimumSize(new java.awt.Dimension(fixedWidth, fixedHeight));
@@ -60,7 +64,6 @@ public class PlayerPanel extends JButton implements ActionListener {
         if(this == e.getSource()){
             if(player != null){
                 //create player large window
-                System.out.println("Make choice");
                 FPLPanel.makeChoice(this);
             }
             else{
@@ -70,8 +73,16 @@ public class PlayerPanel extends JButton implements ActionListener {
         
     }
 
+    public void swapPlayers(PlayerPanel panel){
+        Player player2 = panel.getPlayer();
+        panel.setPlayer(player);
+        panel.updateVisuals();
+        setPlayer(player2);
+        updateVisuals();
+    }
+
     public void updateVisuals(){
-        positionLabel.setText(position + " - £" + String.valueOf(player.getPrice()));
+        positionLabel.setText(position + " - £" + String.valueOf(player.getPrice()) + "m");
 
         String nameLabelText = player.getName();
         if(captain){
@@ -88,6 +99,18 @@ public class PlayerPanel extends JButton implements ActionListener {
     public void setPlayer(Player p){
         player = p;
         updateVisuals();
+    }
+
+    public boolean isBenched(){
+        return benched;
+    }
+
+    public void putOnBench(){
+        benched = true;
+    }
+
+    public void takeOffBench(){
+        benched = false;
     }
 
     public Player getPlayer(){
