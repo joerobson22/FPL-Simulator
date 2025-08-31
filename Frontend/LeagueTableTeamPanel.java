@@ -14,11 +14,14 @@ public class LeagueTableTeamPanel extends JPanel {
     private final Color BOTTOM_COLOR = new Color(171, 84, 84);
 
     private final String font = "SansSerif";
-    private final int teamNameSize = 13;
+    private final int teamNameSize = 12;
     private final int teamAbbrvSize = 14;
     private final int positionSize = 13;
     private final int statSize = 12;
     private final int pointSize = 14;
+
+    private final int fixedIconWidth = 20;
+    private final int fixedIconHeight = 20;
 
     private final Map<Integer, Color> COLOR_MAP = Map.ofEntries(
         Map.entry(1, WINNER_COLOR),
@@ -55,6 +58,7 @@ public class LeagueTableTeamPanel extends JPanel {
     JLabel lossesLabel;
     JLabel gdLabel;
     JLabel pointsLabel;
+    JLabel teamBadge;
 
     Team team;
     int position;
@@ -70,7 +74,7 @@ public class LeagueTableTeamPanel extends JPanel {
         this.setLayout(new GridLayout(1, 2));
         //team panel: this panel's position and team name
         positionLabel = LabelCreator.createJLabel(String.valueOf(position) + ".    ", font, positionSize, Font.BOLD, SwingConstants.LEFT, Color.BLACK);
-        teamNameLabel = LabelCreator.createJLabel(team.getName(), font, teamNameSize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK);
+        teamNameLabel = LabelCreator.createJLabel(" " + team.getName(), font, teamNameSize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK);
         teamAbbrvLabel = LabelCreator.createJLabel(team.getAbbrv() + "  ", font, teamAbbrvSize, Font.BOLD, SwingConstants.RIGHT, Color.BLACK);
         //points panel: this team's wins, draws, losses, gd and points
         winsLabel = LabelCreator.createJLabel(String.valueOf(team.getNumWins()), font, statSize, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
@@ -83,7 +87,12 @@ public class LeagueTableTeamPanel extends JPanel {
         pointsPanel = new JPanel(new GridLayout(1, 5));
 
         teamPanel.add(positionLabel, "West");
-        teamPanel.add(teamNameLabel, "Center");
+        JPanel teamNameAndBadgePanel = new JPanel(new BorderLayout());
+        teamNameAndBadgePanel.add(teamNameLabel, "Center");
+        teamBadge = LabelCreator.getIconLabel(team.getLogoPath(), fixedIconWidth, fixedIconHeight);
+        teamNameAndBadgePanel.add(teamBadge, "West");
+        teamNameAndBadgePanel.setBackground(COLOR_MAP.get(position));
+        teamPanel.add(teamNameAndBadgePanel);
         teamPanel.add(teamAbbrvLabel, "East");
         teamPanel.setBackground(COLOR_MAP.get(position));
 
@@ -99,8 +108,9 @@ public class LeagueTableTeamPanel extends JPanel {
     }
 
     public void update(){
-        teamNameLabel.setText(team.getName());
+        teamNameLabel.setText(" " + team.getName());
         teamAbbrvLabel.setText(team.getAbbrv());
+        teamBadge.setIcon(LabelCreator.getImageIcon(team.getLogoPath(), fixedIconWidth, fixedIconHeight));
         
         winsLabel.setText(String.valueOf(team.getNumWins()));
         drawsLabel.setText(String.valueOf(team.getNumDraws()));

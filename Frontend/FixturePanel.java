@@ -3,7 +3,9 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 import java.awt.*;
+import java.awt.image.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.concurrent.Flow;
 
 public class FixturePanel extends JPanel implements ActionListener{
@@ -11,6 +13,9 @@ public class FixturePanel extends JPanel implements ActionListener{
     private final int fixtureFontSize = 20;
     private final String buttonFont = "SansSerif";
     private final int buttonFontSize = 15;
+
+    private final int fixedIconWidth = 60;
+    private final int fixedIconHeight = 60;
 
     MainWindow mainWindow;
 
@@ -60,10 +65,14 @@ public class FixturePanel extends JPanel implements ActionListener{
         actionButton.setFont(new Font("SansSerif", Font.BOLD, buttonFontSize));
         actionButton.addActionListener(this);
 
-        //add components to score panel
+        JLabel homeIconLabel = LabelCreator.getIconLabel(fixture.getHomeTeam().getLogoPath(), fixedIconWidth, fixedIconHeight);
+        JLabel awayIconLabel = LabelCreator.getIconLabel(fixture.getAwayTeam().getLogoPath(), fixedIconWidth, fixedIconHeight);
+        
+        scorePanel.add(homeIconLabel);
         scorePanel.add(homeTeam);
         scorePanel.add(score);
         scorePanel.add(awayTeam);
+        scorePanel.add(awayIconLabel);
 
         this.add(scorePanel);
 
@@ -120,4 +129,6 @@ public class FixturePanel extends JPanel implements ActionListener{
             viewFixtureOutcome();
         }
     }
+
+    
 }
