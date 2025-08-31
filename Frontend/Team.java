@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.awt.Color;
+
 public class Team {
     private static Map<String, Integer> maxPositions = Map.of(
         "GK", 1,
@@ -15,6 +17,9 @@ public class Team {
     private String name;
     private String abbrv;
 
+    private Color color;
+    private Color mutedColor;
+
     private int numWins;
     private int numDraws;
     private int numLosses;
@@ -24,10 +29,11 @@ public class Team {
     private ArrayList<Player> players;
 
     //constructor
-    public Team(int rating, String name, String abbrv){
+    public Team(int rating, String name, String abbrv, Color color){
         this.rating = rating;
         this.name = name;
         this.abbrv = abbrv;
+        this.color = color;
 
         numWins = 0;
         numDraws = 0;
@@ -49,6 +55,14 @@ public class Team {
 
     public String getAbbrv(){
         return abbrv;
+    }
+
+    public Color getColor(){
+        return color;
+    }
+
+    public Color getMutedColor(){
+        return color;
     }
 
     public int getNumWins(){
