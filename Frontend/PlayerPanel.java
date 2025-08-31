@@ -1,6 +1,7 @@
 package Frontend;
 
 import java.awt.event.*;
+import javax.swing.border.Border;
 
 import javax.swing.*;
 import java.awt.image.*;
@@ -9,6 +10,10 @@ import java.awt.*;
 
 public class PlayerPanel extends JButton implements ActionListener {
     
+    private final Color captainColor = new Color(252, 186, 3);
+    private final Color viceCaptainColor = new Color(255, 225, 143);
+    private final Color normalColor = new Color(255, 252, 245);
+
     //the entire team panel gets 500px -> 400px wide pitch, therefore 400 / 5 (5 at most in any pos) -> 80
     private final int fixedWidth = 95;
     private final int fixedHeight = 60;
@@ -91,9 +96,14 @@ public class PlayerPanel extends JButton implements ActionListener {
         String nameLabelText = player.getName();
         if(captain){
             nameLabelText = "C- " + nameLabelText;
+            this.setBorder(BorderFactory.createLineBorder(captainColor, 2));
         }
         else if(viceCaptain){
             nameLabelText = "V- " + nameLabelText;
+            this.setBorder(BorderFactory.createLineBorder(viceCaptainColor, 2));
+        }
+        else{
+            this.setBorder(BorderFactory.createLineBorder(normalColor, 2));
         }
 
         nameLabel.setText(nameLabelText);

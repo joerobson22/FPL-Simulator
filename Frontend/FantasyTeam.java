@@ -107,16 +107,44 @@ public class FantasyTeam {
         weeklyPoints = 0;
     }
 
-    public boolean makeTransfer(Player oldPlayer, Player newPlayer){
+    public boolean makeTransfer(Player oldPlayer, Player newPlayer, boolean onBench){
         if(players.contains(newPlayer)) return false;
 
         addPlayer(newPlayer);
         removePlayer(oldPlayer);
 
+        bench.remove(oldPlayer);
+        startingXI.remove(oldPlayer);
+
+        if(onBench) bench.add(newPlayer);
+        else startingXI.add(newPlayer);
+
         if(freeTransfers > -1 && freeTransfers > 0) freeTransfers--;
         else changeWeeklyPoints(PointLookupTable.getPointsForTransfer());
 
         return true;
+    }
+
+    public void makeSubstitution(Player player1, Player player2, boolean player1Bench, boolean player2Bench){
+        if(player1Bench){
+            bench.remove(player1);
+            bench.add(player2);
+        }
+        else{
+            startingXI.remove(player1);
+            startingXI.add(player2);
+        } 
+
+        if(player2Bench){
+            bench.remove(player2);
+            bench.add(player1);
+        }
+        else{
+            startingXI.remove(player2);
+            startingXI.add(player1);
+        }
+
+
     }
 
     public void makeCaptain(Player p){
@@ -131,9 +159,11 @@ public class FantasyTeam {
         return budget >= 0.0;
     }
 
+    /*
     public void revertTransfers(ArrayList<Player> originalPlayers, ArrayList<Player> invalidPlayers){
         for(int i = 0; i < originalPlayers.size(); i++){
             makeTransfer(invalidPlayers.get(i), originalPlayers.get(i));
         }
     }
+        */
 }

@@ -277,6 +277,12 @@ public class FPLPanel extends JPanel implements ActionListener{
         PlayerPanel panel1 = focusPlayer;
         PlayerPanel panel2 = p;
 
+        boolean player1Bench = panel1.isBenched();
+        boolean player2Bench = panel2.isBenched();
+
+        Player player1 = panel1.getPlayer();
+        Player player2 = panel2.getPlayer();
+
         //obviously can't swap with yourself, so return but dont reset status
         if(panel1 == panel2 || (!panel1.isBenched() && !panel2.isBenched())){
             System.out.println("panels are equal or they are both on the pitch");
@@ -349,6 +355,8 @@ public class FPLPanel extends JPanel implements ActionListener{
         focusPlayer = null;
         status = NEUTRAL_STATUS;
 
+        fantasyTeam.makeSubstitution(player1, player2, player1Bench, player2Bench);
+
         teamPanel.revalidate();
         teamPanel.repaint();
         benchPanel.revalidate();
@@ -382,7 +390,7 @@ public class FPLPanel extends JPanel implements ActionListener{
             return;
         }
 
-        if(!fantasyTeam.makeTransfer(playerOut, playerIn)){
+        if(!fantasyTeam.makeTransfer(playerOut, playerIn, componentArrayHasElement(benchPanel.getComponents(), benchPanel.getComponentCount(), focusPlayer))){
             status = TRANSFER_STATUS;
             return;
         }
@@ -392,6 +400,13 @@ public class FPLPanel extends JPanel implements ActionListener{
         freeTransfersLabel.setText(fantasyTeam.getFreeTransferString() + " Transfers");
         cancelButton.setVisible(false);
         updateTransferVisuals("");
+    }
+
+    private boolean componentArrayHasElement(Component[] componentArray, int arraySize, Component c){
+        for(int i = 0; i < arraySize; i++){
+            if(componentArray[i] == c) return true;
+        }
+        return false;
     }
 
     private class BackgroundPanel extends JPanel {
