@@ -23,7 +23,7 @@ public class PlayerPanel extends JButton implements ActionListener {
 
     private final int positionLabelTextSize = 10;
     private final int nameLabelTextSize = 10;
-    private final int fixturePointsLabelTextSize = 14;
+    private final int fixturePointsLabelTextSize = 15;
 
     private FPLPanel FPLPanel;
 
@@ -144,6 +144,11 @@ public class PlayerPanel extends JButton implements ActionListener {
         return new ImageIcon(transparentImg);
     }
 
+
+    public void setPoints(int points){
+        if(captain) points *= 2;
+        fixturePointsLabel.setText(String.valueOf(points) + "pts");
+    }
 
     public void setPlayer(Player p){
         player = p;

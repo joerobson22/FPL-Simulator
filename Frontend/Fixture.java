@@ -67,6 +67,12 @@ public class Fixture {
     public void allocatePointsAndChangeStats(int gameWeek){
         System.out.println("Allocating points");
 
+        for(Player p : home.getPlayers()){
+            p.playMatch();
+        }
+        for(Player p : away.getPlayers()){
+            p.playMatch();
+        }
         
         System.out.println("Goals conceded");
         //allocate manager favour for any goals conceded

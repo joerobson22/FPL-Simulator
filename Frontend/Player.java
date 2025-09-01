@@ -32,6 +32,8 @@ public class Player{
     private int numCleanSheets;
     private ArrayList<Integer> weeklyPointHistory;
 
+    private boolean playedThisWeek;
+
     //constructor
     public Player(int id, String name, int rating, String specificPosition, String teamPosition, Team team, ArrayList<Integer> attributes)
     {
@@ -42,6 +44,7 @@ public class Player{
         this.specificPosition = specificPosition;
         this.teamPosition = teamPosition;
         this.team = team;
+        playedThisWeek = false;
 
         if(!specificPosition.equals("GK")) setAttributes(attributes);
         generalPosition = PositionLookupTable.getGeneralPosition(specificPosition);
@@ -136,7 +139,15 @@ public class Player{
         return weeklyPointHistory.get(gameWeek);
     }
 
+    public boolean hasPlayedThisWeek(){
+        return playedThisWeek;
+    }
+
     //mutators
+    public void playMatch(){
+        playedThisWeek = true;
+    }
+
     public void changeManagerApprovalRating(int amount){
         managerApprovalRating += amount;
     }
@@ -197,6 +208,7 @@ public class Player{
 
     public void resetWeeklyPoints(){
         weeklyPoints = 0;
+        playedThisWeek = false;
     }
 
     public void changeWeeklyPoints(int change){

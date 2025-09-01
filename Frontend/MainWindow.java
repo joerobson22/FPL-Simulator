@@ -189,6 +189,7 @@ public class MainWindow extends JFrame implements ActionListener{
         }
 
         statsPanel.updateStats(allPlayers, currentGameWeek);
+        fplPanel.updateTeamPoints();
         nextGameWeek();
     }
 
@@ -270,6 +271,7 @@ public class MainWindow extends JFrame implements ActionListener{
             if(!simulatingAll){
                 System.out.println("Update stats");
                 statsPanel.updateStats(allPlayers, currentGameWeek);
+                fplPanel.updateTeamPoints();
                 if(isGameWeekFinished(currentGameWeek)){
                     nextGameWeek();
                 }
@@ -305,6 +307,8 @@ public class MainWindow extends JFrame implements ActionListener{
         currentGameWeek++;
         simAllButton.setVisible(false);
         teamConfirmed = false;
+        fantasyTeam.saveTeam();
+        fantasyTeam.resetWeeklyTotal();
 
         for(Player p : allPlayers){
             p.resetWeeklyPoints();

@@ -194,7 +194,6 @@ public class FPLPanel extends JPanel implements ActionListener{
         System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
         if(fantasyTeam.isTeamValid() && !teamConfirmed){
             mainWindow.confirmTeam();
-            fantasyTeam.saveTeam();
             teamConfirmed = true;
             status = CONFIRMED_STATUS;
             focusPlayer = null;
@@ -209,40 +208,74 @@ public class FPLPanel extends JPanel implements ActionListener{
             teamSections.get(key).removeAll();
         }
         benchPanel.removeAll();
+        playerPanels = new ArrayList<>();
 
         if(viewingGameWeek < currentGameWeek){
             //get previous fantasy team
             PreviousFantasyTeam ft = fantasyTeam.getPreviousFantasyTeam(viewingGameWeek);
             //for each player in the starting lineup, make a new player panel for it and add it to the correct position
             for(Player p : ft.getStartingXI()){
-                createAndAddPastPlayer(p, teamSections.get(p.getGeneralPosition()), ft.getCaptain(), ft.getViceCaptain(), false);
+                createAndAddPastPlayer(p, teamSections.get(p.getGeneralPosition()), ft.getCaptain(), ft.getViceCaptain(), false, viewingGameWeek, currentGameWeek);
             }
             for(Player p : ft.getBench()){
-                createAndAddPastPlayer(p, benchPanel, ft.getCaptain(), ft.getViceCaptain(), true);
+                createAndAddPastPlayer(p, benchPanel, ft.getCaptain(), ft.getViceCaptain(), true, viewingGameWeek, currentGameWeek);
             }
+            scoreLabel.setText(String.valueOf(ft.getPoints()) + "pts");
         }
         else {
             //for each player in the starting lineup, make a new player panel for it and add it to the correct position
             for(Player p : fantasyTeam.getStartingXI()){
-                createAndAddPastPlayer(p, teamSections.get(p.getGeneralPosition()), fantasyTeam.getCaptain(), fantasyTeam.getViceCaptain(), false);
+                createAndAddPastPlayer(p, teamSections.get(p.getGeneralPosition()), fantasyTeam.getCaptain(), fantasyTeam.getViceCaptain(), false, viewingGameWeek, currentGameWeek);
             }
             for(Player p : fantasyTeam.getBench()){
-                createAndAddPastPlayer(p, benchPanel, fantasyTeam.getCaptain(), fantasyTeam.getViceCaptain(), true);
+                createAndAddPastPlayer(p, benchPanel, fantasyTeam.getCaptain(), fantasyTeam.getViceCaptain(), true, viewingGameWeek, currentGameWeek);
             }
+            scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
         }
 
-        //then update point visuals for every player
-        //update weekly point visuals at the top
+        for(String key : teamSections.keySet()){
+            teamSections.get(key).revalidate();
+            teamSections.get(key).repaint();
+        }
+        benchPanel.revalidate();
+        benchPanel.repaint();
+        teamPanel.revalidate();
+        teamPanel.repaint();
+        this.revalidate();
+        this.repaint();
     }
 
-    public void createAndAddPastPlayer(Player p, JPanel panel, Player captain, Player viceCaptain, boolean benched){
+    public void updateTeamPoints(){
+        fantasyTeam.resetWeeklyTotal();
+        for(PlayerPanel panel : playerPanels){
+            Player player = panel.getPlayer();
+            if(!player.hasPlayedThisWeek()) continue;
+
+            if(!panel.isBenched()) fantasyTeam.changeWeeklyPoints(player);
+            panel.setPoints(player.getWeeklyPoints());
+        }
+        scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
+    }
+
+    public void createAndAddPastPlayer(Player p, JPanel panel, Player captain, Player viceCaptain, boolean benched, int viewingGameWeek, int currentGameWeek){
         PlayerPanel pp = new PlayerPanel(this, p.getGeneralPosition(), benched);
         pp.setPlayer(p);
 
         if(captain == p) pp.makeCaptain();
         else if(viceCaptain == p) pp.makeViceCaptain();
+        
+        // Always set points for past gameweeks
+        if (viewingGameWeek < currentGameWeek) {
+            int points = p.getGameWeekPoints(viewingGameWeek);
+            pp.setPoints(points);
+        } 
+        // For current gameweek, set points only if the player has played
+        else if (viewingGameWeek == currentGameWeek && p.hasPlayedThisWeek()) {
+            pp.setPoints(p.getWeeklyPoints());
+        }
 
         panel.add(pp);
+        playerPanels.add(pp);
     }
 
     public void setConfirmed(boolean correctGameweek, boolean teamConfirmed){

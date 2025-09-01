@@ -127,7 +127,9 @@ public class FantasyTeam {
         return -1;
     }
 
-    public void changeWeeklyPoints(int change){
+    public void changeWeeklyPoints(Player p){
+        int change = p.getWeeklyPoints();
+        if(p == captain) change *= 2;
         weeklyPoints += change;
     }
 
@@ -152,7 +154,7 @@ public class FantasyTeam {
         else startingXI.add(newPlayer);
 
         if(freeTransfers > -1 && freeTransfers > 0) freeTransfers--;
-        else changeWeeklyPoints(PointLookupTable.getPointsForTransfer());
+        else weeklyPoints += PointLookupTable.getPointsForTransfer();
 
         return true;
     }

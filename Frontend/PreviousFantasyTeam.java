@@ -14,6 +14,7 @@ public class PreviousFantasyTeam{
         this.bench = new ArrayList<>();
         this.captain = captain;
         this.viceCaptain = viceCaptain;
+        this.points = points;
 
         //make copies of the starting 11 and bench otherwise confusing james
         for(Player p : startingXI) this.startingXI.add(p);
