@@ -120,6 +120,7 @@ public class MainWindow extends JFrame implements ActionListener{
         setFixtures(viewingGameWeek);
         setStats(viewingGameWeek);
         fplPanel.setConfirmed(currentGameWeek == viewingGameWeek, teamConfirmed);
+        fplPanel.updateTeamVisuals(viewingGameWeek, currentGameWeek);
 
         showAndHideButtons();
     }

@@ -4,14 +4,14 @@ import java.util.ArrayList;
 public class FantasyTeam {
     private String name;
 
+    private ArrayList<PreviousFantasyTeam> teamHistory;
+
     private ArrayList<Player> players;
     private ArrayList<Player> startingXI;
     private ArrayList<Player> bench;
 
     private Player captain;
     private Player viceCaptain;
-
-    private ArrayList<Integer> gameWeekPointsHistory;
 
     private double budget;
     private int totalPoints;
@@ -25,8 +25,8 @@ public class FantasyTeam {
         players = new ArrayList<Player>();
         startingXI = new ArrayList<>();
         bench = new ArrayList<>();
+        teamHistory = new ArrayList<>();
 
-        gameWeekPointsHistory = new ArrayList<>();
         budget = 100.0;
         weeklyPoints = 0;
         totalPoints = 0;
@@ -35,6 +35,10 @@ public class FantasyTeam {
 
 
     //accessors
+    public void saveTeam(){
+        teamHistory.add(new PreviousFantasyTeam(startingXI, bench, captain, viceCaptain, weeklyPoints));
+    }
+
     public boolean isTeamValid(){
         return (players.size() == 15 && checkTeamMax() && captain != null && viceCaptain != null);
     }
@@ -57,6 +61,10 @@ public class FantasyTeam {
         return true;
     }
 
+    public PreviousFantasyTeam getPreviousFantasyTeam(int gameWeek){
+        return teamHistory.get(gameWeek);
+    }
+
     public String getName(){
         return name;
     }
@@ -65,9 +73,11 @@ public class FantasyTeam {
         return players;
     }
 
-    public ArrayList<Player> getBench(){
-        return bench;
-    }
+    public ArrayList<Player> getStartingXI() { return startingXI; }
+    public ArrayList<Player> getBench() { return bench; }
+    public Player getCaptain() { return captain; }
+    public Player getViceCaptain() { return viceCaptain; }
+    public int getPoints() { return weeklyPoints; }
 
     public double getBudget(){
         return budget;
@@ -176,16 +186,4 @@ public class FantasyTeam {
     public void makeViceCaptain(Player p){
         viceCaptain = p;
     }
-
-    public boolean confirmTransfers(){
-        return budget >= 0.0;
-    }
-
-    /*
-    public void revertTransfers(ArrayList<Player> originalPlayers, ArrayList<Player> invalidPlayers){
-        for(int i = 0; i < originalPlayers.size(); i++){
-            makeTransfer(invalidPlayers.get(i), originalPlayers.get(i));
-        }
-    }
-        */
 }
