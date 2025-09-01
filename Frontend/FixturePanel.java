@@ -12,7 +12,7 @@ public class FixturePanel extends JPanel implements ActionListener{
     private final String fixtureFont = "SansSerif";
     private final int fixtureFontSize = 20;
     private final String buttonFont = "SansSerif";
-    private final int buttonFontSize = 15;
+    private final int buttonFontSize = 10;
 
     private final int fixedIconWidth = 60;
     private final int fixedIconHeight = 60;
@@ -45,8 +45,11 @@ public class FixturePanel extends JPanel implements ActionListener{
 
     //methods
     public void setup(){
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        this.setLayout(new BorderLayout());
+        this.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         // Score panel with FlowLayout for horizontal arrangement
         scorePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
@@ -68,18 +71,22 @@ public class FixturePanel extends JPanel implements ActionListener{
         JLabel homeIconLabel = LabelCreator.getIconLabel(fixture.getHomeTeam().getLogoPath(), fixedIconWidth, fixedIconHeight);
         JLabel awayIconLabel = LabelCreator.getIconLabel(fixture.getAwayTeam().getLogoPath(), fixedIconWidth, fixedIconHeight);
         
-        scorePanel.add(homeIconLabel);
+        //scorePanel.add(homeIconLabel);
         scorePanel.add(homeTeam);
         scorePanel.add(score);
         scorePanel.add(awayTeam);
-        scorePanel.add(awayIconLabel);
+        //scorePanel.add(awayIconLabel);
 
-        this.add(scorePanel);
+        mainPanel.add(scorePanel);
+
+        this.add(homeIconLabel, "West");
+        this.add(awayIconLabel, "East");
+        this.add(mainPanel, "Center");
 
         //add button to button panel if not played
         if(canSimulate | fixture.hasPlayed()){
             buttonPanel.add(actionButton);
-            this.add(buttonPanel);
+            mainPanel.add(buttonPanel);
         }
         //otherwise show the score and the fixture's scorers
         
@@ -88,9 +95,6 @@ public class FixturePanel extends JPanel implements ActionListener{
 
             actionButton.setText("View >>");
         }
-
-        //set preferred size
-        this.setPreferredSize(new Dimension(this.getPreferredSize().width, 120));
     }
 
     //this fixture has been played now, so remove the button and display the score and scorers
