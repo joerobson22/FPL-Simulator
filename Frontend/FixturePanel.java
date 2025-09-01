@@ -67,6 +67,7 @@ public class FixturePanel extends JPanel implements ActionListener{
         actionButton = new JButton("Simulate");
         actionButton.setFont(new Font("SansSerif", Font.BOLD, buttonFontSize));
         actionButton.addActionListener(this);
+        actionButton.setVisible(false);
 
         JLabel homeIconLabel = LabelCreator.getIconLabel(fixture.getHomeTeam().getLogoPath(), fixedIconWidth, fixedIconHeight);
         JLabel awayIconLabel = LabelCreator.getIconLabel(fixture.getAwayTeam().getLogoPath(), fixedIconWidth, fixedIconHeight);
@@ -93,7 +94,14 @@ public class FixturePanel extends JPanel implements ActionListener{
         if(fixture.hasPlayed()){
             score.setText(fixture.getOutcome().getScoreString());
 
+            actionButton.setVisible(true);
             actionButton.setText("View >>");
+        }
+    }
+
+    public void showSimulate(){
+        if(!fixture.hasPlayed()){
+            actionButton.setVisible(true);
         }
     }
 

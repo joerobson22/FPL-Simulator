@@ -93,7 +93,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         freeTransfersLabel = LabelCreator.createJLabel(fantasyTeam.getFreeTransferString() + " Transfers", "SansSerif", 10, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
         cancelButton = new JButton("Cancel");
         cancelButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
-        cancelButton.setVisible(false);
+        cancelButton.setText("Confirm Team");
         cancelButton.addActionListener(this);
         otherPanel.add(freeTransfersLabel, "East");
         otherPanel.add(cancelButton, "Center");
@@ -185,6 +185,10 @@ public class FPLPanel extends JPanel implements ActionListener{
         }
     }
 
+    public void confirmTeam(){
+        if(fantasyTeam.isTeamValid()) mainWindow.confirmTeam();
+    }
+
     public void updateTeamVisuals(int gameWeek){
 
     }
@@ -203,10 +207,16 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     public void actionPerformed(ActionEvent e){
         if(cancelButton == e.getSource()){
-            status = NEUTRAL_STATUS;
-            focusPlayer = null;
-            updateTransferVisuals("");
-            cancelButton.setVisible(false);
+            if(cancelButton.getText().equals("Cancel")){
+                status = NEUTRAL_STATUS;
+                focusPlayer = null;
+                updateTransferVisuals("");
+                cancelButton.setText("Confirm Team");
+            }
+            else if(cancelButton.getText().equals("Confirm Team")){
+                confirmTeam();
+            }
+            
         }
     }
 
@@ -237,7 +247,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         }
         else if(status == SUBSTITUTE_STATUS){
             System.out.println("substituting...");
-            cancelButton.setVisible(true);
+            cancelButton.setText("Cancel");
         }
         else if(status  == TRANSFER_STATUS){
             System.out.println("transfer!");
@@ -363,7 +373,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         benchPanel.repaint();
         this.revalidate();
         this.repaint();
-        cancelButton.setVisible(false);
+        cancelButton.setText("Confirm Team");
     }
 
     public void transferOutPlayer(PlayerPanel p){
@@ -373,7 +383,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
             updateTransferVisuals(focusPlayer.getPosition());
 
-            cancelButton.setVisible(true);
+            cancelButton.setText("Cancel");
         }
     }
 
@@ -398,7 +408,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         focusPlayer.setPlayer(playerIn);
         budgetLabel.setText("£" + String.valueOf(fantasyTeam.getBudget()) + "m");
         freeTransfersLabel.setText(fantasyTeam.getFreeTransferString() + " Transfers");
-        cancelButton.setVisible(false);
+        cancelButton.setText("Confirm Team");
         updateTransferVisuals("");
     }
 

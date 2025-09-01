@@ -39,6 +39,7 @@ public class MainWindow extends JFrame implements ActionListener{
     FPLPanel fplPanel;
     ArrayList<Team> allTeams;
     ArrayList<Player> allPlayers;
+    ArrayList<FixturePanel> fixturePanelList;
 
     JButton simAllButton;
     JButton prevGWButton;
@@ -129,6 +130,17 @@ public class MainWindow extends JFrame implements ActionListener{
         else nextGWButton.setVisible(true);
     }
 
+    public void confirmTeam(){
+        for(FixturePanel fp : fixturePanelList){
+            fp.showSimulate();
+        }
+        
+        simAllButton = new JButton("Simulate All");
+        simAllButton.setFont(new Font("SansSerif", Font.BOLD, 18));
+        simAllButton.addActionListener(this);
+        fixtureListPanel.add(simAllButton);
+    }
+
     private void setupTeams(){
         allTeams = IOHandler.readAllTeamData(allTeams);
 
@@ -146,17 +158,12 @@ public class MainWindow extends JFrame implements ActionListener{
     //displaying all the upcoming fixtures
     private void setFixtures(int gameWeek){
         fixtureListPanel.removeAll();
+        fixturePanelList = new ArrayList<>();
 
         for(Fixture f : fixtureList.getFixtures(gameWeek)){
             FixturePanel fp = new FixturePanel(this, f, currentGameWeek == viewingGameWeek);
             fixtureListPanel.add(fp);
-        }
-
-        if(currentGameWeek == viewingGameWeek){
-            simAllButton = new JButton("Simulate All");
-            simAllButton.setFont(new Font("SansSerif", Font.BOLD, 18));
-            simAllButton.addActionListener(this);
-            fixtureListPanel.add(simAllButton);
+            fixturePanelList.add(fp);
         }
 
         fixtureListPanel.revalidate();

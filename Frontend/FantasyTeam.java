@@ -35,6 +35,28 @@ public class FantasyTeam {
 
 
     //accessors
+    public boolean isTeamValid(){
+        return (players.size() == 15 && checkTeamMax() && captain != null && viceCaptain != null);
+    }
+
+    private boolean checkTeamMax(){
+        ArrayList<Team> checkedTeam = new ArrayList<>();
+        for(Player p1 : players){
+            if(checkedTeam.contains(p1.getTeam())) continue;
+
+            int teamCount = 1;
+            for(Player p2 : players){
+                if(p1 == p2) continue;
+
+                if(p1.getTeam() == p2.getTeam()){
+                    teamCount++;
+                    if(teamCount > 3) return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public String getName(){
         return name;
     }
