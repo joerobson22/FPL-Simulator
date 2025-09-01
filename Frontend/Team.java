@@ -11,6 +11,7 @@ public class Team {
         "ATT", 2
     );
 
+    private int id;
     private int rating;
     private String name;
     private String abbrv;
@@ -25,7 +26,8 @@ public class Team {
     private ArrayList<Player> players;
 
     //constructor
-    public Team(int rating, String name, String abbrv, String logoPath){
+    public Team(int id, int rating, String name, String abbrv, String logoPath){
+        this.id = id;
         this.rating = rating;
         this.name = name;
         this.abbrv = abbrv;
@@ -41,6 +43,10 @@ public class Team {
 
 
     //accessors
+    public int getID(){
+        return id;
+    }
+
     public int getRating(){
         return rating;
     }

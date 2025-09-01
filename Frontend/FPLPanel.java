@@ -20,6 +20,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     private int status;
     private PlayerPanel focusPlayer;
+    private String viewingPosition = " ";
 
     private final int fixedPitchWidth = 500;
 
@@ -197,7 +198,26 @@ public class FPLPanel extends JPanel implements ActionListener{
             teamConfirmed = true;
             status = CONFIRMED_STATUS;
             focusPlayer = null;
+            updateInfoPanels(1, 2);
+            updateTransferVisuals(" ");
+            viewingPosition = " ";
         }
+    }
+
+    public void updateTransferInformation(){
+        budgetLabel.setText("£" + String.valueOf(fantasyTeam.getBudget()) + "m");
+        freeTransfersLabel.setText(fantasyTeam.getFreeTransferString() + " Transfers");
+        cancelButton.setText("Confirm Team");
+        //scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
+    }
+
+    public void updateInfoPanels(int viewingGameWeek, int currentGameWeek){
+        boolean visible = viewingGameWeek == currentGameWeek;
+        freeTransfersLabel.setVisible(visible);
+        cancelButton.setVisible(visible);
+        budgetLabel.setVisible(visible);
+
+        updateTransferInformation();
     }
 
     public void updateTeamVisuals(int viewingGameWeek, int currentGameWeek){
@@ -311,13 +331,21 @@ public class FPLPanel extends JPanel implements ActionListener{
         if(cancelButton == e.getSource()){
             if(cancelButton.getText().equals("Cancel")){
                 status = NEUTRAL_STATUS;
-                focusPlayer = null;
-                updateTransferVisuals("");
+                if(focusPlayer != null){
+                    focusPlayer.updateVisuals(false);
+                    focusPlayer = null;
+                }
+                updateTransferVisuals(" ");
+                viewingPosition = " ";
                 cancelButton.setText("Confirm Team");
             }
             else if(cancelButton.getText().equals("Confirm Team")){
                 System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
                 System.out.println("confirm team pressed");
+                if(focusPlayer != null){
+                    focusPlayer.updateVisuals(false);
+                    focusPlayer = null;
+                }
                 confirmTeam();
             }
         }
@@ -330,7 +358,9 @@ public class FPLPanel extends JPanel implements ActionListener{
             substitutePlayers(p);
         }
         else if (status == NEUTRAL_STATUS) {
+            if(focusPlayer != null) focusPlayer.updateVisuals(false);
             focusPlayer = p;
+            focusPlayer.updateVisuals(true);
             PlayerChoiceWindow pcw = new PlayerChoiceWindow(p.getPlayer(), this, CAPTAIN_STATUS, VICE_CAPTAIN_STATUS, SUBSTITUTE_STATUS, TRANSFER_STATUS);
         }
     }
@@ -342,11 +372,11 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         status = flag;
 
-        if(status == CAPTAIN_STATUS){
+        if(status == CAPTAIN_STATUS && !focusPlayer.isBenched()){
             System.out.println("captain!");
             setCaptain(focusPlayer);
         }
-        else if(status == VICE_CAPTAIN_STATUS){
+        else if(status == VICE_CAPTAIN_STATUS && !focusPlayer.isBenched()){
             System.out.println("vice!");
             setViceCaptain(focusPlayer);
         }
@@ -443,6 +473,17 @@ public class FPLPanel extends JPanel implements ActionListener{
             {
                 panel1.swapPlayers(panel2);
             }
+
+            if(panel2.isCaptain()){
+                panel2.unmakeCV();
+                panel1.makeCaptain();
+                fantasyTeam.makeCaptain(panel1.getPlayer());
+            }
+            else if(panel2.isViceCaptain()){
+                panel2.unmakeCV();
+                panel1.makeViceCaptain();
+                fantasyTeam.makeViceCaptain(panel1.getPlayer());
+            }
         }
         //and vice versa
         else if(!panel1.isBenched() && panel2.isBenched()){
@@ -470,6 +511,17 @@ public class FPLPanel extends JPanel implements ActionListener{
             else{
                 panel2.swapPlayers(panel1);
             }
+
+            if(panel1.isCaptain()){
+                panel1.unmakeCV();
+                panel2.makeCaptain();
+                fantasyTeam.makeCaptain(panel2.getPlayer());
+            }
+            else if(panel1.isViceCaptain()){
+                panel1.unmakeCV();
+                panel2.makeViceCaptain();
+                fantasyTeam.makeViceCaptain(panel2.getPlayer());
+            }
         }
 
         System.out.println("done!");
@@ -494,7 +546,8 @@ public class FPLPanel extends JPanel implements ActionListener{
             status = TRANSFER_STATUS;
             focusPlayer = p;
 
-            updateTransferVisuals(focusPlayer.getPosition());
+            if(!viewingPosition.equals(focusPlayer.getPosition())) updateTransferVisuals(focusPlayer.getPosition());
+            viewingPosition = focusPlayer.getPosition();
 
             cancelButton.setText("Cancel");
         }
@@ -519,11 +572,15 @@ public class FPLPanel extends JPanel implements ActionListener{
             return;
         }
 
+        if(focusPlayer.isCaptain()){
+            fantasyTeam.makeCaptain(playerIn);
+        }
+        else if(focusPlayer.isViceCaptain()){
+            fantasyTeam.makeViceCaptain(playerIn);
+        }
+
         focusPlayer.setPlayer(playerIn);
-        budgetLabel.setText("£" + String.valueOf(fantasyTeam.getBudget()) + "m");
-        freeTransfersLabel.setText(fantasyTeam.getFreeTransferString() + " Transfers");
-        cancelButton.setText("Confirm Team");
-        updateTransferVisuals("");
+        updateTransferInformation();
     }
 
     private boolean componentArrayHasElement(Component[] componentArray, int arraySize, Component c){

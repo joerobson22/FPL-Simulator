@@ -121,6 +121,7 @@ public class MainWindow extends JFrame implements ActionListener{
         setStats(viewingGameWeek);
         fplPanel.setConfirmed(currentGameWeek == viewingGameWeek, teamConfirmed);
         fplPanel.updateTeamVisuals(viewingGameWeek, currentGameWeek);
+        fplPanel.updateInfoPanels(viewingGameWeek, currentGameWeek);
 
         showAndHideButtons();
     }
@@ -309,6 +310,7 @@ public class MainWindow extends JFrame implements ActionListener{
         teamConfirmed = false;
         fantasyTeam.saveTeam();
         fantasyTeam.resetWeeklyTotal();
+        fantasyTeam.addFreeTransfer();
 
         for(Player p : allPlayers){
             p.resetWeeklyPoints();

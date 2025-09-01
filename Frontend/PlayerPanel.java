@@ -13,6 +13,7 @@ public class PlayerPanel extends JButton implements ActionListener {
     private final Color captainColor = new Color(252, 186, 3);
     private final Color viceCaptainColor = new Color(255, 225, 143);
     private final Color normalColor = new Color(255, 252, 245);
+    private final Color focusColor = new Color(115, 0, 255);
 
     //the entire team panel gets 500px -> 400px wide pitch, therefore 400 / 5 (5 at most in any pos) -> 80
     private final int fixedWidth = 95;
@@ -77,6 +78,7 @@ public class PlayerPanel extends JButton implements ActionListener {
                 FPLPanel.makeChoice(this);
             }
             else{
+                this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
                 FPLPanel.transferOutPlayer(this);
             }
         }
@@ -86,17 +88,25 @@ public class PlayerPanel extends JButton implements ActionListener {
     public void swapPlayers(PlayerPanel panel){
         Player player2 = panel.getPlayer();
         panel.setPlayer(player);
-        panel.updateVisuals();
         setPlayer(player2);
     }
 
-    public void updateVisuals(){
+    public void updateVisuals(boolean focus){
+        if(player == null){
+            if(focus) this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
+            else this.setBorder(BorderFactory.createLineBorder(normalColor, 2));
+            return;
+        }
+
         positionLabel.setText(position + " - £" + String.valueOf(player.getPrice()) + "m");
 
         String nameLabelText = player.getName();
-        if(captain){
+        if(focus){
+            this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
+        }
+        else if(captain){
             nameLabelText = "C- " + nameLabelText;
-            this.setBorder(BorderFactory.createLineBorder(captainColor, 2));
+            this.setBorder(BorderFactory.createLineBorder(captainColor, 4));
         }
         else if(viceCaptain){
             nameLabelText = "V- " + nameLabelText;
@@ -153,7 +163,7 @@ public class PlayerPanel extends JButton implements ActionListener {
     public void setPlayer(Player p){
         player = p;
         logoPath = player.getTeam().getLogoPath();
-        updateVisuals();
+        updateVisuals(false);
     }
 
     public boolean isBenched(){
@@ -162,10 +172,12 @@ public class PlayerPanel extends JButton implements ActionListener {
 
     public void putOnBench(){
         benched = true;
+        updateVisuals(false);
     }
 
     public void takeOffBench(){
         benched = false;
+        updateVisuals(false);
     }
 
     public Player getPlayer(){
@@ -179,19 +191,19 @@ public class PlayerPanel extends JButton implements ActionListener {
     public void makeCaptain(){
         captain = true;
         viceCaptain = false;
-        updateVisuals();
+        updateVisuals(false);
     }
 
     public void makeViceCaptain(){
         viceCaptain = true;
         captain = false;
-        updateVisuals();
+        updateVisuals(false);
     }
 
     public void unmakeCV(){
         captain = false;
         viceCaptain = false;
-        updateVisuals();
+        updateVisuals(false);
     }
 
     public boolean isCaptain(){ return captain; }

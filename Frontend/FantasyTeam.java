@@ -141,6 +141,11 @@ public class FantasyTeam {
         weeklyPoints = 0;
     }
 
+    public void addFreeTransfer(){
+        if(freeTransfers == -1) freeTransfers = 1;
+        else freeTransfers++;
+    }
+
     public boolean makeTransfer(Player oldPlayer, Player newPlayer, boolean onBench){
         if(players.contains(newPlayer)) return false;
 
@@ -153,7 +158,8 @@ public class FantasyTeam {
         if(onBench) bench.add(newPlayer);
         else startingXI.add(newPlayer);
 
-        if(freeTransfers > -1 && freeTransfers > 0) freeTransfers--;
+        if(freeTransfers == -1) freeTransfers = -1;
+        else if(freeTransfers > 0) freeTransfers--;
         else weeklyPoints += PointLookupTable.getPointsForTransfer();
 
         return true;

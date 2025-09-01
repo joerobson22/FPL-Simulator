@@ -137,6 +137,8 @@ public class IOHandler {
             BufferedReader reader = new BufferedReader(new FileReader("allTeams.txt"));
             String line = reader.readLine();
 
+            int id = 1;
+
             while(line != null)
             {
                 ArrayList<String> lineInfo = new ArrayList<String>(Arrays.asList(line.split("\t")));
@@ -145,7 +147,7 @@ public class IOHandler {
                 String abbrv = lineInfo.get(1);
                 String logoPath = "teamLogos/" + name.replace(' ', '_').replace('/', '_') + ".png";
 
-                allTeams.add(new Team(0, name, abbrv, logoPath));
+                allTeams.add(new Team(id++, 0, name, abbrv, logoPath));
                 line = reader.readLine();
             }
 
@@ -201,7 +203,7 @@ public class IOHandler {
         for(Team t : allTeams){
             if(t.getName().equals(name)) return t;
         }
-        return new Team(0, "NULL", "NULL", "NULL");
+        return new Team(0, 0, "NULL", "NULL", "NULL");
     }
 
     public static ArrayList<Player> readAllPlayerData(ArrayList<Team> allTeams, ArrayList<Player> allPlayers){
