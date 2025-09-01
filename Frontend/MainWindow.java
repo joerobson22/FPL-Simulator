@@ -49,6 +49,7 @@ public class MainWindow extends JFrame implements ActionListener{
     int viewingGameWeek = 0;
 
     boolean simulating = false;
+    boolean teamConfirmed = false;
 
     public MainWindow(FantasyTeam fantasyTeam){
         setupTeams();
@@ -118,6 +119,7 @@ public class MainWindow extends JFrame implements ActionListener{
     public void updateAllVisuals(){
         setFixtures(viewingGameWeek);
         setStats(viewingGameWeek);
+        fplPanel.setConfirmed(currentGameWeek == viewingGameWeek, teamConfirmed);
 
         showAndHideButtons();
     }
@@ -131,14 +133,18 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     public void confirmTeam(){
+        System.out.println("main window confirm team");
+        teamConfirmed = true;
         for(FixturePanel fp : fixturePanelList){
             fp.showSimulate();
         }
-        
+
         simAllButton = new JButton("Simulate All");
         simAllButton.setFont(new Font("SansSerif", Font.BOLD, 18));
         simAllButton.addActionListener(this);
         fixtureListPanel.add(simAllButton);
+
+        fplPanel.setConfirmed(true, true);
     }
 
     private void setupTeams(){
@@ -165,6 +171,8 @@ public class MainWindow extends JFrame implements ActionListener{
             fixtureListPanel.add(fp);
             fixturePanelList.add(fp);
         }
+
+        if(teamConfirmed) confirmTeam();
 
         fixtureListPanel.revalidate();
         fixtureListPanel.repaint();
@@ -295,6 +303,7 @@ public class MainWindow extends JFrame implements ActionListener{
     public void nextGameWeek(){
         currentGameWeek++;
         simAllButton.setVisible(false);
+        teamConfirmed = false;
 
         for(Player p : allPlayers){
             p.resetWeeklyPoints();

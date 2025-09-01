@@ -16,6 +16,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     public final int TRANSFER_STATUS = 2;
     public final int CAPTAIN_STATUS = 3;
     public final int VICE_CAPTAIN_STATUS = 4;
+    public final int CONFIRMED_STATUS = 5;
 
     private int status;
     private PlayerPanel focusPlayer;
@@ -72,11 +73,14 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     FantasyTeam fantasyTeam;
 
+    boolean teamConfirmed;
+
     public FPLPanel(MainWindow mainWindow, FantasyTeam fantasyTeam, ArrayList<Player> allPlayers){
         this.setLayout(new BorderLayout());
         this.mainWindow = mainWindow;
         this.fantasyTeam = fantasyTeam;
         this.allPlayers = allPlayers;
+        teamConfirmed = false;
 
         status = 0;
 
@@ -186,11 +190,35 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void confirmTeam(){
-        if(fantasyTeam.isTeamValid()) mainWindow.confirmTeam();
+        System.out.println("team valid: " + String.valueOf(fantasyTeam.isTeamValid()));
+        System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
+        if(fantasyTeam.isTeamValid() && !teamConfirmed){
+            mainWindow.confirmTeam();
+            teamConfirmed = true;
+            status = CONFIRMED_STATUS;
+            focusPlayer = null;
+        }
     }
 
     public void updateTeamVisuals(int gameWeek){
 
+    }
+
+    public void setConfirmed(boolean correctGameweek, boolean teamConfirmed){
+        System.out.println("correct gameweek: " + String.valueOf(correctGameweek));
+        System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
+        if(correctGameweek && !teamConfirmed){
+            System.out.println("correct gameweek, team unconfirmed, so set teamconfirmed = false");
+            this.teamConfirmed = false;
+            status = NEUTRAL_STATUS;
+        }
+        else if(!correctGameweek){
+            System.out.println("incorrect gameweek, status = confirmed status");
+            this.teamConfirmed = true;
+            status = CONFIRMED_STATUS;
+        }
+        
+        focusPlayer = null;
     }
 
     public void updateTransferVisuals(String position){
@@ -214,13 +242,15 @@ public class FPLPanel extends JPanel implements ActionListener{
                 cancelButton.setText("Confirm Team");
             }
             else if(cancelButton.getText().equals("Confirm Team")){
+                System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
+                System.out.println("confirm team pressed");
                 confirmTeam();
             }
-            
         }
     }
 
     public void makeChoice(PlayerPanel p){
+        if(status == CONFIRMED_STATUS) return;
         if(status == SUBSTITUTE_STATUS){
             System.out.println("substitute " + p.getPlayer().getName() + " and " + focusPlayer.getPlayer().getName());
             substitutePlayers(p);
@@ -232,6 +262,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void choiceMade(int flag){
+        if(status == CONFIRMED_STATUS) return;
         System.out.println(flag);
         if(status != NEUTRAL_STATUS) return;
 
@@ -256,6 +287,8 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void setCaptain(PlayerPanel p){
+        if(status == CONFIRMED_STATUS) return;
+
         for(PlayerPanel playerPanel : playerPanels){
             if(playerPanel.isCaptain()){
                 playerPanel.unmakeCV();
@@ -292,6 +325,11 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         Player player1 = panel1.getPlayer();
         Player player2 = panel2.getPlayer();
+
+        if((panel1.getPosition().equals("GK") && !panel2.getPosition().equals("GK")) || (!panel1.getPosition().equals("GK") && panel2.getPosition().equals("GK"))){
+            System.out.println("Can't sub a keeper with a non keeper idiot");
+            return;
+        }
 
         //obviously can't swap with yourself, so return but dont reset status
         if(panel1 == panel2 || (!panel1.isBenched() && !panel2.isBenched())){
@@ -377,6 +415,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void transferOutPlayer(PlayerPanel p){
+        if(status == CONFIRMED_STATUS) return;
         if(status == NEUTRAL_STATUS || status == TRANSFER_STATUS){
             status = TRANSFER_STATUS;
             focusPlayer = p;
@@ -388,6 +427,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void transferInPlayer(Player p){
+        if(status == CONFIRMED_STATUS) return;
         if(status != TRANSFER_STATUS) return;
 
         status = NEUTRAL_STATUS;
