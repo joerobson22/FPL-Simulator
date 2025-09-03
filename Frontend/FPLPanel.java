@@ -11,29 +11,27 @@ import java.awt.event.*;
 
 public class FPLPanel extends JPanel implements ActionListener{
 
-    public final int NEUTRAL_STATUS = 0;
-    public final int SUBSTITUTE_STATUS = 1;
-    public final int TRANSFER_STATUS = 2;
-    public final int CAPTAIN_STATUS = 3;
-    public final int VICE_CAPTAIN_STATUS = 4;
-    public final int CONFIRMED_STATUS = 5;
-
-    private int status;
-    private PlayerPanel focusPlayer;
-    private String viewingPosition = " ";
+    private final int NEUTRAL_STATUS = 0;
+    private final int SUBSTITUTE_STATUS = 1;
+    private final int TRANSFER_STATUS = 2;
+    private final int CAPTAIN_STATUS = 3;
+    private final int VICE_CAPTAIN_STATUS = 4;
+    private final int CONFIRMED_STATUS = 5;
+    private final String IMAGE_PATH = "Frontend/assets/pitch.png";
+    private final String CONFIRM_TEXT = "Confirm";
+    private final String CANCEL_TEXT = "Cancel";
 
     private final int fixedPitchWidth = 500;
+    Border blackline;
 
     private MainWindow mainWindow;
     private ArrayList<Player> allPlayers;
 
     private Image backgroundImage;
-    private final String imagePath = "Frontend/assets/pitch.png";
 
     private JPanel topPanel; //contains a display for all the players
     private JPanel bottomPanel; //contains bench, input buttons and transfer panel
 
-    private JPanel titleScorePanel;
     private JPanel teamPanel;
     private JPanel benchPanel;
     private JPanel transferScrollPanel;
@@ -43,7 +41,11 @@ public class FPLPanel extends JPanel implements ActionListener{
     private JLabel budgetLabel;
     private JLabel freeTransfersLabel;
 
-    private JButton cancelButton;
+    private JButton cancelConfirmButton;
+    private JButton wildcardButton;
+    private JButton freeHitButton;
+    private JButton tripleCaptainButton;
+    private JButton benchBoostButton;
 
     private final String[] positions = {"GK", "DEF", "MID", "ATT"};
 
@@ -74,6 +76,9 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     FantasyTeam fantasyTeam;
 
+    private int status;
+    private PlayerPanel focusPlayer;
+    private String viewingPosition = " ";
     boolean teamConfirmed;
 
     public FPLPanel(MainWindow mainWindow, FantasyTeam fantasyTeam, ArrayList<Player> allPlayers){
@@ -83,67 +88,12 @@ public class FPLPanel extends JPanel implements ActionListener{
         this.allPlayers = allPlayers;
         teamConfirmed = false;
 
-        status = 0;
+        status = NEUTRAL_STATUS;
 
-        Border blackline = BorderFactory.createLineBorder(Color.black);
+        blackline = BorderFactory.createLineBorder(Color.black);
 
-        //create top and bottom panels
-        topPanel = new JPanel(new BorderLayout());
-        BackgroundPanel pitchPanel = new BackgroundPanel(imagePath);
-        int targetHeight = pitchPanel.getTargetHeight();
-        JPanel titlePanel = new JPanel(new GridLayout(1, 3));
-        scoreLabel = LabelCreator.createJLabel("0 pts", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
-        JPanel otherPanel = new JPanel(new BorderLayout());
-        budgetLabel = LabelCreator.createJLabel("£" + String.valueOf(fantasyTeam.getBudget()) + "m", "SansSerif", 14, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
-        freeTransfersLabel = LabelCreator.createJLabel("   " + fantasyTeam.getFreeTransferString() + " Transfers", "SansSerif", 10, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
-        cancelButton = new JButton("Cancel");
-        cancelButton.setFont(new Font("SansSerif", Font.BOLD, 10));
-        cancelButton.setText("Confirm Team");
-        cancelButton.addActionListener(this);
-        otherPanel.add(freeTransfersLabel, "East");
-        otherPanel.add(cancelButton, "Center");
-
-        titlePanel.add(otherPanel);
-        titlePanel.add(scoreLabel);
-        titlePanel.add(budgetLabel);
-
-
-        
-
-        bottomPanel = new JPanel(new BorderLayout());
-
-        //create every panel
-        teamPanel = new JPanel(new GridLayout(4, 1));
-        teamPanel.setOpaque(false);
-        teamPanel.setPreferredSize(new Dimension(fixedPitchWidth, targetHeight));
-        teamPanel.setMinimumSize(new Dimension(fixedPitchWidth, targetHeight));
-        teamPanel.setMaximumSize(new Dimension(fixedPitchWidth, targetHeight));
-
-        benchPanel = new JPanel();
-        transferPanel = new JPanel(new BorderLayout());
-        JPanel transferTitlePanel = new JPanel();
-        transferTitlePanel.add(LabelCreator.createJLabel("Transfers", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
-        transferScrollPanel = new JPanel();
-        transferScrollPanel.setLayout(new BoxLayout(transferScrollPanel, BoxLayout.Y_AXIS));
-
-        transferScrollWrapper = new JScrollPane(transferScrollPanel,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        transferScrollWrapper.setViewportView(transferScrollPanel);
-        transferScrollWrapper.setPreferredSize(new Dimension(500, 330));
-
-        transferPanel.add(transferScrollWrapper, "Center");
-        transferPanel.add(transferTitlePanel, "North");
-        pitchPanel.add(teamPanel);
-        topPanel.add(pitchPanel, "Center");
-        topPanel.add(titlePanel, "North");
-        topPanel.add(benchPanel, "South");
-        bottomPanel.add(transferPanel, "Center");
-
-        pitchPanel.setBorder(blackline);
-        bottomPanel.setBorder(blackline);
-        benchPanel.setBorder(blackline);
-        transferPanel.setBorder(blackline);
+        topPanel = setupTopPanel();
+        bottomPanel = setupBottomPanel();
 
         this.add(topPanel, "North");
         this.add(bottomPanel, "Center");
@@ -154,15 +104,103 @@ public class FPLPanel extends JPanel implements ActionListener{
         setupInitialTeam();
     }
 
+    public JPanel setupTopPanel(){
+        //create top panels
+        JPanel topPanel = new JPanel(new BorderLayout());
+        //pitch panel background for the team display
+        BackgroundPanel pitchPanel = new BackgroundPanel(IMAGE_PATH);
+        int targetHeight = pitchPanel.getTargetHeight();
+        //title panel- displays chips as well as weekly team information (confirm/cancel button, free transfers, points, budgets)
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        JPanel chipsPanel = new JPanel();
+        JPanel weeklyInfoPanel = new JPanel(new GridLayout(1, 3));
+        JPanel ccAndFTPanel = new JPanel(new BorderLayout());
+        //create all the buttons for the chips panel
+        wildcardButton = createJButton("Wildcard", "SansSerif", Font.BOLD, 12);
+        freeHitButton = createJButton("Free Hit", "SansSerif", Font.BOLD, 12);
+        tripleCaptainButton = createJButton("Triple Captain", "SansSerif", Font.BOLD, 12);
+        benchBoostButton = createJButton("Bench Boost", "SansSerif", Font.BOLD, 12);
+        //create all the labels for the weekly info panel
+        scoreLabel = LabelCreator.createJLabel("0 pts", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        budgetLabel = LabelCreator.createJLabel("£" + String.valueOf(fantasyTeam.getBudget()) + "m", "SansSerif", 14, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
+        freeTransfersLabel = LabelCreator.createJLabel("   " + fantasyTeam.getFreeTransferString() + " Transfers", "SansSerif", 10, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        cancelConfirmButton = createJButton(CONFIRM_TEXT, "SansSerif", Font.BOLD, 12);
+        //add all the components to their respective panels now
+        //first do the weekly info panel
+        ccAndFTPanel.add(freeTransfersLabel, "East");
+        ccAndFTPanel.add(cancelConfirmButton, "Center");
+        weeklyInfoPanel.add(ccAndFTPanel);
+        weeklyInfoPanel.add(scoreLabel);
+        weeklyInfoPanel.add(budgetLabel);
+        //now do the chips panel
+        chipsPanel.add(wildcardButton);
+        chipsPanel.add(freeHitButton);
+        chipsPanel.add(tripleCaptainButton);
+        chipsPanel.add(benchBoostButton);
+        //now add all the panels to the title panel
+        titlePanel.add(chipsPanel);
+        titlePanel.add(weeklyInfoPanel);
+
+        //create the team display
+        teamPanel = new JPanel(new GridLayout(4, 1));
+        teamPanel.setOpaque(false);
+        teamPanel.setPreferredSize(new Dimension(fixedPitchWidth, targetHeight));
+        teamPanel.setMinimumSize(new Dimension(fixedPitchWidth, targetHeight));
+        teamPanel.setMaximumSize(new Dimension(fixedPitchWidth, targetHeight));
+        //and the bench panel
+        benchPanel = new JPanel();
+
+        pitchPanel.add(teamPanel);
+        topPanel.add(pitchPanel, "Center");
+        topPanel.add(titlePanel, "North");
+        topPanel.add(benchPanel, "South");
+
+        pitchPanel.setBorder(blackline);
+
+        return topPanel;
+    }
+
+    public JPanel setupBottomPanel(){
+        //now setup the bottom panel
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        //create each wrapping panel
+        transferPanel = new JPanel(new BorderLayout());
+        transferScrollPanel = new JPanel();
+        //create the title panel, containing the header and the table titles
+        JPanel transferTitlePanel = new JPanel(new GridLayout(2, 1));
+        transferTitlePanel.add(LabelCreator.createJLabel("Transfers", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        //create the transfer scroll panel and setup the scrolll mode
+        transferScrollPanel.setLayout(new BoxLayout(transferScrollPanel, BoxLayout.Y_AXIS));
+        transferScrollWrapper = new JScrollPane(transferScrollPanel,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        transferScrollWrapper.setViewportView(transferScrollPanel);
+        transferScrollWrapper.setPreferredSize(new Dimension(500, 330));
+        //add the two panels to the overall panel
+        transferPanel.add(transferScrollWrapper, "Center");
+        transferPanel.add(transferTitlePanel, "North");
+        //add the transfer panel
+        bottomPanel.add(transferPanel, "Center");
+        //set borders to separate each panel
+        bottomPanel.setBorder(blackline);
+        benchPanel.setBorder(blackline);
+        transferPanel.setBorder(blackline);
+
+        return bottomPanel;
+    }
+
+    //setup the initial team
     public void setupInitialTeam(){
+        //create all team sections and player panels
         for(String pos : positions){
             int num = positionCaps.get(pos);
-            teamSections.put(pos, new JPanel());
-            teamSections.get(pos).setOpaque(false);
+            JPanel panel = new JPanel();
+            panel.setOpaque(false);
+            teamSections.put(pos, panel);
 
             for(int i = 0; i < num; i++){
                 PlayerPanel p = new PlayerPanel(this, pos, false);
-                //p.setPlayer(allPlayers.get(0)); <- TESTING
+                //p.setPlayer(allPlayers.get(i)); <- TESTING
                 playerPanels.add(p);
             }
         }
@@ -173,6 +211,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         positionCounts.put("MID", 0);
         positionCounts.put("ATT", 0);
 
+        //put player panels into correct position panels
         for(PlayerPanel p : playerPanels){
             String pos = p.getPosition();
             if(positionCounts.get(pos) >= startFormation.get(pos)){
@@ -184,10 +223,18 @@ public class FPLPanel extends JPanel implements ActionListener{
             teamSections.get(pos).add(p);
             positionCounts.put(pos, positionCounts.get(pos) + 1);
         }
-
+        //put each panel into the correct place in the team panel
         for(String pos : positions){
             teamPanel.add(teamSections.get(pos));
         }
+    }
+
+    //helper method to create a jbutton
+    public JButton createJButton(String text, String font, int fontType, int fontSize){
+        JButton button = new JButton(text);
+        button.setFont(new Font(font, fontType, fontSize));
+        button.addActionListener(this);
+        return button;
     }
 
     public void confirmTeam(){
@@ -207,14 +254,14 @@ public class FPLPanel extends JPanel implements ActionListener{
     public void updateTransferInformation(){
         budgetLabel.setText("£" + String.valueOf(fantasyTeam.getBudget()) + "m");
         freeTransfersLabel.setText("   " + fantasyTeam.getFreeTransferString() + " Transfers");
-        cancelButton.setText("Confirm Team");
+        cancelConfirmButton.setText("Confirm Team");
         //scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
     }
 
     public void updateInfoPanels(int viewingGameWeek, int currentGameWeek){
         boolean visible = viewingGameWeek == currentGameWeek;
         freeTransfersLabel.setVisible(visible);
-        cancelButton.setVisible(visible);
+        cancelConfirmButton.setVisible(visible);
         budgetLabel.setVisible(visible);
 
         updateTransferInformation();
@@ -328,8 +375,8 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent e){
-        if(cancelButton == e.getSource()){
-            if(cancelButton.getText().equals("Cancel")){
+        if(cancelConfirmButton == e.getSource()){
+            if(cancelConfirmButton.getText().equals(CANCEL_TEXT)){
                 status = NEUTRAL_STATUS;
                 if(focusPlayer != null){
                     focusPlayer.updateVisuals(false);
@@ -337,9 +384,9 @@ public class FPLPanel extends JPanel implements ActionListener{
                 }
                 updateTransferVisuals(" ");
                 viewingPosition = " ";
-                cancelButton.setText("Confirm Team");
+                cancelConfirmButton.setText(CONFIRM_TEXT);
             }
-            else if(cancelButton.getText().equals("Confirm Team")){
+            else if(cancelConfirmButton.getText().equals(CONFIRM_TEXT)){
                 System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
                 System.out.println("confirm team pressed");
                 if(focusPlayer != null){
@@ -353,6 +400,9 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     public void makeChoice(PlayerPanel p){
         if(status == CONFIRMED_STATUS) return;
+
+        if(focusPlayer != null) focusPlayer.updateVisuals(false);
+
         if(status == SUBSTITUTE_STATUS){
             System.out.println("substitute " + p.getPlayer().getName() + " and " + focusPlayer.getPlayer().getName());
             substitutePlayers(p);
@@ -382,7 +432,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         }
         else if(status == SUBSTITUTE_STATUS){
             System.out.println("substituting...");
-            cancelButton.setText("Cancel");
+            cancelConfirmButton.setText(CANCEL_TEXT);
         }
         else if(status  == TRANSFER_STATUS){
             System.out.println("transfer!");
@@ -537,11 +587,12 @@ public class FPLPanel extends JPanel implements ActionListener{
         benchPanel.repaint();
         this.revalidate();
         this.repaint();
-        cancelButton.setText("Confirm Team");
+        cancelConfirmButton.setText("Confirm Team");
     }
 
     public void transferOutPlayer(PlayerPanel p){
         if(status == CONFIRMED_STATUS) return;
+
         if(status == NEUTRAL_STATUS || status == TRANSFER_STATUS){
             status = TRANSFER_STATUS;
             focusPlayer = p;
@@ -549,7 +600,7 @@ public class FPLPanel extends JPanel implements ActionListener{
             if(!viewingPosition.equals(focusPlayer.getPosition())) updateTransferVisuals(focusPlayer.getPosition());
             viewingPosition = focusPlayer.getPosition();
 
-            cancelButton.setText("Cancel");
+            cancelConfirmButton.setText(CANCEL_TEXT);
         }
     }
 
