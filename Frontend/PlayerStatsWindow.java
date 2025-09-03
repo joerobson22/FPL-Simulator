@@ -9,6 +9,8 @@ public class PlayerStatsWindow extends JFrame{
 
     private final int WINDOW_WIDTH = 800;
     private final int WINDOW_HEIGHT = 400;
+    private final int BADGE_WIDTH = 20;
+    private final int BADGE_HEIGHT = 20;
 
     private final String font = "SansSerif";
     private final int columnTitleSize = 15;
@@ -139,16 +141,25 @@ public class PlayerStatsWindow extends JFrame{
         for(int i = 0; i < 10; i++){
             Player p = top10.get(i);
             int quantity = 0;
+            String unitString = "";
 
-            if(title == "Points") quantity = p.getTotalPoints();
+            if(title == "Points"){
+                quantity = p.getTotalPoints();
+                unitString = "pts";
+            }
             else if(title == "Goals") quantity = p.getNumGoals();
             else if(title == "Assists") quantity = p.getNumAssists();
             else if(title == "Clean Sheets") quantity = p.getNumCleanSheets();
 
-            String text = String.valueOf(quantity) + " " + "| " + p.getTeam().getAbbrv() + " (" + p.getGeneralPosition() + ")  " + p.getName();
-            JLabel entryLabel = LabelCreator.createJLabel(padding + text, font, columnBodySize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK);
+            JPanel entryPanel = new JPanel(new BorderLayout());
 
-            panel.add(entryLabel);
+            JLabel badgeLabel = LabelCreator.getIconLabel(p.getTeam().getLogoPath(), BADGE_WIDTH, BADGE_HEIGHT);
+            String text = String.valueOf(quantity) + unitString + "   " + p.getName();
+            JLabel entryLabel = LabelCreator.createJLabel(padding + text, font, columnBodySize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK);
+            entryPanel.add(badgeLabel, "West");
+            entryPanel.add(entryLabel, "Center");
+
+            panel.add(entryPanel);
         }
 
         return panel;

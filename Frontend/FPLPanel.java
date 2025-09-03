@@ -21,6 +21,14 @@ public class FPLPanel extends JPanel implements ActionListener{
     private final String CONFIRM_TEXT = "Confirm";
     private final String CANCEL_TEXT = "Cancel";
 
+    private final String font = "SansSerif";
+    private final int chipButtonFontSize = 12;
+    private final int scoreLabelFontSize = 15;
+    private final int freeTransferLabelFontSize = 10;
+    private final int budgetLabelFontSize = 14;
+    private final int cancelConfirmButtonFontSize = 13;
+
+
     private final int fixedPitchWidth = 500;
     Border blackline;
 
@@ -40,6 +48,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     private JLabel scoreLabel;
     private JLabel budgetLabel;
     private JLabel freeTransfersLabel;
+    private JPanel chipsPanel;
 
     private JButton cancelConfirmButton;
     private JButton wildcardButton;
@@ -73,13 +82,15 @@ public class FPLPanel extends JPanel implements ActionListener{
     );
 
     private ArrayList<PlayerPanel> playerPanels;
-
-    FantasyTeam fantasyTeam;
+    private FantasyTeam fantasyTeam;
 
     private int status;
     private PlayerPanel focusPlayer;
     private String viewingPosition = " ";
-    boolean teamConfirmed;
+    private boolean teamConfirmed;
+    private PlayerChoiceWindow pcw;
+    private int captainMultiplier = 2;
+
 
     public FPLPanel(MainWindow mainWindow, FantasyTeam fantasyTeam, ArrayList<Player> allPlayers){
         this.setLayout(new BorderLayout());
@@ -102,6 +113,8 @@ public class FPLPanel extends JPanel implements ActionListener{
         teamSections = new HashMap<>();
 
         setupInitialTeam();
+        this.revalidate();
+        this.repaint();
     }
 
     public JPanel setupTopPanel(){
@@ -112,19 +125,19 @@ public class FPLPanel extends JPanel implements ActionListener{
         int targetHeight = pitchPanel.getTargetHeight();
         //title panel- displays chips as well as weekly team information (confirm/cancel button, free transfers, points, budgets)
         JPanel titlePanel = new JPanel(new GridLayout(2, 1));
-        JPanel chipsPanel = new JPanel();
+        chipsPanel = new JPanel();
         JPanel weeklyInfoPanel = new JPanel(new GridLayout(1, 3));
         JPanel ccAndFTPanel = new JPanel(new BorderLayout());
         //create all the buttons for the chips panel
-        wildcardButton = createJButton("Wildcard", "SansSerif", Font.BOLD, 12);
-        freeHitButton = createJButton("Free Hit", "SansSerif", Font.BOLD, 12);
-        tripleCaptainButton = createJButton("Triple Captain", "SansSerif", Font.BOLD, 12);
-        benchBoostButton = createJButton("Bench Boost", "SansSerif", Font.BOLD, 12);
+        wildcardButton = createJButton("Wildcard", font, Font.BOLD, chipButtonFontSize);
+        freeHitButton = createJButton("Free Hit", font, Font.BOLD, chipButtonFontSize);
+        tripleCaptainButton = createJButton("Triple Captain", font, Font.BOLD, chipButtonFontSize);
+        benchBoostButton = createJButton("Bench Boost", font, Font.BOLD, chipButtonFontSize);
         //create all the labels for the weekly info panel
-        scoreLabel = LabelCreator.createJLabel("0 pts", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
-        budgetLabel = LabelCreator.createJLabel("£" + String.valueOf(fantasyTeam.getBudget()) + "m", "SansSerif", 14, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
-        freeTransfersLabel = LabelCreator.createJLabel("   " + fantasyTeam.getFreeTransferString() + " Transfers", "SansSerif", 10, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
-        cancelConfirmButton = createJButton(CONFIRM_TEXT, "SansSerif", Font.BOLD, 12);
+        scoreLabel = LabelCreator.createJLabel("0 pts", font, scoreLabelFontSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        budgetLabel = LabelCreator.createJLabel("£" + String.valueOf(fantasyTeam.getBudget()) + "m", font, budgetLabelFontSize, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
+        freeTransfersLabel = LabelCreator.createJLabel("   " + fantasyTeam.getFreeTransferString() + " Transfers", font, freeTransferLabelFontSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        cancelConfirmButton = createJButton(CONFIRM_TEXT, font, Font.BOLD, cancelConfirmButtonFontSize);
         //add all the components to their respective panels now
         //first do the weekly info panel
         ccAndFTPanel.add(freeTransfersLabel, "East");
@@ -237,36 +250,20 @@ public class FPLPanel extends JPanel implements ActionListener{
         return button;
     }
 
-    public void confirmTeam(){
-        System.out.println("team valid: " + String.valueOf(fantasyTeam.isTeamValid()));
-        System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
-        if(fantasyTeam.isTeamValid() && !teamConfirmed){
-            mainWindow.confirmTeam();
-            teamConfirmed = true;
-            status = CONFIRMED_STATUS;
-            focusPlayer = null;
-            updateInfoPanels(1, 2);
-            updateTransferVisuals(" ");
-            viewingPosition = " ";
-        }
+    //the viewing gameweek has been changed, so update all visuals
+    public void changeGW(int viewingGameWeek, int currentGameWeek, boolean teamConfirmed){
+        setConfirmed(currentGameWeek == viewingGameWeek, teamConfirmed);
+        updateAllVisuals(viewingGameWeek, currentGameWeek);
     }
 
-    public void updateTransferInformation(){
-        budgetLabel.setText("£" + String.valueOf(fantasyTeam.getBudget()) + "m");
-        freeTransfersLabel.setText("   " + fantasyTeam.getFreeTransferString() + " Transfers");
-        cancelConfirmButton.setText("Confirm Team");
-        //scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
-    }
-
-    public void updateInfoPanels(int viewingGameWeek, int currentGameWeek){
-        boolean visible = viewingGameWeek == currentGameWeek;
-        freeTransfersLabel.setVisible(visible);
-        cancelConfirmButton.setVisible(visible);
-        budgetLabel.setVisible(visible);
-
+    //update all visuals- change up the player panels, show or hide information labels and their text
+    public void updateAllVisuals(int viewingGameWeek, int currentGameWeek){
+        updateTeamVisuals(viewingGameWeek, currentGameWeek);
+        updateTransferInformationVisibility(viewingGameWeek == currentGameWeek);
         updateTransferInformation();
     }
 
+    //updates all the player panels
     public void updateTeamVisuals(int viewingGameWeek, int currentGameWeek){
         if(viewingGameWeek > currentGameWeek || fantasyTeam.getPlayers().size() < 15) return;
         
@@ -312,18 +309,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         this.repaint();
     }
 
-    public void updateTeamPoints(){
-        fantasyTeam.resetWeeklyTotal();
-        for(PlayerPanel panel : playerPanels){
-            Player player = panel.getPlayer();
-            if(!player.hasPlayedThisWeek()) continue;
-
-            if(!panel.isBenched()) fantasyTeam.changeWeeklyPoints(player);
-            panel.setPoints(player.getWeeklyPoints());
-        }
-        scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
-    }
-
+    //helper method to create and then add a player panel to a given panel
     public void createAndAddPastPlayer(Player p, JPanel panel, Player captain, Player viceCaptain, boolean benched, int viewingGameWeek, int currentGameWeek){
         PlayerPanel pp = new PlayerPanel(this, p.getGeneralPosition(), benched);
         pp.setPlayer(p);
@@ -334,35 +320,49 @@ public class FPLPanel extends JPanel implements ActionListener{
         // Always set points for past gameweeks
         if (viewingGameWeek < currentGameWeek) {
             int points = p.getGameWeekPoints(viewingGameWeek);
-            pp.setPoints(points);
+            pp.setPoints(points, captainMultiplier);
         } 
         // For current gameweek, set points only if the player has played
         else if (viewingGameWeek == currentGameWeek && p.hasPlayedThisWeek()) {
-            pp.setPoints(p.getWeeklyPoints());
+            pp.setPoints(p.getWeeklyPoints(), captainMultiplier);
         }
 
         panel.add(pp);
         playerPanels.add(pp);
     }
-
-    public void setConfirmed(boolean correctGameweek, boolean teamConfirmed){
-        System.out.println("correct gameweek: " + String.valueOf(correctGameweek));
-        System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
-        if(correctGameweek && !teamConfirmed){
-            System.out.println("correct gameweek, team unconfirmed, so set teamconfirmed = false");
-            this.teamConfirmed = false;
-            status = NEUTRAL_STATUS;
-        }
-        else if(!correctGameweek){
-            System.out.println("incorrect gameweek, status = confirmed status");
-            this.teamConfirmed = true;
-            status = CONFIRMED_STATUS;
-        }
-        
-        focusPlayer = null;
+    
+    //updates the free transfer, budget and cancelconfirm stuff
+    public void updateTransferInformation(){
+        budgetLabel.setText("£" + String.valueOf(fantasyTeam.getBudget()) + "m");
+        freeTransfersLabel.setText("   " + fantasyTeam.getFreeTransferString() + " Transfers");
+        cancelConfirmButton.setText(CONFIRM_TEXT);
     }
 
+    //update all labels and buttons
+    public void updateTransferInformationVisibility(boolean show){
+        freeTransfersLabel.setVisible(show);
+        cancelConfirmButton.setVisible(show);
+        budgetLabel.setVisible(show);
+        chipsPanel.setVisible(show);
+    }
+
+    //calculate and update the team's weekly score
+    public void updateTeamPoints(){
+        fantasyTeam.resetWeeklyTotal();
+        for(PlayerPanel panel : playerPanels){
+            Player player = panel.getPlayer();
+            if(!player.hasPlayedThisWeek()) continue;
+
+            if(!panel.isBenched()) fantasyTeam.changeWeeklyPoints(player);
+            panel.setPoints(player.getWeeklyPoints(), captainMultiplier);
+        }
+        scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
+    }
+
+    //updating the transfer panel- only does it if currently not viewing the same position
     public void updateTransferVisuals(String position){
+        if(viewingPosition == position) return;
+
         transferScrollPanel.removeAll();
         for(Player p : allPlayers){
             if(!p.getGeneralPosition().equals(position)) continue;
@@ -374,75 +374,116 @@ public class FPLPanel extends JPanel implements ActionListener{
         transferScrollPanel.repaint();
     }
 
+    public void clearTransferPanel(){
+        viewingPosition = " ";
+        updateTransferVisuals(viewingPosition);
+    }
+
+    
+    
+
+    //confirm team
+    public void confirmTeam(){
+        if(fantasyTeam.isTeamValid() && !teamConfirmed){
+            mainWindow.confirmTeam();
+            
+            teamConfirmed = true;
+            status = CONFIRMED_STATUS;
+            focusPlayer = null;
+
+            updateTransferInformationVisibility(false);
+            clearTransferPanel();
+        }
+    }
+
+    public void setConfirmed(boolean correctGameweek, boolean teamConfirmed){
+        if(correctGameweek && !teamConfirmed){
+            this.teamConfirmed = false;
+            status = NEUTRAL_STATUS;
+        }
+        else if(!correctGameweek){
+            this.teamConfirmed = true;
+            status = CONFIRMED_STATUS;
+        }
+        
+        focusPlayer = null;
+    }
+
+    
+    //INPUTS
+
+    //action performed!!!
     public void actionPerformed(ActionEvent e){
+        //reset the currently focussed player
+        if(focusPlayer != null){
+            focusPlayer.updateVisuals(false);
+            focusPlayer = null;
+        }
+
         if(cancelConfirmButton == e.getSource()){
+            //if cancelling
             if(cancelConfirmButton.getText().equals(CANCEL_TEXT)){
+                //set status to netural, update the focus player's visuals
                 status = NEUTRAL_STATUS;
-                if(focusPlayer != null){
-                    focusPlayer.updateVisuals(false);
-                    focusPlayer = null;
-                }
-                updateTransferVisuals(" ");
-                viewingPosition = " ";
+                
+                //clear the transfer panel
+                clearTransferPanel();
                 cancelConfirmButton.setText(CONFIRM_TEXT);
             }
+            //otherwise, if confirming team
             else if(cancelConfirmButton.getText().equals(CONFIRM_TEXT)){
-                System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
-                System.out.println("confirm team pressed");
-                if(focusPlayer != null){
-                    focusPlayer.updateVisuals(false);
-                    focusPlayer = null;
-                }
                 confirmTeam();
             }
         }
     }
 
-    public void makeChoice(PlayerPanel p){
+    //a player panel has been clicked, unhighlight any currently selected panels and do whatever input
+    public void playerPanelClicked(PlayerPanel p){
         if(status == CONFIRMED_STATUS) return;
-
-        if(focusPlayer != null) focusPlayer.updateVisuals(false);
+        if(focusPlayer != null){
+            focusPlayer.updateVisuals(false);
+        }
 
         if(status == SUBSTITUTE_STATUS){
-            System.out.println("substitute " + p.getPlayer().getName() + " and " + focusPlayer.getPlayer().getName());
             substitutePlayers(p);
         }
-        else if (status == NEUTRAL_STATUS) {
-            if(focusPlayer != null) focusPlayer.updateVisuals(false);
+        else{
             focusPlayer = p;
-            focusPlayer.updateVisuals(true);
-            PlayerChoiceWindow pcw = new PlayerChoiceWindow(p.getPlayer(), this, CAPTAIN_STATUS, VICE_CAPTAIN_STATUS, SUBSTITUTE_STATUS, TRANSFER_STATUS);
+            if(p.getPlayer() == null){
+                transferOutPlayer(p);
+                return;
+            }
+            if(pcw != null) pcw.setVisible(false);
+            pcw = new PlayerChoiceWindow(p.getPlayer(), this, CAPTAIN_STATUS, VICE_CAPTAIN_STATUS, SUBSTITUTE_STATUS, TRANSFER_STATUS);
         }
     }
 
-    public void choiceMade(int flag){
+    //a button has been clicked in the player choice window so do whatever the flag dictates
+    public void playerPanelChoiceMade(int flag){
         if(status == CONFIRMED_STATUS) return;
-        System.out.println(flag);
         if(status != NEUTRAL_STATUS) return;
 
         status = flag;
 
         if(status == CAPTAIN_STATUS && !focusPlayer.isBenched()){
-            System.out.println("captain!");
             setCaptain(focusPlayer);
         }
         else if(status == VICE_CAPTAIN_STATUS && !focusPlayer.isBenched()){
-            System.out.println("vice!");
             setViceCaptain(focusPlayer);
         }
         else if(status == SUBSTITUTE_STATUS){
-            System.out.println("substituting...");
             cancelConfirmButton.setText(CANCEL_TEXT);
         }
         else if(status  == TRANSFER_STATUS){
-            System.out.println("transfer!");
             transferOutPlayer(focusPlayer);
         }
     }
 
+    //set the captain!
     public void setCaptain(PlayerPanel p){
-        if(status == CONFIRMED_STATUS) return;
+        if(status == CONFIRMED_STATUS || p.isBenched()) return;
 
+        //uncaptain any player currently captained
         for(PlayerPanel playerPanel : playerPanels){
             if(playerPanel.isCaptain()){
                 playerPanel.unmakeCV();
@@ -456,7 +497,10 @@ public class FPLPanel extends JPanel implements ActionListener{
         status = NEUTRAL_STATUS;
     }
 
+    //set the vice captain
     public void setViceCaptain(PlayerPanel p){
+        if(status == CONFIRMED_STATUS || p.isBenched()) return;
+
         for(PlayerPanel playerPanel : playerPanels){
             if(playerPanel.isViceCaptain()){
                 playerPanel.unmakeCV();
@@ -470,6 +514,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         status = NEUTRAL_STATUS;
     }
 
+    //substitute 2 players
     public void substitutePlayers(PlayerPanel p){
         PlayerPanel panel1 = focusPlayer;
         PlayerPanel panel2 = p;
@@ -481,18 +526,15 @@ public class FPLPanel extends JPanel implements ActionListener{
         Player player2 = panel2.getPlayer();
 
         if((panel1.getPosition().equals("GK") && !panel2.getPosition().equals("GK")) || (!panel1.getPosition().equals("GK") && panel2.getPosition().equals("GK"))){
-            System.out.println("Can't sub a keeper with a non keeper idiot");
             return;
         }
 
         //obviously can't swap with yourself, so return but dont reset status
         if(panel1 == panel2 || (!panel1.isBenched() && !panel2.isBenched())){
-            System.out.println("panels are equal or they are both on the pitch");
             return;
         }
         //if both benched, then we can swap just fine, no problems
         if(panel1.isBenched() && panel2.isBenched()){
-            System.out.println("swap players casually");
             panel1.swapPlayers(panel2);
         }
         //if one is benched, swap their players
@@ -504,11 +546,9 @@ public class FPLPanel extends JPanel implements ActionListener{
 
             //CHECK THIS FORMATION WILL BE VALID
             if(!panel1Pos.equals(panel2Pos)){
-                System.out.println("they are not the same position");
                 int panel2SectionNumPlayers = teamSections.get(panel2Pos).getComponentCount();
                 //if number of players left in a section is less than allowed, then give up
                 if(panel2SectionNumPlayers - 1 < positionMins.get(panel2Pos)){
-                    System.out.println("would result in invalid formation");
                     return;
                 }
                 //PANEL 1 IS ON THE BENCH IN THIS SCENARIO
@@ -524,6 +564,7 @@ public class FPLPanel extends JPanel implements ActionListener{
                 panel1.swapPlayers(panel2);
             }
 
+            //sort out captain
             if(panel2.isCaptain()){
                 panel2.unmakeCV();
                 panel1.makeCaptain();
@@ -537,17 +578,14 @@ public class FPLPanel extends JPanel implements ActionListener{
         }
         //and vice versa
         else if(!panel1.isBenched() && panel2.isBenched()){
-            System.out.println("panel2 benched, panel1 not benched");
             String panel1Pos = panel1.getPosition();
             String panel2Pos = panel2.getPosition();
 
             //CHECK THIS FORMATION WILL BE VALID
             if(!panel1Pos.equals(panel2Pos)){
-                System.out.println("they are not the same position");
                 int panel1SectionNumPlayers = teamSections.get(panel1Pos).getComponentCount();
                 //if number of players left in a section is less than allowed, then give up
                 if(panel1SectionNumPlayers - 1 < positionMins.get(panel1Pos)){
-                    System.out.println("would result in invalid formation");
                     return;
                 }
                 //PANEL 1 IS ON THE BENCH IN THIS SCENARIO
@@ -562,6 +600,7 @@ public class FPLPanel extends JPanel implements ActionListener{
                 panel2.swapPlayers(panel1);
             }
 
+            //sort out captaincy
             if(panel1.isCaptain()){
                 panel1.unmakeCV();
                 panel2.makeCaptain();
@@ -590,6 +629,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         cancelConfirmButton.setText("Confirm Team");
     }
 
+    //transfer out a player
     public void transferOutPlayer(PlayerPanel p){
         if(status == CONFIRMED_STATUS) return;
 
@@ -597,24 +637,20 @@ public class FPLPanel extends JPanel implements ActionListener{
             status = TRANSFER_STATUS;
             focusPlayer = p;
 
-            if(!viewingPosition.equals(focusPlayer.getPosition())) updateTransferVisuals(focusPlayer.getPosition());
-            viewingPosition = focusPlayer.getPosition();
-
+            updateTransferVisuals(focusPlayer.getPosition());
             cancelConfirmButton.setText(CANCEL_TEXT);
         }
     }
 
+    //transfer in a chosen player
     public void transferInPlayer(Player p){
         if(status == CONFIRMED_STATUS) return;
         if(status != TRANSFER_STATUS) return;
-
-        status = NEUTRAL_STATUS;
 
         Player playerOut = focusPlayer.getPlayer();
         Player playerIn = p;
 
         if(!p.getGeneralPosition().equals(focusPlayer.getPosition())){
-            focusPlayer = null;
             return;
         }
 
@@ -630,10 +666,13 @@ public class FPLPanel extends JPanel implements ActionListener{
             fantasyTeam.makeViceCaptain(playerIn);
         }
 
+        status = NEUTRAL_STATUS;
         focusPlayer.setPlayer(playerIn);
+        focusPlayer = null;
         updateTransferInformation();
     }
 
+    //helper method to check is a component array has an element in it
     private boolean componentArrayHasElement(Component[] componentArray, int arraySize, Component c){
         for(int i = 0; i < arraySize; i++){
             if(componentArray[i] == c) return true;
@@ -641,6 +680,9 @@ public class FPLPanel extends JPanel implements ActionListener{
         return false;
     }
 
+
+
+    //private subclass backgroundpanel
     private class BackgroundPanel extends JPanel {
         private Image backgroundImage;
         private int targetHeight;

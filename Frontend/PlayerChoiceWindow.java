@@ -80,19 +80,19 @@ public class PlayerChoiceWindow extends JFrame implements ActionListener {
         System.out.println("button press...");
         if(captainButton == e.getSource()){
             System.out.println("captain!");
-            fplPanel.choiceMade(captainFlag);
+            fplPanel.playerPanelChoiceMade(captainFlag);
         }
         else if(viceCaptainButton == e.getSource()){
             System.out.println("vice!");
-            fplPanel.choiceMade(viceCaptainFlag);
+            fplPanel.playerPanelChoiceMade(viceCaptainFlag);
         }
         else if(subButton == e.getSource()){
             System.out.println("sub!");
-            fplPanel.choiceMade(subFlag);
+            fplPanel.playerPanelChoiceMade(subFlag);
         }
         else if(transferButton == e.getSource()){
             System.out.println("transfer!");
-            fplPanel.choiceMade(transferFlag);
+            fplPanel.playerPanelChoiceMade(transferFlag);
         }
         this.setVisible(false);
     }

@@ -65,8 +65,6 @@ public class Fixture {
     }
 
     public void allocatePointsAndChangeStats(int gameWeek){
-        System.out.println("Allocating points");
-
         for(Player p : home.getPlayers()){
             p.playMatch();
         }
@@ -74,7 +72,6 @@ public class Fixture {
             p.playMatch();
         }
         
-        System.out.println("Goals conceded");
         //allocate manager favour for any goals conceded
         for(Player p : homeLineup){
             p.concedeGoals(outcome.getAwayGoals());
@@ -83,28 +80,22 @@ public class Fixture {
             p.concedeGoals(outcome.getHomeGoals());
         }
         
-        System.out.println("Goals scored");
         //allocate points for goals
         for(Player p : outcome.getGoalScorers()){
             p.scoreGoal();
         }
-        System.out.println("Assists");
         //allocate points for assists
         for(Player p : outcome.getAssisters()){
             p.makeAssist();
         }
-        System.out.println("Clean sheets");
         //allocate points for clean sheets
         for(Player p : outcome.getCleanSheets()){
             p.keepCleanSheet();
         }
-        System.out.println("60 mins");
         //allocate points for playing 60 mins
         for(Player p : outcome.get60Mins()){
             p.play60Mins();
         }
-
-        System.out.println("Manager favour for blanks");
         //allocate manager favour for any blanks
         for(Player p : homeLineup){
             p.inStartingLineup();
@@ -117,8 +108,6 @@ public class Fixture {
             p.blank();
         }
 
-
-        System.out.println("Store weekly totals");
         //store weekly totals
         for(Player p : home.getPlayers()){
             p.addWeeklyToTotal(gameWeek);

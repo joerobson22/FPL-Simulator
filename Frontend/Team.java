@@ -104,19 +104,14 @@ public class Team {
 
         while(totalPlayers < 11){
             for(String key : maxPositions.keySet()){
-                System.out.println("looking at position: " + key);
 
                 if(formation.get(key) >= maxPositions.get(key)){
-                    System.out.println("Never mind, we already have " + String.valueOf(formation.get(key)) + " " + key + "s");
                     continue;
                 }
 
                 for(Player p : players){
                     if(!p.getGeneralPosition().equals(key)) continue;
                     if(starting.contains(p)) continue;
-
-                    System.out.println("We found " + p.getName() + "(" + p.getGeneralPosition() + ")!");
-                    System.out.println();
 
                     starting.add(p);
                     formation.merge(key, 1, Integer::sum);

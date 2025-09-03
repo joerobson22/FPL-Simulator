@@ -22,11 +22,12 @@ public class PlayerPanel extends JButton implements ActionListener {
     private final int imageWidth = 70;
     private final int imageHeight = 70;
 
+    private final String font = "SansSerif";
     private final int positionLabelTextSize = 10;
     private final int nameLabelTextSize = 10;
     private final int fixturePointsLabelTextSize = 15;
 
-    private FPLPanel FPLPanel;
+    private FPLPanel fplPanel;
 
     private Player player;
     private String logoPath;
@@ -41,8 +42,8 @@ public class PlayerPanel extends JButton implements ActionListener {
     private boolean viceCaptain;
     private boolean benched;
 
-    public PlayerPanel(FPLPanel FPLpanel, String position, boolean benched){
-        this.FPLPanel = FPLpanel;
+    public PlayerPanel(FPLPanel fplPanel, String position, boolean benched){
+        this.fplPanel = fplPanel;
         this.benched = benched;
         captain = false;
         viceCaptain = false;
@@ -50,6 +51,7 @@ public class PlayerPanel extends JButton implements ActionListener {
         this.setPreferredSize(new java.awt.Dimension(fixedWidth, fixedHeight));
         this.setMinimumSize(new java.awt.Dimension(fixedWidth, fixedHeight));
         this.setMaximumSize(new java.awt.Dimension(fixedWidth, fixedHeight));
+        this.setBorder(BorderFactory.createLineBorder(normalColor, 2));
 
         panel = new JPanel(new BorderLayout());
         panel.setPreferredSize(new java.awt.Dimension(fixedWidth, fixedHeight));
@@ -57,9 +59,9 @@ public class PlayerPanel extends JButton implements ActionListener {
         panel.setMaximumSize(new java.awt.Dimension(fixedWidth, fixedHeight));
 
         this.position = position;
-        positionLabel = LabelCreator.createJLabel(position, "SansSerif", positionLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
-        nameLabel = LabelCreator.createJLabel("+", "SansSerif", nameLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
-        fixturePointsLabel = LabelCreator.createJLabel("-", "SansSerif", fixturePointsLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        positionLabel = LabelCreator.createJLabel(position, font, positionLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        nameLabel = LabelCreator.createJLabel("+", font, nameLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
+        fixturePointsLabel = LabelCreator.createJLabel("-", font, fixturePointsLabelTextSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
 
         panel.add(positionLabel, "North");
         panel.add(nameLabel, "Center");
@@ -69,26 +71,6 @@ public class PlayerPanel extends JButton implements ActionListener {
         this.add(panel);
         this.addActionListener(this);
         this.setOpaque(false);
-    }
-
-    public void actionPerformed(ActionEvent e){
-        if(this == e.getSource()){
-            if(player != null){
-                //create player large window
-                FPLPanel.makeChoice(this);
-            }
-            else{
-                this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
-                FPLPanel.transferOutPlayer(this);
-            }
-        }
-        
-    }
-
-    public void swapPlayers(PlayerPanel panel){
-        Player player2 = panel.getPlayer();
-        panel.setPlayer(player);
-        setPlayer(player2);
     }
 
     public void updateVisuals(boolean focus){
@@ -124,11 +106,23 @@ public class PlayerPanel extends JButton implements ActionListener {
         }
     }
 
-    private ImageIcon getTransparentIcon(String logoPath, int width, int height, float alpha) {
-        System.out.println("Loading logo from: " + logoPath);
-        File f = new File(logoPath);
-        System.out.println("Exists? " + f.exists());
+    //action performed!
+    public void actionPerformed(ActionEvent e){
+        if(this == e.getSource()){
+            fplPanel.playerPanelClicked(this);
+            this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
+        }
+    }
 
+    //swap players with another panel
+    public void swapPlayers(PlayerPanel panel){
+        Player player2 = panel.getPlayer();
+        panel.setPlayer(player);
+        setPlayer(player2);
+    }
+
+    //helper method to get a transparent team badge icon
+    private ImageIcon getTransparentIcon(String logoPath, int width, int height, float alpha) {
         ImageIcon icon = new ImageIcon(logoPath);
     
         // Force-load into a BufferedImage first
@@ -155,21 +149,22 @@ public class PlayerPanel extends JButton implements ActionListener {
     }
 
 
-    public void setPoints(int points){
-        if(captain) points *= 2;
+    //mutators
+
+    //set this panel's points
+    public void setPoints(int points, int captainMultiplier){
+        if(captain) points *= captainMultiplier;
         fixturePointsLabel.setText(String.valueOf(points) + "pts");
     }
 
+    //set this panel's player and update the visuals
     public void setPlayer(Player p){
         player = p;
         logoPath = player.getTeam().getLogoPath();
         updateVisuals(false);
     }
 
-    public boolean isBenched(){
-        return benched;
-    }
-
+    
     public void putOnBench(){
         benched = true;
         updateVisuals(false);
@@ -178,10 +173,6 @@ public class PlayerPanel extends JButton implements ActionListener {
     public void takeOffBench(){
         benched = false;
         updateVisuals(false);
-    }
-
-    public Player getPlayer(){
-        return player;
     }
 
     public String getPosition(){
@@ -204,6 +195,15 @@ public class PlayerPanel extends JButton implements ActionListener {
         captain = false;
         viceCaptain = false;
         updateVisuals(false);
+    }
+
+    //accessors
+    public boolean isBenched(){
+        return benched;
+    }
+
+    public Player getPlayer(){
+        return player;
     }
 
     public boolean isCaptain(){ return captain; }

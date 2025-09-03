@@ -40,6 +40,7 @@ public class MainWindow extends JFrame implements ActionListener{
     ArrayList<Team> allTeams;
     ArrayList<Player> allPlayers;
     ArrayList<FixturePanel> fixturePanelList;
+    PlayerStatsWindow psw;
 
     JButton simAllButton;
     JButton prevGWButton;
@@ -110,8 +111,13 @@ public class MainWindow extends JFrame implements ActionListener{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
 
-        fixtureList = new FixtureList();
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        //Rectangle bounds = ge.getMaximumWindowBounds();
+        //this.setBounds(bounds);
 
+
+        fixtureList = new FixtureList();
         setupFixtures();
         updateAllVisuals();
     }
@@ -119,9 +125,7 @@ public class MainWindow extends JFrame implements ActionListener{
     public void updateAllVisuals(){
         setFixtures(viewingGameWeek);
         setStats(viewingGameWeek);
-        fplPanel.setConfirmed(currentGameWeek == viewingGameWeek, teamConfirmed);
-        fplPanel.updateTeamVisuals(viewingGameWeek, currentGameWeek);
-        fplPanel.updateInfoPanels(viewingGameWeek, currentGameWeek);
+        fplPanel.changeGW(viewingGameWeek, currentGameWeek, teamConfirmed);
 
         showAndHideButtons();
     }
@@ -318,7 +322,8 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     public void viewPlayerStats(){
-        PlayerStatsWindow psw = new PlayerStatsWindow(allPlayers);
+        if(psw != null) psw.setVisible(false);
+        psw = new PlayerStatsWindow(allPlayers);
     }
 
 
