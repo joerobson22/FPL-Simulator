@@ -165,6 +165,9 @@ public class StatsPanel extends JPanel implements ActionListener{
         for(LeagueTableTeamPanel panel : leagueTable){
             panel.update();
         }
+        for(int i = 0; i < leagueTable.size(); i++){
+            leagueTable.get(i).getTeam().setLeaguePosition(i + 1);
+        }
     }
 
     public ArrayList<Player> bubbleSortPlayers(ArrayList<Player> players, int gameWeek){

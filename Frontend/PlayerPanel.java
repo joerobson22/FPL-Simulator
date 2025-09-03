@@ -73,10 +73,9 @@ public class PlayerPanel extends JButton implements ActionListener {
         this.setOpaque(false);
     }
 
-    public void updateVisuals(boolean focus){
+    public void updateVisuals(boolean focus, int gameWeek){
         if(player == null){
-            if(focus) this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
-            else this.setBorder(BorderFactory.createLineBorder(normalColor, 2));
+            changeBorder(focus);
             return;
         }
 
@@ -99,26 +98,31 @@ public class PlayerPanel extends JButton implements ActionListener {
         }
 
         nameLabel.setText(nameLabelText);
-        fixturePointsLabel.setText("-");
+
+        fixturePointsLabel.setText(player.getTeam().getFixtureString(gameWeek));
 
         if(player != null && player.getTeam() != null && logoPath != null && !logoPath.isEmpty()){
             this.setIcon(getTransparentIcon(logoPath, imageWidth, imageHeight, 0.3f));
         }
     }
 
+    public void changeBorder(boolean highlighted){
+        if(highlighted) this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
+        else this.setBorder(BorderFactory.createLineBorder(normalColor, 2));
+    }
+
     //action performed!
     public void actionPerformed(ActionEvent e){
         if(this == e.getSource()){
             fplPanel.playerPanelClicked(this);
-            this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
         }
     }
 
     //swap players with another panel
-    public void swapPlayers(PlayerPanel panel){
+    public void swapPlayers(PlayerPanel panel, int gameWeek){
         Player player2 = panel.getPlayer();
-        panel.setPlayer(player);
-        setPlayer(player2);
+        panel.setPlayer(player, gameWeek);
+        setPlayer(player2, gameWeek);
     }
 
     //helper method to get a transparent team badge icon
@@ -158,43 +162,43 @@ public class PlayerPanel extends JButton implements ActionListener {
     }
 
     //set this panel's player and update the visuals
-    public void setPlayer(Player p){
+    public void setPlayer(Player p, int gameWeek){
         player = p;
         logoPath = player.getTeam().getLogoPath();
-        updateVisuals(false);
+        updateVisuals(false, gameWeek);
     }
 
     
-    public void putOnBench(){
+    public void putOnBench(int gw){
         benched = true;
-        updateVisuals(false);
+        updateVisuals(false, gw);
     }
 
-    public void takeOffBench(){
+    public void takeOffBench(int gw){
         benched = false;
-        updateVisuals(false);
+        updateVisuals(false, gw);
     }
 
     public String getPosition(){
         return position;
     }
 
-    public void makeCaptain(){
+    public void makeCaptain(int gw){
         captain = true;
         viceCaptain = false;
-        updateVisuals(false);
+        updateVisuals(false, gw);
     }
 
-    public void makeViceCaptain(){
+    public void makeViceCaptain(int gw){
         viceCaptain = true;
         captain = false;
-        updateVisuals(false);
+        updateVisuals(false, gw);
     }
 
-    public void unmakeCV(){
+    public void unmakeCV(int gw){
         captain = false;
         viceCaptain = false;
-        updateVisuals(false);
+        updateVisuals(false, gw);
     }
 
     //accessors

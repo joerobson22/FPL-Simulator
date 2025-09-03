@@ -10,6 +10,16 @@ public class FixtureList {
     }
 
     //accessors
+    public ArrayList<Fixture> getAllFixtures(){
+        ArrayList<Fixture> allFixtures = new ArrayList<>();
+        for(ArrayList<Fixture> weekFixtures : fixtureList){
+            for(Fixture f : weekFixtures){
+                allFixtures.add(f);
+            }
+        }
+        return allFixtures;
+    }
+
     public ArrayList<Fixture> getFixtures(int gameWeek){
         return fixtureList.get(gameWeek);
     }

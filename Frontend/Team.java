@@ -22,8 +22,10 @@ public class Team {
     private int numLosses;
     private int totalPoints;
     private int goalDifference;
+    private int leaguePosition;
 
     private ArrayList<Player> players;
+    private ArrayList<Fixture> fixtureList;
 
     //constructor
     public Team(int id, int rating, String name, String abbrv, String logoPath){
@@ -39,10 +41,28 @@ public class Team {
         totalPoints = 0;
         goalDifference = 0;
         players = new ArrayList<Player>();
+        fixtureList = new ArrayList<>();
     }
 
 
     //accessors
+    public Fixture getFixture(int gameWeek){
+        return fixtureList.get(gameWeek);
+    }
+
+    public String getFixtureString(int gameWeek){
+        Fixture f = getFixture(gameWeek);
+        return f.getFixtureString(f.getHomeTeam() == this);
+    }
+
+    public ArrayList<Fixture> getNext3Fixtures(int gameWeek){
+        ArrayList<Fixture> next3Fixtures = new ArrayList<>();
+        for(int i = gameWeek; i < fixtureList.size(); i++){
+            next3Fixtures.add(fixtureList.get(i));
+        }
+        return next3Fixtures;
+    }
+
     public int getID(){
         return id;
     }
@@ -181,6 +201,14 @@ public class Team {
     }
 
     //mutators
+    public void setLeaguePosition(int pos){
+        leaguePosition = pos;
+    }
+
+    public void addFixture(Fixture f){
+        fixtureList.add(f);
+    }
+
     public void calculateThisOutcome(Fixture fixture){
         boolean home = fixture.getHomeTeam() == this;
         int homeGoals = fixture.getOutcome().getHomeGoals();

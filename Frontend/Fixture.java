@@ -24,6 +24,11 @@ public class Fixture {
 
 
     //accessors
+    public String getFixtureString(boolean homeTeam){
+        if(homeTeam) return away.getAbbrv() + " (H)";
+        else return home.getAbbrv() + " (A)";
+    }
+
     public Team getHomeTeam(){
         return home;
     }

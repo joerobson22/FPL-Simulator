@@ -52,8 +52,14 @@ public class MainWindow extends JFrame implements ActionListener{
     boolean simulating = false;
     boolean teamConfirmed = false;
 
+    //setup methods
+
     public MainWindow(FantasyTeam fantasyTeam){
         setupTeams();
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenWidth = screenSize.width;
+        int oneThird = screenWidth / 3;
 
         this.fantasyTeam = fantasyTeam;
 
@@ -86,7 +92,7 @@ public class MainWindow extends JFrame implements ActionListener{
         statsPanel.setBackground(statsPanelBackgroundColor);
         statsPanel.setBorder(blackline);
 
-        fplPanel = new FPLPanel(this, fantasyTeam, allPlayers);
+        fplPanel = new FPLPanel(this, fantasyTeam, allPlayers, oneThird);
         teamSelectionPanel.add(fplPanel);
 
         fixtureListPanel = new JPanel(new GridLayout(11, 1));
@@ -106,22 +112,58 @@ public class MainWindow extends JFrame implements ActionListener{
 
         this.setContentPane(mainPanel);
         this.setVisible(true);
-        this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.setTitle("FPL Simulator");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
-
+        //this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         //Rectangle bounds = ge.getMaximumWindowBounds();
         //this.setBounds(bounds);
-
 
         fixtureList = new FixtureList();
         setupFixtures();
         updateAllVisuals();
     }
 
+    private void setupTeams(){
+        allTeams = IOHandler.readAllTeamData(allTeams);
+        allPlayers = IOHandler.readAllPlayerData(allTeams, allPlayers);
+    }
+
+    private void setupFixtures(){
+        fixtureList = IOHandler.readAllFixtures(allTeams);
+
+        for(Fixture f : fixtureList.getAllFixtures()){
+            f.getHomeTeam().addFixture(f);
+            f.getAwayTeam().addFixture(f);
+        }
+    }
+
+    private void setStats(int gameWeek){
+        statsPanel.updateStats(allPlayers, gameWeek);
+    }
+
+
+    //method to show all the fixtures for the upcoming gameweek
+    private void setFixtures(int gameWeek){
+        fixtureListPanel.removeAll();
+        fixturePanelList = new ArrayList<>();
+
+        for(Fixture f : fixtureList.getFixtures(gameWeek)){
+            FixturePanel fp = new FixturePanel(this, f, currentGameWeek == viewingGameWeek);
+            fixtureListPanel.add(fp);
+            fixturePanelList.add(fp);
+        }
+
+        if(teamConfirmed) confirmTeam();
+
+        fixtureListPanel.revalidate();
+        fixtureListPanel.repaint();
+    }
+
+
+    //method to update all the window's visuals- fixture panel, stats panel, fpl panel and input buttons
     public void updateAllVisuals(){
         setFixtures(viewingGameWeek);
         setStats(viewingGameWeek);
@@ -139,7 +181,6 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     public void confirmTeam(){
-        System.out.println("main window confirm team");
         teamConfirmed = true;
         for(FixturePanel fp : fixturePanelList){
             fp.showSimulate();
@@ -151,51 +192,6 @@ public class MainWindow extends JFrame implements ActionListener{
         fixtureListPanel.add(simAllButton);
 
         fplPanel.setConfirmed(true, true);
-    }
-
-    private void setupTeams(){
-        allTeams = IOHandler.readAllTeamData(allTeams);
-
-        allPlayers = IOHandler.readAllPlayerData(allTeams, allPlayers);
-    }
-
-    private void setupFixtures(){
-        fixtureList = IOHandler.readAllFixtures(allTeams);
-    }
-
-    private void setStats(int gameWeek){
-        statsPanel.updateStats(allPlayers, gameWeek);
-    }
-
-    //displaying all the upcoming fixtures
-    private void setFixtures(int gameWeek){
-        fixtureListPanel.removeAll();
-        fixturePanelList = new ArrayList<>();
-
-        for(Fixture f : fixtureList.getFixtures(gameWeek)){
-            FixturePanel fp = new FixturePanel(this, f, currentGameWeek == viewingGameWeek);
-            fixtureListPanel.add(fp);
-            fixturePanelList.add(fp);
-        }
-
-        if(teamConfirmed) confirmTeam();
-
-        fixtureListPanel.revalidate();
-        fixtureListPanel.repaint();
-    }
-
-    public void simulateAllFixtures(){
-        int i = 0;
-        for(Fixture f : fixtureList.getFixtures(currentGameWeek)){
-            if(!f.hasPlayed()){
-                simulateFixture((FixturePanel)fixtureListPanel.getComponent(i), f, true);
-            }
-            i++;
-        }
-
-        statsPanel.updateStats(allPlayers, currentGameWeek);
-        fplPanel.updateTeamPoints();
-        nextGameWeek();
     }
 
 
@@ -298,6 +294,21 @@ public class MainWindow extends JFrame implements ActionListener{
             e.printStackTrace();
         }
         simulating = false;
+    }
+
+    //simulating all fixtures
+    public void simulateAllFixtures(){
+        int i = 0;
+        for(Fixture f : fixtureList.getFixtures(currentGameWeek)){
+            if(!f.hasPlayed()){
+                simulateFixture((FixturePanel)fixtureListPanel.getComponent(i), f, true);
+            }
+            i++;
+        }
+
+        statsPanel.updateStats(allPlayers, currentGameWeek);
+        fplPanel.updateTeamPoints();
+        nextGameWeek();
     }
 
 
