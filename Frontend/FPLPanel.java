@@ -95,9 +95,9 @@ public class FPLPanel extends JPanel implements ActionListener{
         scoreLabel = LabelCreator.createJLabel("0 pts", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         JPanel otherPanel = new JPanel(new BorderLayout());
         budgetLabel = LabelCreator.createJLabel("£" + String.valueOf(fantasyTeam.getBudget()) + "m", "SansSerif", 14, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
-        freeTransfersLabel = LabelCreator.createJLabel(fantasyTeam.getFreeTransferString() + " Transfers", "SansSerif", 10, Font.PLAIN, SwingConstants.CENTER, Color.BLACK);
+        freeTransfersLabel = LabelCreator.createJLabel("   " + fantasyTeam.getFreeTransferString() + " Transfers", "SansSerif", 10, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         cancelButton = new JButton("Cancel");
-        cancelButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        cancelButton.setFont(new Font("SansSerif", Font.BOLD, 10));
         cancelButton.setText("Confirm Team");
         cancelButton.addActionListener(this);
         otherPanel.add(freeTransfersLabel, "East");
@@ -206,7 +206,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     public void updateTransferInformation(){
         budgetLabel.setText("£" + String.valueOf(fantasyTeam.getBudget()) + "m");
-        freeTransfersLabel.setText(fantasyTeam.getFreeTransferString() + " Transfers");
+        freeTransfersLabel.setText("   " + fantasyTeam.getFreeTransferString() + " Transfers");
         cancelButton.setText("Confirm Team");
         //scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
     }
