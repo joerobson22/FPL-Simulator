@@ -40,6 +40,10 @@ public class FantasyTeam {
     }
 
     public boolean isTeamValid(){
+        System.out.println(players.size());
+        System.out.println(checkTeamMax());
+        System.out.println(captain != null);
+        System.out.println(viceCaptain != null);
         return (players.size() == 15 && checkTeamMax() && captain != null && viceCaptain != null);
     }
 

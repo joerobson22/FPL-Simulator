@@ -59,6 +59,7 @@ public class MainWindow extends JFrame implements ActionListener{
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = screenSize.width;
+        int screenHeight = screenSize.height;
         int oneThird = screenWidth / 3;
 
         this.fantasyTeam = fantasyTeam;

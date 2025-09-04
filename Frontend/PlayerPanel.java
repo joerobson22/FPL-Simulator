@@ -212,4 +212,5 @@ public class PlayerPanel extends JButton implements ActionListener {
 
     public boolean isCaptain(){ return captain; }
     public boolean isViceCaptain(){ return viceCaptain; }
+    public boolean isCaptainOrVice(){ return captain || viceCaptain; }
 }
