@@ -131,6 +131,8 @@ public class StatsPanel extends JPanel implements ActionListener{
         this.add(topScorerPanel, "North");
         this.add(leagueTablePanel, "Center");
         this.add(buttonsPanel, "South");
+
+        sortLeagueTable();
     }
 
     public void updateStats(ArrayList<Player> allPlayers, int gameWeek){

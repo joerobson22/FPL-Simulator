@@ -269,6 +269,9 @@ public class FPLPanel extends JPanel implements ActionListener{
         this.currentGameWeek = currentGameWeek;
         setConfirmed(currentGameWeek == viewingGameWeek, teamConfirmed);
         updateAllVisuals();
+        focusPlayer = null;
+        status = NEUTRAL_STATUS;
+        cancelConfirmButton.setText(CONFIRM_TEXT);
     }
 
     //update all visuals- change up the player panels, show or hide information labels and their text
@@ -387,7 +390,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         for(Player p : allPlayers){
             if(!p.getGeneralPosition().equals(position)) continue;
 
-            transferScrollPanel.add(new PlayerTransferPanel(p, this, true));
+            transferScrollPanel.add(new PlayerTransferPanel(p, this, true, viewingGameWeek));
         }
 
         transferScrollPanel.revalidate();

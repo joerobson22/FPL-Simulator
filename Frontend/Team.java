@@ -46,6 +46,10 @@ public class Team {
 
 
     //accessors
+    public int getLeaguePosition(){
+        return leaguePosition;
+    }
+
     public Fixture getFixture(int gameWeek){
         return fixtureList.get(gameWeek);
     }
@@ -57,7 +61,7 @@ public class Team {
 
     public ArrayList<Fixture> getNext3Fixtures(int gameWeek){
         ArrayList<Fixture> next3Fixtures = new ArrayList<>();
-        for(int i = gameWeek; i < fixtureList.size(); i++){
+        for(int i = gameWeek; i < fixtureList.size() && i - gameWeek < 3; i++){
             next3Fixtures.add(fixtureList.get(i));
         }
         return next3Fixtures;

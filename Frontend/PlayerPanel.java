@@ -1,11 +1,9 @@
 package Frontend;
 
 import java.awt.event.*;
-import javax.swing.border.Border;
 
 import javax.swing.*;
 import java.awt.image.*;
-import java.io.File;
 import java.awt.*;
 
 public class PlayerPanel extends JButton implements ActionListener {

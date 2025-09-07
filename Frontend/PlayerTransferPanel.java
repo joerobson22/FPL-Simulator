@@ -24,7 +24,7 @@ public class PlayerTransferPanel extends JPanel implements ActionListener {
 
     
 
-    public PlayerTransferPanel(Player p, FPLPanel fplPanel, boolean transferrable){
+    public PlayerTransferPanel(Player p, FPLPanel fplPanel, boolean transferrable, int gameWeek){
         this.setLayout(new GridLayout(1, 3));
         this.setPreferredSize(new Dimension(fixedWidth, fixedHeight));
         this.setMinimumSize(new Dimension(fixedWidth, fixedHeight));
@@ -56,6 +56,10 @@ public class PlayerTransferPanel extends JPanel implements ActionListener {
         transferInButton.addActionListener(this);
         actionButtonPanel.add(transferInButton);
         transferInButton.setVisible(transferrable);
+
+        for(Fixture f : player.getTeam().getNext3Fixtures(gameWeek)){
+            upcomingFixturesPanel.add(new FixtureTile(f, player.getTeam() == f.getHomeTeam()));
+        }
 
         this.add(playerInfoPanel);
         this.add(upcomingFixturesPanel);
