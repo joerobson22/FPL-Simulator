@@ -269,6 +269,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         this.currentGameWeek = currentGameWeek;
         setConfirmed(currentGameWeek == viewingGameWeek, teamConfirmed);
         updateAllVisuals();
+        clearTransferPanel();
         focusPlayer = null;
         status = NEUTRAL_STATUS;
         cancelConfirmButton.setText(CONFIRM_TEXT);
@@ -384,7 +385,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     //updating the transfer panel- only does it if currently not viewing the same position
     public void updateTransferVisuals(String position){
-        if(viewingPosition == position) return;
+        if(viewingPosition == position && position != " ") return;
 
         transferScrollPanel.removeAll();
         for(Player p : allPlayers){
@@ -398,8 +399,8 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void clearTransferPanel(){
-        viewingPosition = " ";
         updateTransferVisuals(viewingPosition);
+        viewingPosition = " ";
     }
 
     
@@ -407,8 +408,6 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     //confirm team
     public void confirmTeam(){
-        System.out.println("team valid: " + String.valueOf(fantasyTeam.isTeamValid()));
-        System.out.println("team confirmed: " + String.valueOf(teamConfirmed));
         if(fantasyTeam.isTeamValid() && !teamConfirmed){
             mainWindow.confirmTeam();
             
@@ -464,7 +463,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     //a player panel has been clicked, unhighlight any currently selected panels and do whatever input
     public void playerPanelClicked(PlayerPanel p){
-        if(status == CONFIRMED_STATUS) return;
+        if(status == CONFIRMED_STATUS || viewingGameWeek != currentGameWeek) return;
 
         //reset visuals for currently selected focus player
         if(focusPlayer != null){

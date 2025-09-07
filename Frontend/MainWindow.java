@@ -349,10 +349,12 @@ public class MainWindow extends JFrame implements ActionListener{
         }
         else if(prevGWButton == e.getSource() && viewingGameWeek > 0){
             viewingGameWeek--;
+            fplPanel.changeGW(viewingGameWeek, currentGameWeek, teamConfirmed);
             updateAllVisuals();
         }
         else if(nextGWButton == e.getSource() && viewingGameWeek < 37){
             viewingGameWeek++;
+            fplPanel.changeGW(viewingGameWeek, currentGameWeek, teamConfirmed);
             updateAllVisuals();
         }
     }
