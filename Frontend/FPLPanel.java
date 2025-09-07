@@ -487,7 +487,7 @@ public class FPLPanel extends JPanel implements ActionListener{
             }
             //get the choice
             if(pcw != null) pcw.setVisible(false);
-            pcw = new PlayerChoiceWindow(p.getPlayer(), this, CAPTAIN_STATUS, VICE_CAPTAIN_STATUS, SUBSTITUTE_STATUS, TRANSFER_STATUS);
+            pcw = new PlayerChoiceWindow(p.getPlayer(), this, CAPTAIN_STATUS, VICE_CAPTAIN_STATUS, SUBSTITUTE_STATUS, TRANSFER_STATUS, viewingGameWeek);
         }
     }
 
@@ -588,6 +588,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         status = NEUTRAL_STATUS;
         cancelConfirmButton.setText(CONFIRM_TEXT);
 
+        //can't swap a gk with a non gk
         if((panel1.getPosition().equals("GK") && !panel2.getPosition().equals("GK")) || (!panel1.getPosition().equals("GK") && panel2.getPosition().equals("GK"))){
             return;
         }
@@ -661,7 +662,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         this.revalidate();
         this.repaint();
-        cancelConfirmButton.setText("Confirm Team");
+        cancelConfirmButton.setText(CONFIRM_TEXT);
 
         stabilizeLayout();
     }

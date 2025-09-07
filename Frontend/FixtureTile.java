@@ -3,6 +3,8 @@ package Frontend;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+
 import java.awt.image.*;
 import java.awt.*;
 
@@ -14,6 +16,8 @@ public class FixtureTile extends JPanel {
     private Fixture fixture;
     private boolean home;
 
+    private Border blackline = BorderFactory.createLineBorder(Color.black);
+
     public FixtureTile(Fixture fixture, boolean home){
         this.fixture = fixture;
         this.home = home;
@@ -22,6 +26,8 @@ public class FixtureTile extends JPanel {
     }
 
     private void setup(){
+        this.setLayout(new BorderLayout());
+
         JLabel opponentLabel = LabelCreator.createJLabel(fixture.getFixtureString(home), "SansSerif", 10, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         Color difficultyColor;
         Team opponent;
@@ -34,6 +40,7 @@ public class FixtureTile extends JPanel {
         else difficultyColor = EASY_COLOR;
 
         this.setBackground(difficultyColor);
-        this.add(opponentLabel);
+        this.add(opponentLabel, "Center");
+        this.setBorder(blackline);
     }
 }

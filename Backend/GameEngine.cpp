@@ -21,7 +21,7 @@ const string AWAY_PLAYERS_START = "AWAY PLAYERS";
 int seed;
 
 bool validCleanSheetPosition(string position){
-    return position == "GK" | position == "DEF" | position == "MID";
+    return position == "GK" || position == "DEF" || position == "MID";
 }
 
 

@@ -2,7 +2,8 @@ GPP = g++
 
 
 cpp_build: GameEngine.cpp
-	$(GPP) GameEngine.cpp -o GameEngine.exe
+	$(GPP) -std=c++17 GameEngine.cpp -o GameEngine.exe
+
 
 
 clean:
