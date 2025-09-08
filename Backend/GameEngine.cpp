@@ -25,6 +25,11 @@ bool validCleanSheetPosition(string position){
     return position == "GK" || position == "DEF" || position == "MID";
 }
 
+int generateRandom(int min, int max) 
+{
+   return min + rand() % (max - min);
+}
+
 
 //PLAYER CLASS
 class Player{
@@ -148,7 +153,19 @@ class Team{
         team[player.getGeneralPosition()].push_back(player);
     }
 
-    vector<Player> getPlayers(){ return players; }
+    vector<Player>& getPlayers(){ return players; }
+
+    Player* getPlayerFromPosition(string position){
+        vector<Player*> positionPlayers;
+        for(auto& p : players){
+            if(p.getSpecificPosition() == position){
+                positionPlayers.push_back(&p);
+            }
+        }
+        if(positionPlayers.size() == 0) return nullptr;
+
+        return positionPlayers[generateRandom(0, positionPlayers.size())];
+    }
 
     string getGoalScorersDictionary(){
         string output = "";
@@ -394,11 +411,28 @@ const int ST_DRIBBLE_WEIGHT = 40;
 const int ST_SHOOT_WEIGHT = 50;
 
 
-const double FORWARD_PASS_MODIFIER = 0.2;
-const double BACKWARD_PASS_MODIFIER = -0.2;
+//const double FORWARD_PASS_MODIFIER = 0.2;
+//const double BACKWARD_PASS_MODIFIER = -0.2;
 
 std::unordered_map<std::string, std::unordered_map<string, int>> decisionMap;
 std::unordered_map<std::string, std::unordered_map<string, int>> passMap;
+
+string getRandomPosition(Team team, std::unordered_map<std::string, int> map){
+    //add up all weights in the given map
+    int total = 0;
+    for(int i = 0; i < numPositions; i++){
+        total += map[allPositions[i]];
+    }
+    //now generate a number and go back through the map until we know which position the number applies to
+    int number = generateRandom(0, total);
+    total = 0;
+    for(int i = 0; i < numPositions; i++){
+        total += map[allPositions[i]];
+        if(total > number) return allPositions[i];
+    }
+    //otherwise return the last position
+    return allPositions[numPositions - 1];
+}
 
 void setupDecisionMap(){
     //setup every position's unordered maps
@@ -506,7 +540,8 @@ void setupPassMap(){
         passMap[allPositions[i]] = passes;
     }*/
 
-    
+    //manually create a graph of all chances of passing to another position
+
     std::unordered_map<string, int> gkPasses;
     gkPasses["GK"] = 0;
     gkPasses["CB"] = 100;
@@ -590,6 +625,104 @@ void setupPassMap(){
     rwbPasses["LW"] = 1;
     rwbPasses["RW"] = 50;
     rwbPasses["ST"] = 5;
+
+    std::unordered_map<string, int> cdmPasses;
+    cdmPasses["GK"] = 2;
+    cdmPasses["CB"] = 20;
+    cdmPasses["LB"] = 5;
+    cdmPasses["RB"] = 5;
+    cdmPasses["LWB"] = 6;
+    cdmPasses["RWB"] = 6;
+    cdmPasses["CDM"] = 30;
+    cdmPasses["CM"] = 40;
+    cdmPasses["CAM"] = 35;
+    cdmPasses["LW"] = 20;
+    cdmPasses["RW"] = 20;
+    cdmPasses["ST"] = 10;
+
+    std::unordered_map<string, int> cmPasses;
+    cmPasses["GK"] = 0;
+    cmPasses["CB"] = 12;
+    cmPasses["LB"] = 3;
+    cmPasses["RB"] = 3;
+    cmPasses["LWB"] = 5;
+    cmPasses["RWB"] = 5;
+    cmPasses["CDM"] = 25;
+    cmPasses["CM"] = 50;
+    cmPasses["CAM"] = 50;
+    cmPasses["LW"] = 30;
+    cmPasses["RW"] = 30;
+    cmPasses["ST"] = 20;
+
+    std::unordered_map<string, int> camPasses;
+    camPasses["GK"] = 0;
+    camPasses["CB"] = 1;
+    camPasses["LB"] = 2;
+    camPasses["RB"] = 2;
+    camPasses["LWB"] = 4;
+    camPasses["RWB"] = 4;
+    camPasses["CDM"] = 15;
+    camPasses["CM"] = 40;
+    camPasses["CAM"] = 50;
+    camPasses["LW"] = 40;
+    camPasses["RW"] = 40;
+    camPasses["ST"] = 30;
+
+    std::unordered_map<string, int> lwPasses;
+    lwPasses["GK"] = 0;
+    lwPasses["CB"] = 0;
+    lwPasses["LB"] = 10;
+    lwPasses["RB"] = 1;
+    lwPasses["LWB"] = 15;
+    lwPasses["RWB"] = 1;
+    lwPasses["CDM"] = 2;
+    lwPasses["CM"] = 15;
+    lwPasses["CAM"] = 30;
+    lwPasses["LW"] = 0;
+    lwPasses["RW"] = 5;
+    lwPasses["ST"] = 40;
+
+    std::unordered_map<string, int> rwPasses;
+    rwPasses["GK"] = 0;
+    rwPasses["CB"] = 0;
+    rwPasses["LB"] = 1;
+    rwPasses["RB"] = 10;
+    rwPasses["LWB"] = 1;
+    rwPasses["RWB"] = 15;
+    rwPasses["CDM"] = 2;
+    rwPasses["CM"] = 15;
+    rwPasses["CAM"] = 30;
+    rwPasses["LW"] = 5;
+    rwPasses["RW"] = 0;
+    rwPasses["ST"] = 40;
+
+    std::unordered_map<string, int> stPasses;
+    stPasses["GK"] = 0;
+    stPasses["CB"] = 0;
+    stPasses["LB"] = 0;
+    stPasses["RB"] = 0;
+    stPasses["LWB"] = 0;
+    stPasses["RWB"] = 0;
+    stPasses["CDM"] = 1;
+    stPasses["CM"] = 5;
+    stPasses["CAM"] = 50;
+    stPasses["LW"] = 30;
+    stPasses["RW"] = 30;
+    stPasses["ST"] = 40;
+
+    //add all maps to the passMap
+    passMap["GK"] = gkPasses;
+    passMap["CB"] = cbPasses;
+    passMap["LB"] = lbPasses;
+    passMap["RB"] = rbPasses;
+    passMap["LWB"] = lwbPasses;
+    passMap["RWB"] = rwbPasses;
+    passMap["CDM"] = cdmPasses;
+    passMap["CM"] = cmPasses;
+    passMap["CAM"] = camPasses;
+    passMap["LW"] = lwPasses;
+    passMap["RW"] = rwPasses;
+    passMap["ST"] = stPasses;
 }
 
 void setupMaps(){
@@ -597,7 +730,7 @@ void setupMaps(){
     setupPassMap();
 }
 
-void simulateStep(Team teams[], Player& onBall){
+void simulateStep(Team teams[], Player& onBall, string* position){
     //player decision making:
     //first, use SPECIFIC position to look at the different options: passing, dribbling or shooting.
 
@@ -623,14 +756,16 @@ int simulateMatch(Team teams[]){
         */
 
     //kickoff
-    Player onBall = teams[0].getPlayers()[10];
+    Player& onBall = teams[0].getPlayers()[10];
+    std::string position = onBall.getSpecificPosition();
+
     for(int step = 0; step < NUM_STEPS / 2; step++){
-        simulateStep(teams, onBall);
+        simulateStep(teams, onBall, &position);
     }
     //half time
     onBall = teams[1].getPlayers()[10];
     for(int step = NUM_STEPS / 2; step < NUM_STEPS; step++){
-        simulateStep(teams, onBall);
+        simulateStep(teams, onBall, &position);
     }
 
     return 0;
