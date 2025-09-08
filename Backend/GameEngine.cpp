@@ -148,6 +148,8 @@ class Team{
         team[player.getGeneralPosition()].push_back(player);
     }
 
+    vector<Player> getPlayers(){ return players; }
+
     string getGoalScorersDictionary(){
         string output = "";
         for(int i = 0; i < players.size(); i++){
@@ -344,13 +346,34 @@ void writeToOutputFile(Team teams[]){
 
 
 //MATCH ENGINE!!!
+const int NUM_STEPS = 90;
+
+const std::map<string, map> positionOptions;
+
+void simulateStep(Team teams[], Player& onBall){
+
+}
+
 int simulateMatch(Team teams[]){
+    /*
     for(int i = 0; i < rand() % 4; i++){
         teams[0].scored(teams[0].getRandomPlayer(), teams[0].getRandomPlayer());
     }
 
     for(int i = 0; i < rand() % 4; i++){
         teams[1].scored(teams[1].getRandomPlayer(), teams[1].getRandomPlayer());
+    }
+        */
+
+    //kickoff
+    Player onBall = teams[0].getPlayers()[10];
+    for(int step = 0; step < NUM_STEPS / 2; i++){
+        simulateStep(teams, onBall);
+    }
+    //half time
+    onBall = teams[1].getPlayers()[10];
+    for(int step = NUM_STEPS / 2; step < NUM_STEPS; i++){
+        simulateStep(teams, onBall);
     }
 
     return 0;
@@ -359,7 +382,11 @@ int simulateMatch(Team teams[]){
 
 
 
-
+//main function:
+//1. reads fixture data .txt file
+//2. creates player and team objects
+//3. simulates the match
+//4. writes outcome to output file
 
 int main() {
     cout << "GameEngine.exe running\n";
