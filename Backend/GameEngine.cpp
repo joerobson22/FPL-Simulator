@@ -194,15 +194,6 @@ class Team{
         return output;
     }
     int getGoals(){ return goals; }
-    std::optional<Player> getPlayer(int id){
-        for(int i = 0; i < players.size(); i++){
-            if(players[i].getID() == id){
-                return players[i];
-            }
-        }
-        //check is getPlayer.has_value()
-        return std::nullopt;
-    }
 
     //temporary testing functions
     void outputTeam(){
@@ -271,7 +262,7 @@ void readInputFile(Team teams[]){
         
         int subStrStart = 0;
         int j = 0;
-        for(j; j < line.size(); j++){
+        for(j = 0; j < line.size(); j++){
             char c = line.at(j);
 
             if(c == ',' || j == line.size()){
@@ -347,7 +338,7 @@ void writeToOutputFile(Team teams[]){
 
 //MATCH ENGINE!!!
 
-const int NUM_STEPS = 90;
+const int NUM_STEPS = 1000;
 const int GK_SHOOTING = 10;
 const int GK_DRIBBLING = 30;
 
@@ -356,6 +347,11 @@ const int GK_DRIBBLING = 30;
 //cb, lb, cb, lwb, rwb
 //cdm, cm, cam, lw, rw
 //st
+const int numPositions = 12;
+const std::string allPositions[numPositions] = {
+    "GK", "CB", "LB", "RB", "LWB", "RWB", 
+    "CDM", "CM", "CAM", "LW", "RW", "ST"
+};
 
 //decision weightings for every position
 const int GK_PASS_WEIGHT = 100;
@@ -396,6 +392,10 @@ const int W_SHOOT_WEIGHT = 40;
 const int ST_PASS_WEIGHT = 30;
 const int ST_DRIBBLE_WEIGHT = 40;
 const int ST_SHOOT_WEIGHT = 50;
+
+
+const double FORWARD_PASS_MODIFIER = 0.2;
+const double BACKWARD_PASS_MODIFIER = -0.2;
 
 std::unordered_map<std::string, std::unordered_map<string, int>> decisionMap;
 std::unordered_map<std::string, std::unordered_map<string, int>> passMap;
@@ -464,7 +464,132 @@ void setupDecisionMap(){
 }
 
 void setupPassMap(){
+    /*
+    std::unordered_map<std::string, double> selfPassWeights;
+    selfPassWeights["GK"] = 0;
+    selfPassWeights["CB"] = 0.75;
+    selfPassWeights["LB"] = 0;
+    selfPassWeights["RB"] = 0;
+    selfPassWeights["LWB"] = 0;
+    selfPassWeights["RWB"] = 0;
+    selfPassWeights["CDM"] = 0.75;
+    selfPassWeights["CM"] = 0.75;
+    selfPassWeights["CAM"] = 0.75;
+    selfPassWeights["LW"] = 0;
+    selfPassWeights["RW"] = 0;
+    selfPassWeights["ST"] = 0.5;
 
+    //setup something to do with distance between positions in the 'positions' array?
+    //could even get team tactics from fifa database and use different functions to make teams play differently
+
+    int maxDistance = numPositions * numPositions;
+
+    for(int i = 0; i < numPositions; i++){
+        std::unordered_map<string, int> passes;
+        for(int j = 0; j < numPositions; j++){
+            int distance = j - i;
+            
+            //weight = max distance - (max distance / distance)
+            int weight = maxDistance - (distance * distance);
+            //change weighting depending on how far up the pitch the current position (i) is
+
+            //change weighting depending on if the pass goes forward or backward
+            cout << to_string(weight) + "\n";
+            if(distance > 0) weight += (double)weight * FORWARD_PASS_MODIFIER;
+            else weight += (double)weight * BACKWARD_PASS_MODIFIER;
+            cout << to_string(weight) + "\n\n";
+
+            if(i == j) weight = (double)weight * selfPassWeights[allPositions[i]];
+
+            passes[allPositions[j]] = weight;
+        }
+        passMap[allPositions[i]] = passes;
+    }*/
+
+    
+    std::unordered_map<string, int> gkPasses;
+    gkPasses["GK"] = 0;
+    gkPasses["CB"] = 100;
+    gkPasses["LB"] = 50;
+    gkPasses["RB"] = 50;
+    gkPasses["LWB"] = 20;
+    gkPasses["RWB"] = 20;
+    gkPasses["CDM"] = 25;
+    gkPasses["CM"] = 10;
+    gkPasses["CAM"] = 5;
+    gkPasses["LW"] = 2;
+    gkPasses["RW"] = 2;
+    gkPasses["ST"] = 1;
+
+    std::unordered_map<string, int> cbPasses;
+    cbPasses["GK"] = 50;
+    cbPasses["CB"] = 75;
+    cbPasses["LB"] = 25;
+    cbPasses["RB"] = 25;
+    cbPasses["LWB"] = 20;
+    cbPasses["RWB"] = 20;
+    cbPasses["CDM"] = 30;
+    cbPasses["CM"] = 10;
+    cbPasses["CAM"] = 5;
+    cbPasses["LW"] = 2;
+    cbPasses["RW"] = 2;
+    cbPasses["ST"] = 1;
+
+    std::unordered_map<string, int> lbPasses;
+    lbPasses["GK"] = 10;
+    lbPasses["CB"] = 30;
+    lbPasses["LB"] = 0;
+    lbPasses["RB"] = 5;
+    lbPasses["LWB"] = 10;
+    lbPasses["RWB"] = 3;
+    lbPasses["CDM"] = 20;
+    lbPasses["CM"] = 10;
+    lbPasses["CAM"] = 5;
+    lbPasses["LW"] = 40;
+    lbPasses["RW"] = 1;
+    lbPasses["ST"] = 3;
+    
+    std::unordered_map<string, int> rbPasses;
+    rbPasses["GK"] = 10;
+    rbPasses["CB"] = 30;
+    rbPasses["LB"] = 5;
+    rbPasses["RB"] = 0;
+    rbPasses["LWB"] = 3;
+    rbPasses["RWB"] = 10;
+    rbPasses["CDM"] = 20;
+    rbPasses["CM"] = 10;
+    rbPasses["CAM"] = 5;
+    rbPasses["LW"] = 1;
+    rbPasses["RW"] = 40;
+    rbPasses["ST"] = 3;
+
+    std::unordered_map<string, int> lwbPasses;
+    lwbPasses["GK"] = 5;
+    lwbPasses["CB"] = 10;
+    lwbPasses["LB"] = 5;
+    lwbPasses["RB"] = 1;
+    lwbPasses["LWB"] = 0;
+    lwbPasses["RWB"] = 2;
+    lwbPasses["CDM"] = 10;
+    lwbPasses["CM"] = 20;
+    lwbPasses["CAM"] = 22;
+    lwbPasses["LW"] = 50;
+    lwbPasses["RW"] = 1;
+    lwbPasses["ST"] = 5;
+
+    std::unordered_map<string, int> rwbPasses;
+    rwbPasses["GK"] = 5;
+    rwbPasses["CB"] = 10;
+    rwbPasses["LB"] = 1;
+    rwbPasses["RB"] = 5;
+    rwbPasses["LWB"] = 2;
+    rwbPasses["RWB"] = 0;
+    rwbPasses["CDM"] = 10;
+    rwbPasses["CM"] = 20;
+    rwbPasses["CAM"] = 22;
+    rwbPasses["LW"] = 1;
+    rwbPasses["RW"] = 50;
+    rwbPasses["ST"] = 5;
 }
 
 void setupMaps(){
@@ -528,6 +653,16 @@ int main() {
     readInputFile(teams);
 
     //simulate the match
+    setupMaps();
+
+    for(int i = 0; i < numPositions; i++){
+        string position1 = allPositions[i];
+        for(int j = 0; j < numPositions; j++){
+            string position2 = allPositions[j];
+            cout << position1 + ">>" + position2 + ": " + to_string(passMap[position1][position2]) + "\n";
+        }
+    }
+
     int errorCode = simulateMatch(teams);
     if(errorCode != 0){
         cout << "Match simulation failed with error" + to_string(errorCode) + ".\n";
