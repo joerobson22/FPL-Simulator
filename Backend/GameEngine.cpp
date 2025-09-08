@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <unordered_map>
 #include <map>
 #include <cstdlib>
 #include <ctime>
@@ -49,7 +50,6 @@ class Player{
         assists = 0;
         minsPlayed = 90;
         sub = false;
-
     }
 
     /*
@@ -346,12 +346,144 @@ void writeToOutputFile(Team teams[]){
 
 
 //MATCH ENGINE!!!
-const int NUM_STEPS = 90;
 
-const std::map<string, map> positionOptions;
+const int NUM_STEPS = 90;
+const int GK_SHOOTING = 10;
+const int GK_DRIBBLING = 30;
+
+//FINAL POSITION MAP:
+//gk
+//cb, lb, cb, lwb, rwb
+//cdm, cm, cam, lw, rw
+//st
+
+//decision weightings for every position
+const int GK_PASS_WEIGHT = 100;
+const int GK_DRIBBLE_WEIGHT = 2;
+const int GK_SHOOT_WEIGHT = 1;
+
+const int CB_PASS_WEIGHT = 70;
+const int CB_DRIBBLE_WEIGHT = 10;
+const int CB_SHOOT_WEIGHT = 2;
+
+//fb covers lb and rb
+const int FB_PASS_WEIGHT = 60;
+const int FB_DRIBBLE_WEIGHT = 15;
+const int FB_SHOOT_WEIGHT = 4;
+
+//wb covers lwb and rwb
+const int WB_PASS_WEIGHT = 50;
+const int WB_DRIBBLE_WEIGHT = 15;
+const int WB_SHOOT_WEIGHT = 8;
+
+const int CDM_PASS_WEIGHT = 60;
+const int CDM_DRIBBLE_WEIGHT = 30;
+const int CDM_SHOOT_WEIGHT = 15;
+
+const int CM_PASS_WEIGHT = 80;
+const int CM_DRIBBLE_WEIGHT = 50;
+const int CM_SHOOT_WEIGHT = 20;
+
+const int CAM_PASS_WEIGHT = 70;
+const int CAM_DRIBBLE_WEIGHT = 50;
+const int CAM_SHOOT_WEIGHT = 30;
+
+//w covers lw and rw
+const int W_PASS_WEIGHT = 50;
+const int W_DRIBBLE_WEIGHT = 50;
+const int W_SHOOT_WEIGHT = 40;
+
+const int ST_PASS_WEIGHT = 30;
+const int ST_DRIBBLE_WEIGHT = 40;
+const int ST_SHOOT_WEIGHT = 50;
+
+std::unordered_map<std::string, std::unordered_map<string, int>> decisionMap;
+std::unordered_map<std::string, std::unordered_map<string, int>> passMap;
+
+void setupDecisionMap(){
+    //setup every position's unordered maps
+    std::unordered_map<string, int> gkDecisions;
+    gkDecisions["PASS"] = GK_PASS_WEIGHT;
+    gkDecisions["DRIBBLE"] = GK_DRIBBLE_WEIGHT;
+    gkDecisions["SHOOT"] = GK_SHOOT_WEIGHT;
+
+    std::unordered_map<string, int> cbDecisions;
+    cbDecisions["PASS"] = CB_PASS_WEIGHT;
+    cbDecisions["DRIBBLE"] = CB_DRIBBLE_WEIGHT;
+    cbDecisions["SHOOT"] = CB_SHOOT_WEIGHT;
+
+    std::unordered_map<string, int> fbDecisions;
+    fbDecisions["PASS"] = FB_PASS_WEIGHT;
+    fbDecisions["DRIBBLE"] = FB_DRIBBLE_WEIGHT;
+    fbDecisions["SHOOT"] = FB_SHOOT_WEIGHT;
+
+    std::unordered_map<string, int> wbDecisions;
+    wbDecisions["PASS"] = WB_PASS_WEIGHT;
+    wbDecisions["DRIBBLE"] = WB_DRIBBLE_WEIGHT;
+    wbDecisions["SHOOT"] = WB_SHOOT_WEIGHT;
+
+    std::unordered_map<string, int> cdmDecisions;
+    cdmDecisions["PASS"] = CDM_PASS_WEIGHT;
+    cdmDecisions["DRIBBLE"] = CDM_DRIBBLE_WEIGHT;
+    cdmDecisions["SHOOT"] = CDM_SHOOT_WEIGHT;
+
+    std::unordered_map<string, int> cmDecisions;
+    cmDecisions["PASS"] = CM_PASS_WEIGHT;
+    cmDecisions["DRIBBLE"] = CM_DRIBBLE_WEIGHT;
+    cmDecisions["SHOOT"] = CM_SHOOT_WEIGHT;
+
+    std::unordered_map<string, int> camDecisions;
+    camDecisions["PASS"] = CAM_PASS_WEIGHT;
+    camDecisions["DRIBBLE"] = CAM_DRIBBLE_WEIGHT;
+    camDecisions["SHOOT"] = CAM_SHOOT_WEIGHT;
+
+    std::unordered_map<string, int> wDecisions;
+    wDecisions["PASS"] = W_PASS_WEIGHT;
+    wDecisions["DRIBBLE"] = W_DRIBBLE_WEIGHT;
+    wDecisions["SHOOT"] = W_SHOOT_WEIGHT;
+
+    std::unordered_map<string, int> stDecisions;
+    stDecisions["PASS"] = ST_PASS_WEIGHT;
+    stDecisions["DRIBBLE"] = ST_DRIBBLE_WEIGHT;
+    stDecisions["SHOOT"] = ST_SHOOT_WEIGHT;
+
+    //then add every position to the overall decision map
+    decisionMap["GK"] = gkDecisions;
+    decisionMap["CB"] = cbDecisions;
+    decisionMap["LB"] = fbDecisions;
+    decisionMap["RB"] = fbDecisions;
+    decisionMap["LWB"] = wbDecisions;
+    decisionMap["RWB"] = wbDecisions;
+    decisionMap["CDM"] = cdmDecisions;
+    decisionMap["CM"] = cmDecisions;
+    decisionMap["CAM"] = camDecisions;
+    decisionMap["LW"] = wDecisions;
+    decisionMap["RW"] = wDecisions;
+    decisionMap["ST"] = stDecisions;
+
+}
+
+void setupPassMap(){
+
+}
+
+void setupMaps(){
+    setupDecisionMap();
+    setupPassMap();
+}
 
 void simulateStep(Team teams[], Player& onBall){
+    //player decision making:
+    //first, use SPECIFIC position to look at the different options: passing, dribbling or shooting.
 
+    //pass:
+    //now look at the pass map: for every position, there is a pass map to every other position. choose one at random (if your team contains a player in that position)
+
+    //dribbling:
+    //move one position up the position index
+
+    //shooting:
+    //shoot at goal, chance of a block or deflection or saving
 }
 
 int simulateMatch(Team teams[]){
@@ -367,12 +499,12 @@ int simulateMatch(Team teams[]){
 
     //kickoff
     Player onBall = teams[0].getPlayers()[10];
-    for(int step = 0; step < NUM_STEPS / 2; i++){
+    for(int step = 0; step < NUM_STEPS / 2; step++){
         simulateStep(teams, onBall);
     }
     //half time
     onBall = teams[1].getPlayers()[10];
-    for(int step = NUM_STEPS / 2; step < NUM_STEPS; i++){
+    for(int step = NUM_STEPS / 2; step < NUM_STEPS; step++){
         simulateStep(teams, onBall);
     }
 

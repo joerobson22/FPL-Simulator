@@ -1,10 +1,57 @@
 package Frontend;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PositionLookupTable {
     private static String[] gk = {"gk"};
-    private static String[] def = {"lwb", "rwb", "lb", "rb", "lcb", "cb", "rcb"};
-    private static String[] mid = { "ldm", "cdm", "rdm",  "lm", "lcm", "cm", "rcm", "rm", "lam", "cam", "ram", "lw", "rw"};
-    private static String[] att = {"ls", "rs", "lf", "cf", "rf", "st"};
+    private static String[] def = {"cb", "lb", "rb", "lwb", "rwb"};
+    private static String[] mid = {"cdm", "cm", "cam", "lw", "rw"};
+    private static String[] att = {"st"};
+
+    private static final Map<String, String> positionMap = new HashMap<>();
+
+    static {
+        positionMap.put("GK", "GK");
+        positionMap.put("LWB", "LWB");
+        positionMap.put("RWB", "RWB");
+        positionMap.put("LB", "LB");
+        positionMap.put("RB", "RB");
+        positionMap.put("LCB", "CB");
+        positionMap.put("RCB", "CB");
+        positionMap.put("CB", "CB");
+        positionMap.put("LDM", "CDM");
+        positionMap.put("CDM", "CDM");
+        positionMap.put("RDM", "CDM");
+        positionMap.put("LM", "LW");
+        positionMap.put("LCM", "CM");
+        positionMap.put("CM", "CM");
+        positionMap.put("RCM", "CM");
+        positionMap.put("RM", "RW");
+        positionMap.put("LAM", "CAM");
+        positionMap.put("RAM", "CAM");
+        positionMap.put("CAM", "CAM");
+        positionMap.put("LW", "LW");
+        positionMap.put("RW", "RW");
+        positionMap.put("LS", "ST");
+        positionMap.put("RS", "ST");
+        positionMap.put("LF", "ST");
+        positionMap.put("CF", "ST");
+        positionMap.put("RF", "ST");
+        positionMap.put("ST", "ST");
+        positionMap.put("SUB", "SUB");
+        positionMap.put("RES", "RES");
+    }
+    //FINAL POSITION MAP:
+    //gk
+    //cb, lb, cb, lwb, rwb
+    //cdm, cm, cam, lw, rw
+    //st
+
+    public static String getMappedPosition(String position){
+        return positionMap.get(position);
+    }
+
 
     public static String getGeneralPosition(String specificPosition){
         for(String position : gk){

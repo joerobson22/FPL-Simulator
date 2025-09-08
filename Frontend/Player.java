@@ -41,14 +41,15 @@ public class Player{
         this.name = name;
         this.rating = rating;
         managerApprovalRating = rating * 10;
-        this.specificPosition = specificPosition;
-        this.teamPosition = teamPosition;
+        this.specificPosition = PositionLookupTable.getMappedPosition(specificPosition);
+        this.teamPosition = PositionLookupTable.getMappedPosition(teamPosition);
         this.team = team;
         playedThisWeek = false;
 
         if(!specificPosition.equals("GK")) setAttributes(attributes);
-        generalPosition = PositionLookupTable.getGeneralPosition(specificPosition);
-        positionIndex = PositionLookupTable.getPositionIndex(specificPosition);
+        
+        generalPosition = PositionLookupTable.getGeneralPosition(this.specificPosition);
+        positionIndex = PositionLookupTable.getPositionIndex(this.specificPosition);
 
         price = 1.0;
 
