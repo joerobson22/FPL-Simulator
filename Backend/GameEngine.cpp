@@ -369,6 +369,12 @@ const std::string allPositions[numPositions] = {
     "GK", "CB", "LB", "RB", "LWB", "RWB", 
     "CDM", "CM", "CAM", "LW", "RW", "ST"
 };
+const int numChoices = 3;
+const std::string allChoices[numChoices] = {
+    "PASS",
+    "SHOOT",
+    "DRIBBLE"
+};
 
 //decision weightings for every position
 const int GK_PASS_WEIGHT = 100;
@@ -414,24 +420,35 @@ const int ST_SHOOT_WEIGHT = 50;
 //const double FORWARD_PASS_MODIFIER = 0.2;
 //const double BACKWARD_PASS_MODIFIER = -0.2;
 
-std::unordered_map<std::string, std::unordered_map<string, int>> decisionMap;
-std::unordered_map<std::string, std::unordered_map<string, int>> passMap;
+std::unordered_map<std::string, std::unordered_map<std::string, int>> decisionMap;
+std::unordered_map<std::string, std::unordered_map<std::string, int>> passMap;
 
-string getRandomPosition(Team team, std::unordered_map<std::string, int> map){
+string getRandomKeyFromMap(std::unordered_map<std::string, int> map, const std::string keys[], int numKeys){
     //add up all weights in the given map
     int total = 0;
-    for(int i = 0; i < numPositions; i++){
-        total += map[allPositions[i]];
+    for(int i = 0; i < numKeys; i++){
+        total += map[keys[i]];
     }
     //now generate a number and go back through the map until we know which position the number applies to
     int number = generateRandom(0, total);
     total = 0;
-    for(int i = 0; i < numPositions; i++){
-        total += map[allPositions[i]];
-        if(total > number) return allPositions[i];
+    for(int i = 0; i < numKeys; i++){
+        total += map[keys[i]];
+        if(total > number) return keys[i];
     }
     //otherwise return the last position
-    return allPositions[numPositions - 1];
+    return keys[numKeys - 1];
+}
+
+Player* getPlayerToPassTo(Team team, string* position){
+    bool valid = false;
+    Player* player = nullptr;
+    while(!valid){
+        player = team.getPlayerFromPosition(getRandomKeyFromMap(passMap[*position], allPositions, numPositions));
+        valid = player;
+    }
+    *position = player->getSpecificPosition();
+    return player;
 }
 
 void setupDecisionMap(){
@@ -733,7 +750,8 @@ void setupMaps(){
 void simulateStep(Team teams[], Player& onBall, string* position){
     //player decision making:
     //first, use SPECIFIC position to look at the different options: passing, dribbling or shooting.
-
+    string choice = getRandomKeyFromMap(decisionMap[*position], allChoices, numChoices);
+    
     //pass:
     //now look at the pass map: for every position, there is a pass map to every other position. choose one at random (if your team contains a player in that position)
 
@@ -756,14 +774,16 @@ int simulateMatch(Team teams[]){
         */
 
     //kickoff
-    Player& onBall = teams[0].getPlayers()[10];
+    Team& teamOnBall = teams[0];
+    Player& onBall = teams[0].getRandomPlayer();
     std::string position = onBall.getSpecificPosition();
 
     for(int step = 0; step < NUM_STEPS / 2; step++){
         simulateStep(teams, onBall, &position);
     }
+
     //half time
-    onBall = teams[1].getPlayers()[10];
+    onBall = teams[1].getRandomPlayer();
     for(int step = NUM_STEPS / 2; step < NUM_STEPS; step++){
         simulateStep(teams, onBall, &position);
     }
@@ -790,13 +810,14 @@ int main() {
     //simulate the match
     setupMaps();
 
-    for(int i = 0; i < numPositions; i++){
+    
+    /*for(int i = 0; i < numPositions; i++){
         string position1 = allPositions[i];
         for(int j = 0; j < numPositions; j++){
             string position2 = allPositions[j];
             cout << position1 + ">>" + position2 + ": " + to_string(passMap[position1][position2]) + "\n";
         }
-    }
+    }*/
 
     int errorCode = simulateMatch(teams);
     if(errorCode != 0){
