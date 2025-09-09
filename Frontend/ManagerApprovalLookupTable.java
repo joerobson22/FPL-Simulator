@@ -34,8 +34,8 @@ public class ManagerApprovalLookupTable {
     );
 
     private static Map<String, Integer> approvalForGoalConceded = Map.of(
-        "GK", -5,
-        "DEF", -3,
+        "GK", -2,
+        "DEF", -2,
         "MID", -1,
         "ATT", 0
     );
