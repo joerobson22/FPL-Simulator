@@ -14,8 +14,8 @@ public class PlayerPanel extends JButton implements ActionListener {
     private final Color focusColor = new Color(115, 0, 255);
 
     //the entire team panel gets 500px -> 400px wide pitch, therefore 400 / 5 (5 at most in any pos) -> 80
-    private final int fixedWidth = 95;
-    private final int fixedHeight = 60;
+    private final int fixedWidth = 80;
+    private final int fixedHeight = 50;
 
     private final int imageWidth = 70;
     private final int imageHeight = 70;

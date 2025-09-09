@@ -29,7 +29,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     private final int cancelConfirmButtonFontSize = 13;
 
 
-    private int fixedPitchWidth = 500;
+    private int fixedPitchWidth = 400;
     private final int BENCH_PANEL_HEIGHT = 100;
     private final int TITLE_PANEL_HEIGHT = 80;
     Border blackline;
@@ -449,6 +449,7 @@ public class FPLPanel extends JPanel implements ActionListener{
             if(cancelConfirmButton.getText().equals(CANCEL_TEXT)){
                 //set status to netural, update the focus player's visuals
                 status = NEUTRAL_STATUS;
+                focusPlayer = null;
                 
                 //clear the transfer panel
                 clearTransferPanel();
@@ -511,7 +512,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         else if(status == SUBSTITUTE_STATUS){
             cancelConfirmButton.setText(CANCEL_TEXT);
         }
-        else if(status  == TRANSFER_STATUS){
+        else if(status == TRANSFER_STATUS){
             transferOutPlayer(focusPlayer);
         }
     }
@@ -643,7 +644,7 @@ public class FPLPanel extends JPanel implements ActionListener{
             
             teamSections.get(panel2Pos).add(panel2);
             teamSections.get(panel1Pos).remove(panel1);
-            benchPanel.add(panel2);
+            benchPanel.add(panel1);
 
             //sort out captaincy
             if(panel1.isCaptain()){

@@ -30,10 +30,10 @@ bool validDFConPosition(string position){
 }
 
 int getDFConForPosition(string position){
-    if(!validDFConPosition(position)) return INFINITY;
+    if(!validDFConPosition(position)) return 1000000;
 
     if(position == "DEF") return 10;
-    else if(position == "MID") return 12;
+    else return 12;
 }
 
 int generateRandom(int min, int maxExclusive)
@@ -99,20 +99,28 @@ class Player{
         string value = p.second;
         if(key == "id"){
             id = stoi(value);
+            return;
         }
         else if(key == "rating"){
             rating = stoi(value);
+            return;
         }
         else if(key == "specificPosition"){
             specificPosition = value;
+            return;
         }
         else if(key == "generalPosition"){
             generalPosition = value;
+            return;
         }
         else if(key == "name"){
             name = value;
+            return;
         }
-        else if(key == "PAC"){
+
+        if(generalPosition == "GK") value = to_string(rating);
+
+        if(key == "PAC"){
             pace = stoi(value);
         }
         else if(key == "SHO"){
@@ -503,55 +511,56 @@ const std::string allChoices[numChoices] = {
 };
 
 //decision weightings for every position
-const int GK_PASS_WEIGHT = 100;
+const int GK_PASS_WEIGHT = 200;
 const int GK_DRIBBLE_WEIGHT = 2;
 const int GK_SHOOT_WEIGHT = 1;
 
-const int CB_PASS_WEIGHT = 70;
-const int CB_DRIBBLE_WEIGHT = 10;
+const int CB_PASS_WEIGHT = 140;
+const int CB_DRIBBLE_WEIGHT = 20;
 const int CB_SHOOT_WEIGHT = 2;
 
 //fb covers lb and rb
-const int FB_PASS_WEIGHT = 60;
-const int FB_DRIBBLE_WEIGHT = 15;
+const int FB_PASS_WEIGHT = 80;
+const int FB_DRIBBLE_WEIGHT = 25;
 const int FB_SHOOT_WEIGHT = 4;
 
 //wb covers lwb and rwb
-const int WB_PASS_WEIGHT = 50;
-const int WB_DRIBBLE_WEIGHT = 15;
-const int WB_SHOOT_WEIGHT = 8;
+const int WB_PASS_WEIGHT = 60;
+const int WB_DRIBBLE_WEIGHT = 30;
+const int WB_SHOOT_WEIGHT = 5;
 
-const int CDM_PASS_WEIGHT = 60;
+const int CDM_PASS_WEIGHT = 80;
 const int CDM_DRIBBLE_WEIGHT = 30;
-const int CDM_SHOOT_WEIGHT = 15;
+const int CDM_SHOOT_WEIGHT = 5;
 
-const int CM_PASS_WEIGHT = 80;
+const int CM_PASS_WEIGHT = 100;
 const int CM_DRIBBLE_WEIGHT = 50;
-const int CM_SHOOT_WEIGHT = 20;
+const int CM_SHOOT_WEIGHT = 6;
 
-const int CAM_PASS_WEIGHT = 70;
-const int CAM_DRIBBLE_WEIGHT = 50;
-const int CAM_SHOOT_WEIGHT = 25;
+const int CAM_PASS_WEIGHT = 75;
+const int CAM_DRIBBLE_WEIGHT = 75;
+const int CAM_SHOOT_WEIGHT = 10;
 
 //w covers lw and rw
 const int W_PASS_WEIGHT = 50;
-const int W_DRIBBLE_WEIGHT = 70;
-const int W_SHOOT_WEIGHT = 20;
+const int W_DRIBBLE_WEIGHT = 50;
+const int W_SHOOT_WEIGHT = 10;
 
-const int ST_PASS_WEIGHT = 40;
-const int ST_DRIBBLE_WEIGHT = 30;
-const int ST_SHOOT_WEIGHT = 30;
+const int ST_PASS_WEIGHT = 25;
+const int ST_DRIBBLE_WEIGHT = 25;
+const int ST_SHOOT_WEIGHT = 15;
 
 
 
 const double GK_POSITIVE_VARIATION = 0.25;
 const double GK_NEGATIVE_VARIATION = 0.1;
 
-const double DEF_BLOCK_CHANCE = 0.33;
+const double DEF_BLOCK_CHANCE = 0.1;
 const double DEF_BLOCK_VARIATION = 0.5;
 const double SHOOTING_BLOCK_VARIATION = 0.5;
 const double DEFENDING_VARIATION = 0.3;
 
+const int SHOOTING_ON_TARGET_THRESHOLD = 50;
 const double SHOOTING_VARIATION = 0.25;
 const double SHOT_PASS_MODIFIER = 0.1;
 const double SHOT_PACE_MODIFIER = 0.1;
@@ -880,13 +889,13 @@ void goal(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     position = onBall->getSpecificPosition();
 }
 
-void save(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+void save(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position, bool saved){
     *teamIndexOnBall = !(*teamIndexOnBall);
     lastPass = nullptr;
     onBall = teams[*teamIndexOnBall].getPlayerFromPosition("GK");
     position = "GK";
 
-    onBall->makeSave();
+    if(saved) onBall->makeSave();
 }
 
 void block(Player*& blocker, Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
@@ -932,7 +941,7 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
         //cout << "rolled\n";
 
         if(roll > chanceToSucceed){
-            //cout << "pass blocked by " + defender->getName() + "\n";
+            cout << "pass blocked by " + defender->getName() + "\n";
             block(defender, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
         }
@@ -974,7 +983,7 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
         //cout << "rolled\n";
 
         if(roll > chanceToSucceed){
-            //cout << "pass intercepted by " + intercepter->getName() + "\n";
+            cout << "pass intercepted by " + intercepter->getName() + "\n";
             block(intercepter, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
         }
@@ -1010,6 +1019,7 @@ void dribble(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
         double roll = (double)rand() / RAND_MAX;
 
         if(roll > chanceToSucceed){
+            cout << "Tackled!\n";
             block(defender, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
         }
@@ -1060,6 +1070,13 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
         }
     }
 
+    //is it even on target?
+    if(generateRandom(0, min((int)(playerShooting * (1 + SHOOTING_VARIATION)), 100)) <= SHOOTING_ON_TARGET_THRESHOLD){
+        cout << "OFF TARGET\n";
+        save(teams, teamIndexOnBall, onBall, lastPass, position, false);
+        return;
+    }
+
     //now compare show rating to other team's gk ability
     int gkRating = teams[!(*teamIndexOnBall)].getPlayerFromPosition("GK")->getRating();
     int saveRating = gkRating;
@@ -1080,7 +1097,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     }
     else{
         cout << "SAVE!\n";
-        save(teams, teamIndexOnBall, onBall, lastPass, position);
+        save(teams, teamIndexOnBall, onBall, lastPass, position, true);
     }
 }
 
@@ -1157,7 +1174,7 @@ int main() {
     //simulate the match
     setupMaps();
 
-    //srand(time(NULL));
+    srand(time(NULL));
 
     int errorCode = simulateMatch(teams);
     if(errorCode != 0){
