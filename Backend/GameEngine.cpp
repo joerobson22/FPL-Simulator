@@ -207,6 +207,16 @@ class Team{
         return positionPlayers[generateRandom(0, positionPlayers.size())];
     }
 
+    vector<Player*> getPlayersFromGeneralPosition(string generalPos){
+        vector<Player*> positionPlayers;
+        for(auto& p : players){
+            if(p.getGeneralPosition() == generalPos){
+                positionPlayers.push_back(&p);
+            }
+        }
+        return positionPlayers;
+    }
+
     string getGoalScorersDictionary(){
         string output = "";
         for(int i = 0; i < players.size(); i++){
@@ -404,7 +414,9 @@ void writeToOutputFile(Team teams[]){
 
 //MATCH ENGINE!!!
 
-const int NUM_STEPS = 90;
+const int PARTS = 2;
+const int MINUTES_PER_PART = 46;
+const int STEPS_PER_MINUTE = 5;
 const int GK_SHOOTING = 10;
 const int GK_DRIBBLING = 30;
 
@@ -472,7 +484,11 @@ const int ST_SHOOT_WEIGHT = 50;
 const double GK_POSITIVE_VARIATION = 0.25;
 const double GK_NEGATIVE_VARIATION = 0.1;
 
-const double SHOOTING_VARIATION = 0.15;
+const double DEF_BLOCK_CHANCE = 0.25;
+const double DEF_BLOCK_VARIATION = 0.5;
+const double SHOOTING_BLOCK_VARIATION = 0.5;
+
+const double SHOOTING_VARIATION = 0.25;
 const double SHOT_PASS_MODIFIER = 0.1;
 const double SHOT_PACE_MODIFIER = 0.1;
 const double SHOT_PASS_VARIATION = 0.05;
@@ -547,48 +563,6 @@ void setupDecisionMap(){
 }
 
 void setupPassMap(){
-    /*
-    std::unordered_map<std::string, double> selfPassWeights;
-    selfPassWeights["GK"] = 0;
-    selfPassWeights["CB"] = 0.75;
-    selfPassWeights["LB"] = 0;
-    selfPassWeights["RB"] = 0;
-    selfPassWeights["LWB"] = 0;
-    selfPassWeights["RWB"] = 0;
-    selfPassWeights["CDM"] = 0.75;
-    selfPassWeights["CM"] = 0.75;
-    selfPassWeights["CAM"] = 0.75;
-    selfPassWeights["LW"] = 0;
-    selfPassWeights["RW"] = 0;
-    selfPassWeights["ST"] = 0.5;
-
-    //setup something to do with distance between positions in the 'positions' array?
-    //could even get team tactics from fifa database and use different functions to make teams play differently
-
-    int maxDistance = numPositions * numPositions;
-
-    for(int i = 0; i < numPositions; i++){
-        std::unordered_map<string, int> passes;
-        for(int j = 0; j < numPositions; j++){
-            int distance = j - i;
-            
-            //weight = max distance - (max distance / distance)
-            int weight = maxDistance - (distance * distance);
-            //change weighting depending on how far up the pitch the current position (i) is
-
-            //change weighting depending on if the pass goes forward or backward
-            cout << to_string(weight) + "\n";
-            if(distance > 0) weight += (double)weight * FORWARD_PASS_MODIFIER;
-            else weight += (double)weight * BACKWARD_PASS_MODIFIER;
-            cout << to_string(weight) + "\n\n";
-
-            if(i == j) weight = (double)weight * selfPassWeights[allPositions[i]];
-
-            passes[allPositions[j]] = weight;
-        }
-        passMap[allPositions[i]] = passes;
-    }*/
-
     //manually create a graph of all chances of passing to another position
 
     std::unordered_map<string, int> gkPasses;
@@ -813,6 +787,13 @@ void save(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     position = "GK";
 }
 
+void block(Player*& blocker, Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+    *teamIndexOnBall = !(*teamIndexOnBall);
+    lastPass = nullptr;
+    onBall = blocker;
+    position = blocker->getSpecificPosition();
+}
+
 void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     cout << "Pass\n";
     lastPass = onBall;
@@ -839,9 +820,7 @@ void dribble(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
 
 void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     cout << "SHOOT!\n";
-    //first check for any blocks -> EVERY DEFENDER for the other team has a chance to block the shot
-
-    //then check how good the shot is
+    //check how good the shot is
     //base value is how good they are at shooting (+- some random number)
     int playerShooting = onBall->getShooting();
     int shotRating = playerShooting;
@@ -869,6 +848,16 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     }
     cout << "shot rating: " + to_string(shotRating) + "\n";
     
+    //check for defensive blocks
+    vector<Player*> defenders = teams[!(*teamIndexOnBall)].getPlayersFromGeneralPosition("DEF");
+    for(auto player : defenders){
+        if(generateRandom(0, 100) <= (DEF_BLOCK_CHANCE * 100) && 
+        generateRandom(player->getDefending() - (player->getDefending() * DEF_BLOCK_VARIATION), player->getDefending() + (player->getDefending() * DEF_BLOCK_VARIATION) > shotRating)){
+            cout << "BLOCKED by " + player->getName() + "\n";
+            block(player, teams, teamIndexOnBall, onBall, lastPass, position);
+            return;
+        }
+    }
 
     //now compare show rating to other team's gk ability
     int gkRating = teams[!(*teamIndexOnBall)].getPlayerFromPosition("GK")->getRating();
@@ -919,27 +908,22 @@ void simulateStep(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& 
 
 int simulateMatch(Team teams[]) {
     //kickoff
-    int teamIndexOnBall = 0;
+    int teamIndexOnBall = generateRandom(0, 1);
     Player* onBall = teams[teamIndexOnBall].getRandomPlayer();
     Player* lastPass = nullptr;
     std::string position = onBall->getSpecificPosition();
 
-    //first half
-    for (int step = 0; step < NUM_STEPS / 2; step++) {
-        cout << to_string(step) + "'  ";
-        simulateStep(teams, &teamIndexOnBall, onBall, lastPass, position);
-    }
-
-    //halftime – switch sides
-    teamIndexOnBall = 1;
-    onBall = teams[teamIndexOnBall].getRandomPlayer();
-    lastPass = nullptr;
-    position = onBall->getSpecificPosition();
-
-    //second half
-    for (int step = NUM_STEPS / 2; step < NUM_STEPS; step++) {
-        cout << to_string(step) + "'  ";
-        simulateStep(teams, &teamIndexOnBall, onBall, lastPass, position);
+    for(int part = 0; part < PARTS; part++){
+        for(int minute = 1; minute <= MINUTES_PER_PART; minute++){
+            cout << to_string(minute) + "'  ";
+            for(int step = 0; step < STEPS_PER_MINUTE; step++){
+                simulateStep(teams, &teamIndexOnBall, onBall, lastPass, position);
+            }
+        }
+        teamIndexOnBall = !teamIndexOnBall;
+        onBall = teams[teamIndexOnBall].getRandomPlayer();
+        lastPass = nullptr;
+        position = onBall->getSpecificPosition();
     }
 
     //fulltime
