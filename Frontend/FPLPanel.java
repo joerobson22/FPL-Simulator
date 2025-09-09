@@ -278,7 +278,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     //update all visuals- change up the player panels, show or hide information labels and their text
     public void updateAllVisuals(){
         updateTeamVisuals();
-        updateTransferInformationVisibility(viewingGameWeek == currentGameWeek);
+        updateTransferInformationVisibility(viewingGameWeek == currentGameWeek && !teamConfirmed);
         updateTransferInformation();
     }
 
@@ -420,6 +420,10 @@ public class FPLPanel extends JPanel implements ActionListener{
         }
     }
 
+    public void unconfirmTeam(){
+        teamConfirmed = false;
+    }
+
     public void canEdit(boolean correctGameweek){
         if(correctGameweek && !teamConfirmed){
             status = NEUTRAL_STATUS;
@@ -462,7 +466,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     //a player panel has been clicked, unhighlight any currently selected panels and do whatever input
     public void playerPanelClicked(PlayerPanel p){
-        if(status == CONFIRMED_STATUS || viewingGameWeek != currentGameWeek) return;
+        if(status == CONFIRMED_STATUS || viewingGameWeek != currentGameWeek || teamConfirmed) return;
 
         //reset visuals for currently selected focus player
         if(focusPlayer != null){
@@ -531,7 +535,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         status = NEUTRAL_STATUS;
         cancelConfirmButton.setText(CONFIRM_TEXT);
 
-        if(p.isBenched()){
+        if(p.isBenched() || p.isViceCaptain()){
             p.updateVisuals(false, viewingGameWeek);
             return;
         }
@@ -556,7 +560,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         status = NEUTRAL_STATUS;
         cancelConfirmButton.setText(CONFIRM_TEXT);
 
-        if(p.isBenched()){
+        if(p.isBenched() || p.isCaptain()){
             p.updateVisuals(false, viewingGameWeek);
             return;
         }

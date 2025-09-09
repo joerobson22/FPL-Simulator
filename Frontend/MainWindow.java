@@ -327,6 +327,7 @@ public class MainWindow extends JFrame implements ActionListener{
         fantasyTeam.saveTeam();
         fantasyTeam.resetWeeklyTotal();
         fantasyTeam.addFreeTransfer();
+        fplPanel.unconfirmTeam();
 
         for(Player p : allPlayers){
             p.resetWeeklyPoints();
