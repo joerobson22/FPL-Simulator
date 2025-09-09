@@ -192,7 +192,7 @@ public class MainWindow extends JFrame implements ActionListener{
         simAllButton.addActionListener(this);
         fixtureListPanel.add(simAllButton);
 
-        fplPanel.setConfirmed(true, true);
+        fplPanel.canEdit(true);
     }
 
 

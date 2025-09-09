@@ -7,11 +7,16 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class FixtureOutcomeWindow extends JFrame implements ActionListener{
+    private final int WINDOW_WIDTH = 500;
+    private final int WINDOW_HEIGHT = 1000;
+
     private final String fixtureFont = "SansSerif";
     private final int fixtureFontSize = 20;
     final String font = "SansSerif";
     final int infoSectionTitleFontSize = 15;
+    final int infoSectionTitleSmallerFontSize = 13;
     final int infoSectionBodyFontSize = 12;
+    final int infoSectionSmallerBodyFontSize = 10;
     final String infoSectionBodyPadding = "     ";
 
     Fixture fixture;
@@ -49,7 +54,7 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
 
         this.setContentPane(mainPanel);
         this.setVisible(true);
-        this.setSize(500,750);
+        this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.setTitle(fixture.getHomeTeam().getName() + " vs " + fixture.getAwayTeam().getName());
         this.setResizable(false);
     }
@@ -58,29 +63,30 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
         JPanel startingLineupPanel = new JPanel();
-        startingLineupPanel.add(setupInfoSection("Lineups", fixture.getLineups()));
+        startingLineupPanel.add(setupInfoSection("Lineups", fixture.getLineups(), infoSectionTitleFontSize, infoSectionBodyFontSize));
 
         JPanel goalContributionsPanel = new JPanel();
         goalContributionsPanel.setLayout(new BoxLayout(goalContributionsPanel, BoxLayout.Y_AXIS));
         JPanel extraInfoPanel = new JPanel();
         extraInfoPanel.setLayout(new BoxLayout(extraInfoPanel, BoxLayout.Y_AXIS));
 
-        goalContributionsPanel.add(setupInfoSection("Goals", fixture.getOutcome().getGoalScorers()));
-        goalContributionsPanel.add(setupInfoSection("Assists", fixture.getOutcome().getAssisters()));
+        goalContributionsPanel.add(setupInfoSection("Goals", fixture.getOutcome().getGoalScorers(), infoSectionTitleFontSize, infoSectionBodyFontSize));
+        goalContributionsPanel.add(setupInfoSection("Assists", fixture.getOutcome().getAssisters(), infoSectionTitleFontSize, infoSectionBodyFontSize));
 
-        extraInfoPanel.add(setupInfoSection("Clean Sheets", fixture.getOutcome().getCleanSheets()));
+        extraInfoPanel.add(setupInfoSection("Clean Sheets", fixture.getOutcome().getCleanSheets(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        extraInfoPanel.add(setupInfoSection("3x Saves", fixture.getOutcome().getThreeSaves(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        extraInfoPanel.add(setupInfoSection("Defensive Contributions", fixture.getOutcome().getDFCon(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
 
         infoPanel.add(startingLineupPanel);
         infoPanel.add(goalContributionsPanel);
         infoPanel.add(extraInfoPanel);
     }
 
-    public JPanel setupInfoSection(String title, ArrayList<Player> players){
+    public JPanel setupInfoSection(String title, ArrayList<Player> players, int headerFontSize, int bodyFontSize){
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel titlePanel = new JPanel();
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font(font, Font.BOLD, infoSectionTitleFontSize));
+        JLabel titleLabel = LabelCreator.createJLabel(title, "SansSerif", headerFontSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
         titlePanel.add(titleLabel);
 
         JPanel contentPanel = new JPanel(new GridLayout(1, 2));
@@ -95,7 +101,7 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         awayPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         for(Player p : players){
-            JLabel label = setupDefaultLabel(p.getName());
+            JLabel label = LabelCreator.createJLabel(p.getName(), "SansSerif", bodyFontSize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK);
             if(p.getTeam() == fixture.getHomeTeam()){
                 //label.setText(label.getText() + infoSectionBodyPadding);
                 homePanelLabels.add(label);

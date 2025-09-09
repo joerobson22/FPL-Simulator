@@ -294,7 +294,7 @@ class Team{
     }
     string get3SavesDictionary(){
         string output = "";
-        for(int j = 0; j < players[0].getSaves(); j++){
+        for(int j = 0; j < players[0].getSaves() % 3; j++){
             if(output != "") output += ",";
             output += to_string(players[0].getID());
         }
@@ -490,8 +490,6 @@ void writeToOutputFile(Team teams[]){
 const int PARTS = 2;
 const int MINUTES_PER_PART = 46;
 const int STEPS_PER_MINUTE = 5;
-const int GK_SHOOTING = 10;
-const int GK_DRIBBLING = 30;
 
 //FINAL POSITION MAP:
 //gk
@@ -538,11 +536,11 @@ const int CM_DRIBBLE_WEIGHT = 50;
 const int CM_SHOOT_WEIGHT = 6;
 
 const int CAM_PASS_WEIGHT = 75;
-const int CAM_DRIBBLE_WEIGHT = 75;
+const int CAM_DRIBBLE_WEIGHT = 50;
 const int CAM_SHOOT_WEIGHT = 10;
 
 //w covers lw and rw
-const int W_PASS_WEIGHT = 50;
+const int W_PASS_WEIGHT = 40;
 const int W_DRIBBLE_WEIGHT = 50;
 const int W_SHOOT_WEIGHT = 10;
 
@@ -561,6 +559,7 @@ const double SHOOTING_BLOCK_VARIATION = 0.5;
 const double DEFENDING_VARIATION = 0.3;
 
 const int SHOOTING_ON_TARGET_THRESHOLD = 50;
+const double SHOOTING_ON_TARGET_SHOOTING_BONUS_PROPORTION = 0.2;
 const double SHOOTING_VARIATION = 0.25;
 const double SHOT_PASS_MODIFIER = 0.1;
 const double SHOT_PACE_MODIFIER = 0.1;
@@ -1071,7 +1070,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     }
 
     //is it even on target?
-    if(generateRandom(0, min((int)(playerShooting * (1 + SHOOTING_VARIATION)), 100)) <= SHOOTING_ON_TARGET_THRESHOLD){
+    if(generateRandom(0, 100) + (playerShooting * SHOOTING_ON_TARGET_SHOOTING_BONUS_PROPORTION) <= SHOOTING_ON_TARGET_THRESHOLD){
         cout << "OFF TARGET\n";
         save(teams, teamIndexOnBall, onBall, lastPass, position, false);
         return;

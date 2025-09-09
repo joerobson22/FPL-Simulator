@@ -267,7 +267,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     public void changeGW(int viewingGameWeek, int currentGameWeek, boolean teamConfirmed){
         this.viewingGameWeek = viewingGameWeek;
         this.currentGameWeek = currentGameWeek;
-        setConfirmed(currentGameWeek == viewingGameWeek, teamConfirmed);
+        canEdit(currentGameWeek == viewingGameWeek);
         updateAllVisuals();
         clearTransferPanel();
         focusPlayer = null;
@@ -420,13 +420,11 @@ public class FPLPanel extends JPanel implements ActionListener{
         }
     }
 
-    public void setConfirmed(boolean correctGameweek, boolean teamConfirmed){
+    public void canEdit(boolean correctGameweek){
         if(correctGameweek && !teamConfirmed){
-            this.teamConfirmed = false;
             status = NEUTRAL_STATUS;
         }
-        else if(!correctGameweek){
-            this.teamConfirmed = true;
+        else{
             status = CONFIRMED_STATUS;
         }
         
@@ -496,6 +494,14 @@ public class FPLPanel extends JPanel implements ActionListener{
     public void playerPanelChoiceMade(int flag){
         if(status == CONFIRMED_STATUS) return;
         if(status != NEUTRAL_STATUS){
+            return;
+        }
+
+        if(flag == -1){
+            focusPlayer.updateVisuals(false, viewingGameWeek);
+            focusPlayer = null;
+            status = NEUTRAL_STATUS;
+            cancelConfirmButton.setText(CONFIRM_TEXT);
             return;
         }
 
@@ -727,6 +733,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         focusPlayer.setPlayer(playerIn, viewingGameWeek);
         focusPlayer = null;
         updateTransferInformation();
+        scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
     }
 
     //helper method to check is a component array has an element in it
