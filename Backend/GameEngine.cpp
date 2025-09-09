@@ -25,6 +25,17 @@ bool validCleanSheetPosition(string position){
     return position == "GK" || position == "DEF" || position == "MID";
 }
 
+bool validDFConPosition(string position){
+    return position == "DEF" || position == "MID";
+}
+
+int getDFConForPosition(string position){
+    if(!validDFConPosition(position)) return INFINITY;
+
+    if(position == "DEF") return 10;
+    else if(position == "MID") return 12;
+}
+
 int generateRandom(int min, int maxExclusive)
 {
     if (maxExclusive <= min) return min;
@@ -273,6 +284,25 @@ class Team{
         }
         return output;
     }
+    string get3SavesDictionary(){
+        string output = "";
+        for(int j = 0; j < players[0].getSaves(); j++){
+            if(output != "") output += ",";
+            output += to_string(players[0].getID());
+        }
+        return output;
+    }
+    string getDFConDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            if(players[i].getDFCon() >= getDFConForPosition(players[i].getGeneralPosition())){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+
     int getGoals(){ return goals; }
 
     //temporary testing functions
@@ -408,6 +438,26 @@ string get60MinString(Team teams[]){
     return output;
 }
 
+string get3SavesString(Team teams[]){
+    string output = "";
+    output += teams[0].get3SavesDictionary();
+
+    if(output != "" && teams[1].get3SavesDictionary() != "") output += ",";
+    output += teams[1].get3SavesDictionary();
+
+    return output;
+}
+
+string getDFConString(Team teams[]){
+    string output = "";
+    output += teams[0].getDFConDictionary();
+
+    if(output != "" && teams[1].getDFConDictionary() != "") output += ",";
+    output += teams[1].getDFConDictionary();
+
+    return output;
+}
+
 void writeToOutputFile(Team teams[]){
     ofstream output(outputFilePath);
 
@@ -417,6 +467,8 @@ void writeToOutputFile(Team teams[]){
     output << "ASSISTERS," + getAssistersString(teams) + "\n";
     output << "CLEAN SHEETS," + getCleanSheetsString(teams) + "\n";
     output << "60 MINS," + get60MinString(teams) + "\n";
+    output << "3 SAVES," + get3SavesString(teams) + "\n";
+    output << "DFCON," + getDFConString(teams) + "\n";
 
     output.close();
 }
@@ -1105,16 +1157,7 @@ int main() {
     //simulate the match
     setupMaps();
 
-    
-    /*for(int i = 0; i < numPositions; i++){
-        string position1 = allPositions[i];
-        for(int j = 0; j < numPositions; j++){
-            string position2 = allPositions[j];
-            cout << position1 + ">>" + position2 + ": " + to_string(passMap[position1][position2]) + "\n";
-        }
-    }*/
-
-    srand(time(NULL));
+    //srand(time(NULL));
 
     int errorCode = simulateMatch(teams);
     if(errorCode != 0){

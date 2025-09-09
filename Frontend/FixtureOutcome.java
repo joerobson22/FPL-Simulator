@@ -1,4 +1,5 @@
 package Frontend;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class FixtureOutcome {
@@ -9,6 +10,8 @@ public class FixtureOutcome {
     private ArrayList<Player> assisters;
     private ArrayList<Player> cleanSheets;
     private ArrayList<Player> sixtyMins;
+    private ArrayList<Player> threeSaves;
+    private ArrayList<Player> dfCon;
 
     //constructors
     public FixtureOutcome(){
@@ -20,13 +23,15 @@ public class FixtureOutcome {
         cleanSheets = new ArrayList<>();
     }
 
-    public FixtureOutcome(int homeGoals, int awayGoals, ArrayList<Player> goalScorers, ArrayList<Player> assisters, ArrayList<Player> cleanSheets, ArrayList<Player> sixtyMins){
+    public FixtureOutcome(int homeGoals, int awayGoals, ArrayList<Player> goalScorers, ArrayList<Player> assisters, ArrayList<Player> cleanSheets, ArrayList<Player> sixtyMins, ArrayList<Player> threeSaves, ArrayList<Player> dfCon){
         this.homeGoals = homeGoals;
         this.awayGoals = awayGoals;
         this.goalScorers = goalScorers;
         this.assisters = assisters;
         this.cleanSheets = cleanSheets;
         this.sixtyMins = sixtyMins;
+        this.threeSaves = threeSaves;
+        this.dfCon = dfCon;
     }
 
 
@@ -53,6 +58,14 @@ public class FixtureOutcome {
 
     public ArrayList<Player> get60Mins(){
         return sixtyMins;
+    }
+
+    public ArrayList<Player> getThreeSaves(){
+        return threeSaves;
+    }
+
+    public ArrayList<Player> getDFCon(){
+        return dfCon;
     }
 
     public String getScoreString(){

@@ -101,6 +101,17 @@ public class Fixture {
         for(Player p : outcome.get60Mins()){
             p.play60Mins();
         }
+        //allocate points for making 3 saves
+        for(Player p : outcome.getThreeSaves()){
+            p.makeThreeSaves();
+        }
+        //allocate points for meeting dfcon
+        for(Player p : outcome.getDFCon()){
+            p.makeDFCon();
+        }
+
+
+
         //allocate manager favour for any blanks
         for(Player p : homeLineup){
             p.inStartingLineup();

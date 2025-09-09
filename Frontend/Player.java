@@ -168,6 +168,14 @@ public class Player{
         changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForAssist(generalPosition));
     }
 
+    public void makeThreeSaves(){
+        weeklyPoints += PointLookupTable.getPointsFor3Saves();
+    }
+
+    public void makeDFCon(){
+        weeklyPoints += PointLookupTable.getPointsForDFCon();
+    }
+
     public void blank(){
         changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForBlank(generalPosition));
     }

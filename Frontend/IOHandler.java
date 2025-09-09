@@ -14,8 +14,10 @@ public class IOHandler {
     protected static final int ASSISTERS = 3;
     protected static final int CLEAN_SHEETS = 4;
     protected static final int SIXTY_MINUTES = 5;
+    protected static final int THREE_SAVES = 6;
+    protected static final int DFCON = 7;
 
-    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS"};
+    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS", "3 SAVES", "DFCON"};
 
     public static void writeFixtureData(Fixture fixture, int seed){
         try{
@@ -62,6 +64,8 @@ public class IOHandler {
         ArrayList<String> assisters = new ArrayList<>();
         ArrayList<String> cleanSheets = new ArrayList<>();
         ArrayList<String> sixtyMins = new ArrayList<>();
+        ArrayList<String> threeSaves = new ArrayList<>();
+        ArrayList<String> dfCon = new ArrayList<>();
 
         try{
             BufferedReader reader = new BufferedReader(new FileReader("fixtureOutcome.txt"));
@@ -93,6 +97,14 @@ public class IOHandler {
                     System.out.println("60 mins");
                     sixtyMins = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
+                else if(i == THREE_SAVES){
+                    System.out.println("3 saves");
+                    threeSaves = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
+                else if(i == DFCON){
+                    System.out.println("DFCon");
+                    dfCon = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
 
                 line = reader.readLine();
 
@@ -106,7 +118,7 @@ public class IOHandler {
         }
         
         System.out.println("Generating FixtureOutcome object");
-        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, getPlayersFromID(players, goalScorers), getPlayersFromID(players, assisters), getPlayersFromID(players, cleanSheets), getPlayersFromID(players, sixtyMins));
+        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, getPlayersFromID(players, goalScorers), getPlayersFromID(players, assisters), getPlayersFromID(players, cleanSheets), getPlayersFromID(players, sixtyMins), getPlayersFromID(players, threeSaves), getPlayersFromID(players, dfCon));
         return outcome;
     }
 

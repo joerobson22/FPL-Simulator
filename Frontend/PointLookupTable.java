@@ -24,18 +24,20 @@ public class PointLookupTable {
     );
 
     private static int pointsForTransfer = -4;
+    private static int pointsFor3Saves = 1;
+    private static int pointsForDFCon = 2;
 
 
-    //2 goals conceded  : -1 (only gk and def)
-    //3 saves           : 1
+    //2 goals conceded  : -1 (only gk and def)  -  
+    //3 saves           : 1                     !
     //penalty save      : 5
     //penalty miss      : -2
     //yellow card       : -1
     //red cards         : -3
     //own goal          : -2
-    //dfcon             : 2
-    //minutes played??  : 1 -> 2
-    //bonus points      : 1-3
+    //dfcon             : 2                     !
+    //minutes played??  : 1 -> 2                -
+    //bonus points      : 1-3       
 
     public static int getPointsForGoal(String position){
         return pointsForGoals.get(position);
@@ -58,5 +60,13 @@ public class PointLookupTable {
 
     public static int getPointsForTransfer(){
         return pointsForTransfer;
+    }
+
+    public static int getPointsFor3Saves(){
+        return pointsFor3Saves;
+    }
+
+    public static int getPointsForDFCon(){
+        return pointsForDFCon;
     }
 }
