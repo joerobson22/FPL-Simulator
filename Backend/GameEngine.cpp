@@ -44,6 +44,13 @@ class Player{
     int minsPlayed;
     bool sub;
 
+    int pace;
+    int shooting;
+    int passing;
+    int dribbling;
+    int defending;
+    int physical;
+
     public:
     Player(vector<pair<string, string>> pairs){
         for(int i = 0; i < pairs.size(); i++){
@@ -70,20 +77,40 @@ class Player{
         */
 
     void setAttribute(pair<string, string> p){
-        if(p.first == "id"){
-            id = stoi(p.second);
+        string key = p.first;
+        string value = p.second;
+        if(key == "id"){
+            id = stoi(value);
         }
-        else if(p.first == "rating"){
-            rating = stoi(p.second);
+        else if(key == "rating"){
+            rating = stoi(value);
         }
-        else if(p.first == "specificPosition"){
-            specificPosition = p.second;
+        else if(key == "specificPosition"){
+            specificPosition = value;
         }
-        else if(p.first == "generalPosition"){
-            generalPosition = p.second;
+        else if(key == "generalPosition"){
+            generalPosition = value;
         }
-        else if(p.first == "name"){
-            name = p.second;
+        else if(key == "name"){
+            name = value;
+        }
+        else if(key == "PAC"){
+            pace = stoi(value);
+        }
+        else if(key == "SHO"){
+            shooting = stoi(value);
+        }
+        else if(key == "PAS"){
+            passing = stoi(value);
+        }
+        else if(key == "DRI"){
+            dribbling = stoi(value);
+        }
+        else if(key == "DEF"){
+            defending = stoi(value);
+        }
+        else if(key == "PHY"){
+            physical = stoi(value);
         }
     }
 
@@ -355,7 +382,7 @@ void writeToOutputFile(Team teams[]){
 
 //MATCH ENGINE!!!
 
-const int NUM_STEPS = 10;
+const int NUM_STEPS = 90;
 const int GK_SHOOTING = 10;
 const int GK_DRIBBLING = 30;
 
@@ -736,63 +763,93 @@ string getRandomKeyFromMap(std::unordered_map<std::string, int> map, const std::
     return keys[numKeys - 1];
 }
 
-Player* getPlayerToPassTo(Player& onBall, Team& team, std::string& position){
+void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+    cout << "Pass\n";
+    lastPass = onBall;
+
+    //first check for interception from passer
+
     Player* player = nullptr;
-    while(!player || player == &onBall){
-        player = team.getPlayerFromPosition(getRandomKeyFromMap(passMap[position], allPositions, numPositions));
+    while(!player || player == onBall){
+        player = teams[*teamIndexOnBall].getPlayerFromPosition(getRandomKeyFromMap(passMap[position], allPositions, numPositions));
     }
+
+    //then check for interception for person marking receiver
+
     position = player->getSpecificPosition();
-    return player;
+    onBall = player;
 }
 
-void simulateStep(Team teams[], Team& teamOnBall, Player*& onBall, std::string& position){
+void dribble(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+    cout << "dribble\n";
+    //first check for any blocks -> EVERY DEFENDER for the other team has a chance to block the shot
+
+    //then check how good the shot is -> depending on the passing of the player that passed it to this one and the current player's shooting
+    //int shotRating = onBall;
+
+    //now compare show rating to other team's gk ability
+}
+
+void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+    cout << "SHOOT!\n";
+    //first check for any blocks -> EVERY DEFENDER for the other team has a chance to block the shot
+
+    //then check how good the shot is -> depending on the passing of the player that passed it to this one and the current player's shooting
+    //int shotRating = onBall;
+
+    //now compare show rating to other team's gk ability
+}
+
+void simulateStep(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     cout << onBall->getName() + " on the ball\n";
     //player decision making:
     //first, use SPECIFIC position to look at the different options: passing, dribbling or shooting.
-    string choice = "PASS";//getRandomKeyFromMap(decisionMap[*position], allChoices, numChoices);
+    string choice;
+
+    if(!lastPass) choice = "PASS";
+    else choice = getRandomKeyFromMap(decisionMap[position], allChoices, numChoices);
     
     //pass:
     //now look at the pass map: for every position, there is a pass map to every other position. choose one at random (if your team contains a player in that position)
-    if(choice == "PASS"){
-        onBall = getPlayerToPassTo(*onBall, teamOnBall, position);
-    }
+    if(choice == "PASS") pass(teams, teamIndexOnBall, onBall, lastPass, position);
 
     //dribbling:
     //move one position up the position index
+    else if(choice == "DRIBBLE") dribble(teams, teamIndexOnBall, onBall, lastPass, position);
 
     //shooting:
     //shoot at goal, chance of a block or deflection or saving
+    else if(choice == "SHOOT") shoot(teams, teamIndexOnBall, onBall, lastPass, position);
 }
 
-int simulateMatch(Team teams[]){
-    /*
-    for(int i = 0; i < rand() % 4; i++){
-        teams[0].scored(teams[0].getRandomPlayer(), teams[0].getRandomPlayer());
-    }
-
-    for(int i = 0; i < rand() % 4; i++){
-        teams[1].scored(teams[1].getRandomPlayer(), teams[1].getRandomPlayer());
-    }
-        */
-
+int simulateMatch(Team teams[]) {
     //kickoff
-    Team& teamOnBall = teams[0];
-    Player* onBall = teamOnBall.getRandomPlayer();
+    int teamIndexOnBall = 0;
+    Player* onBall = teams[teamIndexOnBall].getRandomPlayer();
+    Player* lastPass = nullptr;
     std::string position = onBall->getSpecificPosition();
 
+    //first half
     for (int step = 0; step < NUM_STEPS / 2; step++) {
-        simulateStep(teams, teamOnBall, onBall, position);
+        simulateStep(teams, &teamIndexOnBall, onBall, lastPass, position);
     }
 
-    //half time
-    teamOnBall = teams[1];
-    onBall = teamOnBall.getRandomPlayer();
-    for(int step = NUM_STEPS / 2; step < NUM_STEPS; step++){
-        simulateStep(teams, teamOnBall, onBall, position);
+    //halftime – switch sides
+    teamIndexOnBall = 1;
+    onBall = teams[teamIndexOnBall].getRandomPlayer();
+    lastPass = nullptr;
+    position = onBall->getSpecificPosition();
+
+    //second half
+    for (int step = NUM_STEPS / 2; step < NUM_STEPS; step++) {
+        simulateStep(teams, &teamIndexOnBall, onBall, lastPass, position);
     }
+
+    //fulltime
 
     return 0;
 }
+
 
 
 

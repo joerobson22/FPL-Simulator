@@ -132,7 +132,8 @@ public class Player{
     }
 
     public String toDictionaryString(){
-        return String.format("id:%d,rating:%d,specificPosition:%s,generalPosition:%s,name:%s", playerID, rating, specificPosition, generalPosition, name);
+        return String.format("id:%d,rating:%d,specificPosition:%s,generalPosition:%s,name:%s,PAC:%d,SHO:%d,PAS:%d,DRI:%d,DEF:%d,PHY:%d", 
+        playerID, rating, specificPosition, generalPosition, name, pace, shooting, passing, dribbling, defending, physical);
     }
 
     public int getGameWeekPoints(int gameWeek){
