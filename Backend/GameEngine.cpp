@@ -25,10 +25,13 @@ bool validCleanSheetPosition(string position){
     return position == "GK" || position == "DEF" || position == "MID";
 }
 
-int generateRandom(int min, int max) 
+int generateRandom(int min, int maxExclusive)
 {
-   return min + rand() % (max - min);
+    if (maxExclusive <= min) return min;
+    int range = maxExclusive - min;
+    return min + (rand() % range);
 }
+
 
 
 //PLAYER CLASS
@@ -126,6 +129,13 @@ class Player{
         if(!sub) minsPlayed++;
     }
 
+    int getPace(){ return pace; }
+    int getShooting(){ return shooting; }
+    int getPassing(){ return passing; }
+    int getDribbling(){ return dribbling; }
+    int getDefending(){ return defending; }
+    int getPhysical(){ return physical; }
+
     int getID(){ return id; }
     int getRating(){ return rating; }
     string getSpecificPosition(){ return specificPosition; }
@@ -169,11 +179,14 @@ class Team{
                 players[i].scored();
             }
         }
-        for(int i = 0; i < players.size(); i++){
-            if(assister.getID() == players[i].getID()){
-                players[i].assisted();
+        if(true){
+            for(int i = 0; i < players.size(); i++){
+                if(assister.getID() == players[i].getID()){
+                    players[i].assisted();
+                }
             }
         }
+        
     }
     void addPlayer(Player& player){ 
         players.push_back(player);
@@ -251,6 +264,15 @@ class Team{
         return &players[rand() % players.size()];
     }
 };
+
+int getTeamIndex(Team teams[], Player p){
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < 11; j++){
+            if(p.getID() == teams[i].getPlayers()[j].getID()) return i;
+        }
+    }
+    return -1;
+}
 
 //FILE INPUT FUNCTIONS
 pair<string, string> parseKeyValuePair(string section){
@@ -446,6 +468,17 @@ const int ST_SHOOT_WEIGHT = 50;
 
 //const double FORWARD_PASS_MODIFIER = 0.2;
 //const double BACKWARD_PASS_MODIFIER = -0.2;
+
+const double GK_POSITIVE_VARIATION = 0.25;
+const double GK_NEGATIVE_VARIATION = 0.1;
+
+const double SHOOTING_VARIATION = 0.15;
+const double SHOT_PASS_MODIFIER = 0.1;
+const double SHOT_PACE_MODIFIER = 0.1;
+const double SHOT_PASS_VARIATION = 0.05;
+const double SHOT_PACE_VARIATION = 0.05;
+const double PASSING_VARIATION = 0.15;
+const double PACE_VARIATION = 0.15;
 
 std::unordered_map<std::string, std::unordered_map<std::string, int>> decisionMap;
 std::unordered_map<std::string, std::unordered_map<std::string, int>> passMap;
@@ -763,6 +796,23 @@ string getRandomKeyFromMap(std::unordered_map<std::string, int> map, const std::
     return keys[numKeys - 1];
 }
 
+
+void goal(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+    teams[*teamIndexOnBall].scored(*onBall, *lastPass);
+
+    *teamIndexOnBall = !(*teamIndexOnBall);
+    lastPass = nullptr;
+    onBall = teams[*teamIndexOnBall].getRandomPlayer();
+    position = onBall->getSpecificPosition();
+}
+
+void save(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+    *teamIndexOnBall = !(*teamIndexOnBall);
+    lastPass = nullptr;
+    onBall = teams[*teamIndexOnBall].getPlayerFromPosition("GK");
+    position = "GK";
+}
+
 void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     cout << "Pass\n";
     lastPass = onBall;
@@ -782,22 +832,67 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
 
 void dribble(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     cout << "dribble\n";
-    //first check for any blocks -> EVERY DEFENDER for the other team has a chance to block the shot
+    //check being tackled
 
-    //then check how good the shot is -> depending on the passing of the player that passed it to this one and the current player's shooting
-    //int shotRating = onBall;
-
-    //now compare show rating to other team's gk ability
+    //then increase position by 1 index
 }
 
 void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     cout << "SHOOT!\n";
     //first check for any blocks -> EVERY DEFENDER for the other team has a chance to block the shot
 
-    //then check how good the shot is -> depending on the passing of the player that passed it to this one and the current player's shooting
-    //int shotRating = onBall;
+    //then check how good the shot is
+    //base value is how good they are at shooting (+- some random number)
+    int playerShooting = onBall->getShooting();
+    int shotRating = playerShooting;
+    //cout << "shooting: " + to_string(playerShooting) + "\n";
+
+    shotRating += generateRandom(-(double)playerShooting * SHOOTING_VARIATION, (double)playerShooting * SHOOTING_VARIATION);
+    //cout << "shot rating: " + to_string(shotRating) + "\n";
+
+    //if the current player was passed to, increase shooting by half the other player's passing
+    if(lastPass){
+        //cout << "Passed to\n";
+        int passValue = lastPass->getPassing();
+        //cout << "pass value\n";
+        passValue += generateRandom(-passValue * SHOT_PASS_VARIATION, passValue * SHOT_PASS_VARIATION);
+        //cout << "noise added\n";
+        shotRating += passValue * SHOT_PASS_MODIFIER;
+        //cout << "shot rating calculated\n";
+    }
+    //otherwise increase by the current player's pace
+    else{
+        //cout << "won it back\n";
+        int paceValue = onBall->getPace();
+        paceValue += generateRandom(-paceValue * SHOT_PACE_VARIATION, paceValue * SHOT_PACE_VARIATION);
+        shotRating += paceValue * SHOT_PACE_MODIFIER;
+    }
+    cout << "shot rating: " + to_string(shotRating) + "\n";
+    
 
     //now compare show rating to other team's gk ability
+    int gkRating = teams[!(*teamIndexOnBall)].getPlayerFromPosition("GK")->getRating();
+    int saveRating = gkRating;
+    saveRating += generateRandom(-gkRating * GK_NEGATIVE_VARIATION, gkRating * GK_POSITIVE_VARIATION);
+    cout << "Keeper rating: " + to_string(saveRating) + "\n";
+
+    int total = shotRating + saveRating;
+    double chanceToScore = (double)shotRating / (double)total;
+    chanceToScore /= 2.0;
+    cout << "Chance to score: " + to_string(chanceToScore) + "\n";
+
+    double roll = (double)rand() / RAND_MAX;
+    cout << "roll: " + to_string(roll) + "\n";
+
+    if(roll < chanceToScore){
+        cout << "GOAL!!!\n";
+        goal(teams, teamIndexOnBall, onBall, lastPass, position);
+    }
+    else{
+        cout << "SAVE!\n";
+        save(teams, teamIndexOnBall, onBall, lastPass, position);
+    }
+    cout<<"\n\n\n";
 }
 
 void simulateStep(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
@@ -831,6 +926,7 @@ int simulateMatch(Team teams[]) {
 
     //first half
     for (int step = 0; step < NUM_STEPS / 2; step++) {
+        cout << to_string(step) + "'  ";
         simulateStep(teams, &teamIndexOnBall, onBall, lastPass, position);
     }
 
@@ -842,6 +938,7 @@ int simulateMatch(Team teams[]) {
 
     //second half
     for (int step = NUM_STEPS / 2; step < NUM_STEPS; step++) {
+        cout << to_string(step) + "'  ";
         simulateStep(teams, &teamIndexOnBall, onBall, lastPass, position);
     }
 
@@ -884,6 +981,8 @@ int main() {
         cout << "Match simulation failed with error" + to_string(errorCode) + ".\n";
         return -1;
     }
+    cout << "Match finished\n";
+    cout << to_string(teams[0].getGoals()) + "-" + to_string(teams[1].getGoals()) + "\n";
 
     //write the match details to the 'fixtureOutcome.txt' file
     writeToOutputFile(teams);
