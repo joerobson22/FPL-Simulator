@@ -243,42 +243,75 @@ class Team{
     void scored(Player& scorer, Player* assister){
         goals++;
 
-        for(int i = 0; i < players.size(); i++){
-            if(scorer.getID() == players[i].getID()){
-                players[i].scored();
+        for(int i = 0; i < playingPlayers.size(); i++){
+            if(scorer.getID() == playingPlayers[i].getID()){
+                playingPlayers[i].scored();
             }
         }
         if(assister){
-            for(int i = 0; i < players.size(); i++){
-                if(assister->getID() == players[i].getID()){
-                    players[i].assisted();
+            for(int i = 0; i < playingPlayers.size(); i++){
+                if(assister->getID() == playingPlayers[i].getID()){
+                    playingPlayers[i].assisted();
                 }
             }
         }
     }
 
-    void getRedCard(Player& offender){
-        offender.getRedCard();
+    void missedPenalty(Player& misser){
+        for(int i = 0; i < playingPlayers.size(); i++){
+            if(misser.getID() == playingPlayers[i].getID()){
+                playingPlayers[i].missPenalty();
+            }
+        }
+    }
+
+    void getRedCard(int id){
+        Player* p = nullptr;
+        for(int i = 0; i < playingPlayers.size(); i++){
+            if(playingPlayers[i].getID() == id){
+                p = &playingPlayers[i];
+                p->getRedCard();
+                break;
+            }
+        }
+
+        for(int i = 0; i < players.size(); i++){
+            if(p->getID() == id){
+                players[i] = *p;
+                break;
+            }
+        }
 
         playingPlayers.erase(
             std::remove_if(
                 playingPlayers.begin(), playingPlayers.end(),
-                [&](Player &p) { return p.getID() == offender.getID(); }
+                [&](Player &p) { return p.getID() == id; }
             ),
             playingPlayers.end()
         );
     }
 
-    void getYellowCard(Player& offender){
-        if(offender.gotYellowCard()) getRedCard(offender);
-        else offender.getYellowCard();
+    void getYellowCard(int id){
+        for(int i = 0; i < playingPlayers.size(); i++){
+            if(playingPlayers[i].getID() == id){
+                if(playingPlayers[i].gotYellowCard()) playingPlayers[i].getRedCard();
+                else playingPlayers[i].getYellowCard();
+            }
+        }
+    }
+
+    void teamPlayAMinute(){
+        for(int i = 0; i < playingPlayers.size(); i++){
+            playingPlayers[i].playMinute();
+        }
     }
 
     Player* getPenaltyTaker(){
         int highest = -1;
         Player* taker;
         for(auto &p : playingPlayers){
-            if(p.getShooting() > highest){
+            if(p.getShooting() > highest && p.getGeneralPosition() != "GK"){
+                //cout << to_string(highest) + "\n";
                 highest = p.getShooting();
                 taker = &p;
             }
@@ -296,6 +329,19 @@ class Team{
     vector<Player>& getPlayers(){ return players; }
 
     vector<Player>& getPlayingPlayers(){ return playingPlayers; }
+
+    void transferPlayingPlayersToPlayers(){
+        for(int i = 0; i < playingPlayers.size(); i++){
+            int iid = playingPlayers[i].getID();
+            for(int j = 0; j < players.size(); j++){
+                int jid = players[j].getID();
+                if(jid == iid){
+                    players[j] = playingPlayers[i];
+                    break;
+                }
+            }
+        }
+    }
 
 
     Player* getPlayerFromPosition(string position){
@@ -618,6 +664,9 @@ string getPenaltySavesString(Team teams[]){
 }
 
 void writeToOutputFile(Team teams[]){
+    teams[0].transferPlayingPlayersToPlayers();
+    teams[1].transferPlayingPlayersToPlayers();
+
     ofstream output(outputFilePath);
 
     output << to_string(teams[0].getGoals()) + "\n";
@@ -631,7 +680,7 @@ void writeToOutputFile(Team teams[]){
     output << "YELLOW CARDS," + getYellowCardString(teams) + "\n";
     output << "RED CARDS," + getRedCardString(teams) + "\n";
     output << "PENALTY MISSES," + getPenaltyMissesString(teams) + "\n";
-    output << "PENALTY SAVEES," + getPenaltySavesString(teams) + "\n";
+    output << "PENALTY SAVES," + getPenaltySavesString(teams) + "\n";
 
     output.close();
 }
@@ -696,12 +745,28 @@ const int CAM_SHOOT_WEIGHT = 8;
 
 //w covers lw and rw
 const int W_PASS_WEIGHT = 35;
-const int W_DRIBBLE_WEIGHT = 30;
-const int W_SHOOT_WEIGHT = 10;
+const int W_DRIBBLE_WEIGHT = 40;
+const int W_SHOOT_WEIGHT = 5;
 
-const int ST_PASS_WEIGHT = 25;
-const int ST_DRIBBLE_WEIGHT = 20;
-const int ST_SHOOT_WEIGHT = 10;
+const int ST_PASS_WEIGHT = 40;
+const int ST_DRIBBLE_WEIGHT = 25;
+const int ST_SHOOT_WEIGHT = 5;
+
+
+
+const int GK_PENALTY_CHANCE = 0;
+const int CB_PENALTY_CHANCE = 1;
+const int LB_PENALTY_CHANCE = 2;
+const int RB_PENALTY_CHANCE = 2;
+const int LWB_PENALTY_CHANCE = 3;
+const int RWB_PENALTY_CHANCE = 3;
+const int CDM_PENALTY_CHANCE = 4;
+const int CM_PENALTY_CHANCE = 5;
+const int CAM_PENALTY_CHANCE = 8;
+const int LW_PENALTY_CHANCE = 10;
+const int RW_PENALTY_CHANCE = 10;
+const int ST_PENALTY_CHANCE = 12;
+
 
 
 
@@ -713,13 +778,22 @@ const double DEF_BLOCK_VARIATION = 0.5;
 const double SHOOTING_BLOCK_VARIATION = 0.5;
 const double DEFENDING_VARIATION = 0.3;
 
+
+const int FOUL_THRESHOLD = 20;
+const int YELLOW_CARD_THRESHOLD = 10;
+const int RED_CARD_THRESHOLD = 1;
+
+
+/*
+const int FOUL_THRESHOLD = 100;
+const int YELLOW_CARD_THRESHOLD = 50;
+const int RED_CARD_THRESHOLD = 25;
+*/
+
 const double PENALTY_SHOT_MODIFIER = 0.75;
 const double PENALTY_SAVE_MODIFIER = 0.1;
 
 const int SHOOTING_ON_TARGET_THRESHOLD = 60;
-const int FOUL_THRESHOLD = 30;
-const int YELLOW_CARD_THRESHOLD = 10;
-const int RED_CARD_THRESHOLD = 2;
 const double SHOOTING_ON_TARGET_SHOOTING_BONUS_PROPORTION = 0.2;
 const double SHOOTING_VARIATION = 0.25;
 const double SHOT_PASS_MODIFIER = 0.1;
@@ -1018,24 +1092,25 @@ void setupDefendingMap(){
 }
 
 void setupPenaltyChanceMap(){
-    penaltyChanceMap["GK"] = 0;
-    penaltyChanceMap["CB"] = 1;
-    penaltyChanceMap["LB"] = 1;
-    penaltyChanceMap["RB"] = 1;
-    penaltyChanceMap["LWB"] = 1;
-    penaltyChanceMap["RWB"] = 1;
-    penaltyChanceMap["CDM"] = 2;
-    penaltyChanceMap["CM"] = 5;
-    penaltyChanceMap["CAM"] = 10;
-    penaltyChanceMap["LW"] = 15;
-    penaltyChanceMap["RW"] = 15;
-    penaltyChanceMap["ST"] = 25;
+    penaltyChanceMap["GK"] = GK_PENALTY_CHANCE;
+    penaltyChanceMap["CB"] = CB_PENALTY_CHANCE;
+    penaltyChanceMap["LB"] = LB_PENALTY_CHANCE;
+    penaltyChanceMap["RB"] = RB_PENALTY_CHANCE;
+    penaltyChanceMap["LWB"] = LWB_PENALTY_CHANCE;
+    penaltyChanceMap["RWB"] = RWB_PENALTY_CHANCE;
+    penaltyChanceMap["CDM"] = CDM_PENALTY_CHANCE;
+    penaltyChanceMap["CM"] = CM_PENALTY_CHANCE;
+    penaltyChanceMap["CAM"] = CAM_PENALTY_CHANCE;
+    penaltyChanceMap["LW"] = LW_PENALTY_CHANCE;
+    penaltyChanceMap["RW"] = RW_PENALTY_CHANCE;
+    penaltyChanceMap["ST"] = ST_PENALTY_CHANCE;
 }
 
 void setupMaps(){
     setupDecisionMap();
     setupPassMap();
     setupDefendingMap();
+    setupPenaltyChanceMap();
 }
 
 string getRandomKeyFromMap(std::unordered_map<std::string, int> map, const std::string keys[], int numKeys){
@@ -1085,44 +1160,61 @@ void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
 
     //decide which player should take
     onBall = teams[*teamIndexOnBall].getPenaltyTaker();
+    cout << onBall->getName() + " taking the penalty\n";
     int shootingRating = onBall->getShooting();
     int shotRating = shootingRating + generateRandom(0, shootingRating * PENALTY_SHOT_MODIFIER);
     shotRating = generateRandom(shotRating * 0.5, shotRating);
+    //cout << "chosen taker\n";
 
     Player* keeper = teams[!(*teamIndexOnBall)].getPlayerFromPosition("GK");
-    int keeperRating;
-    if(!keeper) keeperRating = 10;
-    else keeperRating = keeper->getRating();
+    int keeperRating = 10;
+    if(keeper) keeperRating = keeper->getRating();
+    cout << "keeper rating: " + to_string(keeperRating) + "\n";
+    //cout << "found keeper\n";
 
-    int saveRating = keeperRating + generateRandom(0, saveRating * PENALTY_SAVE_MODIFIER);
+    int saveRating = keeperRating + generateRandom(0, keeperRating * PENALTY_SAVE_MODIFIER);
     saveRating = generateRandom(saveRating * 0.5, saveRating);
+    //cout << "got save rating\n";
 
     //figure out who gets credited with the assist
-    if(onBall == lastPass) lastPass = nullptr;
+    if(onBall->getID() == lastPass->getID()){
+        //cout << onBall->getName() + "\n";
+        //cout << lastPass->getName() + "\n";
+        //cout << "penalty taker is the penalty winner\n";
+        lastPass = nullptr;
+    }
+    //cout << "comparing values now\n";
+
+    cout << "Save rating: " + to_string(saveRating) + "\n";
+    cout << "Shot rating: " + to_string(shotRating) + "\n";
 
     if(saveRating < shotRating){
+        cout << "penalty scored\n";
         goal(teams, teamIndexOnBall, onBall, lastPass, position);
     }
     else{
-        onBall->missPenalty();
+        cout << "penalty missed\n";
+        teams[*teamIndexOnBall].missedPenalty(*onBall);
         save(teams, teamIndexOnBall, onBall, lastPass, position, true, true);
     }
 }
 
 void foul(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position, Player*& defender, int tackleRating){
-    cout << "FOUL!\n";
+    cout << "\nFOUL!\n";
     //check if it's a red or yellow card
-    if(generateRandom(0, tackleRating) < RED_CARD_THRESHOLD){
-        teams[!(*teamIndexOnBall)].getRedCard(*defender);
+    if(generateRandom(0, defender->getDefending()) < RED_CARD_THRESHOLD){
+        teams[!(*teamIndexOnBall)].getRedCard(defender->getID());
     }
-    else if(generateRandom(0, tackleRating) < YELLOW_CARD_THRESHOLD){
-        teams[!(*teamIndexOnBall)].getYellowCard(*defender);
+    else if(generateRandom(0, defender->getDefending()) < YELLOW_CARD_THRESHOLD){
+        teams[!(*teamIndexOnBall)].getYellowCard(defender->getID());
     }
 
     //also check if it's a penalty!
     int penaltyChance = penaltyChanceMap[onBall->getSpecificPosition()];
+    //cout << "chance of penalty: " + to_string(penaltyChance) + "\n";
     if(generateRandom(0, 100) < penaltyChance){
-        penalty(teams, teamIndexOnBall, onBall, onBall, position);
+        lastPass = onBall;
+        penalty(teams, teamIndexOnBall, onBall, lastPass, position);
     }
 }
 
@@ -1143,7 +1235,7 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     int passAbility = onBall->getPassing();
     int passRating = passAbility + generateRandom(-passAbility * PASSING_VARIATION, passAbility * PASSING_VARIATION);
 
-    cout << "pass rating: " + to_string(passRating) + "\n";
+    //cout << "pass rating: " + to_string(passRating) + "\n";
 
     //cout << "pass ratings\n";
 
@@ -1157,10 +1249,10 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
 
         //get the defender's defending ability (with some random variation)
         int defendingAbility = defender->getDefending() * PASS_BLOCK_MULTI;
-        cout << "defending rating: " + to_string(defendingAbility) + "\n";
+        //cout << "defending rating: " + to_string(defendingAbility) + "\n";
 
         if(defendingAbility > passRating){
-            cout << "pass blocked by " + defender->getName() + "\n";
+            //cout << "pass blocked by " + defender->getName() + "\n";
             block(defender, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
         }
@@ -1182,7 +1274,7 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     int paceAbility = player->getPace();
     int paceRating = paceAbility + generateRandom(-paceAbility * PACE_VARIATION, paceAbility * PACE_VARIATION);
     //cout << "pace\n";
-    cout << "pace rating: " + to_string(paceRating) + "\n";
+    //cout << "pace rating: " + to_string(paceRating) + "\n";
 
     //get position of the defender
     string receiverPosition = player->getSpecificPosition();
@@ -1193,10 +1285,10 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     if(intercepter){
         //get the defender's physical ability (with some random variation)
         int physicalAbility = intercepter->getPhysical() * PASS_INTERCEPT_MULTI;
-        cout << "physical rating: " + to_string(physicalAbility) + "\n";
+        //cout << "physical rating: " + to_string(physicalAbility) + "\n";
 
         if(physicalAbility > passRating){
-            cout << "pass intercepted by " + intercepter->getName() + "\n";
+            //cout << "pass intercepted by " + intercepter->getName() + "\n";
             block(intercepter, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
         }
@@ -1324,9 +1416,7 @@ void simulateStep(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& 
 
     //every playing player, play one minute
     for(int i = 0; i < 2; i++){
-        for(auto &p : teams[i].getPlayingPlayers()){
-            p.playMinute();
-        }
+        teams[i].teamPlayAMinute();
     }
 
     //player decision making:
