@@ -89,6 +89,10 @@ class Player{
         saves = 0;
         yellowCard = false;
         redCard = false;
+
+        if (generalPosition == "GK") {
+            pace = shooting = passing = dribbling = defending = physical = rating;
+        }
     }
 
     /*
@@ -270,6 +274,18 @@ class Team{
         else offender.getYellowCard();
     }
 
+    Player* getPenaltyTaker(){
+        int highest = -1;
+        Player* taker;
+        for(auto &p : playingPlayers){
+            if(p.getShooting() > highest){
+                highest = p.getShooting();
+                taker = &p;
+            }
+        }
+        return taker;
+    }
+
 
     void addPlayer(Player& player){ 
         players.push_back(player);
@@ -417,7 +433,7 @@ class Team{
         }
     }
     Player* getRandomPlayer(){
-        return &players[rand() % players.size()];
+        return &playingPlayers[rand() % playingPlayers.size()];
     }
 };
 
@@ -697,20 +713,26 @@ const double DEF_BLOCK_VARIATION = 0.5;
 const double SHOOTING_BLOCK_VARIATION = 0.5;
 const double DEFENDING_VARIATION = 0.3;
 
-const int SHOOTING_ON_TARGET_THRESHOLD = 50;
+const double PENALTY_SHOT_MODIFIER = 0.75;
+const double PENALTY_SAVE_MODIFIER = 0.1;
+
+const int SHOOTING_ON_TARGET_THRESHOLD = 60;
+const int FOUL_THRESHOLD = 30;
+const int YELLOW_CARD_THRESHOLD = 10;
+const int RED_CARD_THRESHOLD = 2;
 const double SHOOTING_ON_TARGET_SHOOTING_BONUS_PROPORTION = 0.2;
 const double SHOOTING_VARIATION = 0.25;
 const double SHOT_PASS_MODIFIER = 0.1;
 const double SHOT_PACE_MODIFIER = 0.1;
 const double SHOT_PASS_VARIATION = 0.05;
 const double SHOT_PACE_VARIATION = 0.05;
-const double PASSING_VARIATION = 0.3;
+const double PASSING_VARIATION = 0.5;
 const double PACE_VARIATION = 0.1;
 const double PHYSICAL_VARIATION = 0.05;
 const double DRIBBLING_VARIATION = 0.5;
 
-const double PASS_BLOCK_MULTI = 0.5;
-const double PASS_INTERCEPT_MULTI = 0.25;
+const double PASS_BLOCK_MULTI = 0.75;
+const double PASS_INTERCEPT_MULTI = 0.75;
 
 std::unordered_map<std::string, std::unordered_map<std::string, int>> decisionMap;
 std::unordered_map<std::string, std::unordered_map<std::string, int>> passMap;
@@ -1033,13 +1055,8 @@ string getRandomKeyFromMap(std::unordered_map<std::string, int> map, const std::
     return keys[numKeys - 1];
 }
 
-void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
-    
-}
 
-void foul(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
 
-}
 
 void goal(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     teams[*teamIndexOnBall].scored(*onBall, lastPass);
@@ -1050,13 +1067,63 @@ void goal(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     position = onBall->getSpecificPosition();
 }
 
-void save(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position, bool saved){
+void save(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position, bool saved, bool penalty){
     *teamIndexOnBall = !(*teamIndexOnBall);
     lastPass = nullptr;
     onBall = teams[*teamIndexOnBall].getPlayerFromPosition("GK");
+
+    if(!onBall) onBall = teams[*teamIndexOnBall].getRandomPlayer();
+
     position = "GK";
 
     if(saved) onBall->makeSave();
+    if(penalty) onBall->savePenalty();
+}
+
+void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+    cout << "PENALTY!\n";
+
+    //decide which player should take
+    onBall = teams[*teamIndexOnBall].getPenaltyTaker();
+    int shootingRating = onBall->getShooting();
+    int shotRating = shootingRating + generateRandom(0, shootingRating * PENALTY_SHOT_MODIFIER);
+    shotRating = generateRandom(shotRating * 0.5, shotRating);
+
+    Player* keeper = teams[!(*teamIndexOnBall)].getPlayerFromPosition("GK");
+    int keeperRating;
+    if(!keeper) keeperRating = 10;
+    else keeperRating = keeper->getRating();
+
+    int saveRating = keeperRating + generateRandom(0, saveRating * PENALTY_SAVE_MODIFIER);
+    saveRating = generateRandom(saveRating * 0.5, saveRating);
+
+    //figure out who gets credited with the assist
+    if(onBall == lastPass) lastPass = nullptr;
+
+    if(saveRating < shotRating){
+        goal(teams, teamIndexOnBall, onBall, lastPass, position);
+    }
+    else{
+        onBall->missPenalty();
+        save(teams, teamIndexOnBall, onBall, lastPass, position, true, true);
+    }
+}
+
+void foul(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position, Player*& defender, int tackleRating){
+    cout << "FOUL!\n";
+    //check if it's a red or yellow card
+    if(generateRandom(0, tackleRating) < RED_CARD_THRESHOLD){
+        teams[!(*teamIndexOnBall)].getRedCard(*defender);
+    }
+    else if(generateRandom(0, tackleRating) < YELLOW_CARD_THRESHOLD){
+        teams[!(*teamIndexOnBall)].getYellowCard(*defender);
+    }
+
+    //also check if it's a penalty!
+    int penaltyChance = penaltyChanceMap[onBall->getSpecificPosition()];
+    if(generateRandom(0, 100) < penaltyChance){
+        penalty(teams, teamIndexOnBall, onBall, onBall, position);
+    }
 }
 
 void block(Player*& blocker, Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
@@ -1076,6 +1143,8 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     int passAbility = onBall->getPassing();
     int passRating = passAbility + generateRandom(-passAbility * PASSING_VARIATION, passAbility * PASSING_VARIATION);
 
+    cout << "pass rating: " + to_string(passRating) + "\n";
+
     //cout << "pass ratings\n";
 
     //get position of the defender
@@ -1088,20 +1157,9 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
 
         //get the defender's defending ability (with some random variation)
         int defendingAbility = defender->getDefending() * PASS_BLOCK_MULTI;
-        int defendingRating = defendingAbility + generateRandom(-defendingAbility * PASSING_VARIATION, defendingAbility * PASSING_VARIATION);
+        cout << "defending rating: " + to_string(defendingAbility) + "\n";
 
-        //cout << "defending ratings\n";
-
-        //get the chance of the pass succeeding
-        int total = passRating + defendingRating;
-        double chanceToSucceed = (double)passRating / (double)total;
-        double roll = (double)rand() / RAND_MAX;
-
-        //cout << "\nchance of pass success: " + to_string(chanceToSucceed) + "\n";
-
-        //cout << "rolled\n";
-
-        if(roll > chanceToSucceed){
+        if(defendingAbility > passRating){
             cout << "pass blocked by " + defender->getName() + "\n";
             block(defender, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
@@ -1124,6 +1182,7 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     int paceAbility = player->getPace();
     int paceRating = paceAbility + generateRandom(-paceAbility * PACE_VARIATION, paceAbility * PACE_VARIATION);
     //cout << "pace\n";
+    cout << "pace rating: " + to_string(paceRating) + "\n";
 
     //get position of the defender
     string receiverPosition = player->getSpecificPosition();
@@ -1134,16 +1193,9 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     if(intercepter){
         //get the defender's physical ability (with some random variation)
         int physicalAbility = intercepter->getPhysical() * PASS_INTERCEPT_MULTI;
-        int physicalRating = physicalAbility + generateRandom(-physicalAbility * PHYSICAL_VARIATION, physicalAbility * PHYSICAL_VARIATION);
-        //cout << "physical ability\n";
+        cout << "physical rating: " + to_string(physicalAbility) + "\n";
 
-        //get the chance of the pass succeeding
-        int total = paceRating + physicalRating;
-        double chanceToSucceed = (double)paceRating / (double)total;
-        double roll = (double)rand() / RAND_MAX;
-        //cout << "rolled\n";
-
-        if(roll > chanceToSucceed){
+        if(physicalAbility > passRating){
             cout << "pass intercepted by " + intercepter->getName() + "\n";
             block(intercepter, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
@@ -1183,6 +1235,11 @@ void dribble(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
             cout << "Tackled!\n";
             block(defender, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
+        }
+        else{
+            if(generateRandom(0, defendRating) < FOUL_THRESHOLD){
+                foul(teams, teamIndexOnBall, onBall, lastPass, position, defender, defendRating);
+            }
         }
     }
 
@@ -1224,7 +1281,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     vector<Player*> defenders = teams[!(*teamIndexOnBall)].getPlayersFromGeneralPosition("DEF");
     for(auto player : defenders){
         if(generateRandom(0, 100) <= (DEF_BLOCK_CHANCE * 100) && 
-        generateRandom(player->getDefending() - (player->getDefending() * DEF_BLOCK_VARIATION), player->getDefending() + (player->getDefending() * DEF_BLOCK_VARIATION) > shotRating)){
+        generateRandom(player->getDefending() - (player->getDefending() * DEF_BLOCK_VARIATION), player->getDefending() + (player->getDefending() * DEF_BLOCK_VARIATION)) > shotRating){
             cout << "BLOCKED by " + player->getName() + "\n";
             block(player, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
@@ -1234,7 +1291,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     //is it even on target?
     if(generateRandom(0, 100) + (playerShooting * SHOOTING_ON_TARGET_SHOOTING_BONUS_PROPORTION) <= SHOOTING_ON_TARGET_THRESHOLD){
         cout << "OFF TARGET\n";
-        save(teams, teamIndexOnBall, onBall, lastPass, position, false);
+        save(teams, teamIndexOnBall, onBall, lastPass, position, false, false);
         return;
     }
 
@@ -1258,7 +1315,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     }
     else{
         cout << "SAVE!\n";
-        save(teams, teamIndexOnBall, onBall, lastPass, position, true);
+        save(teams, teamIndexOnBall, onBall, lastPass, position, true, false);
     }
 }
 
@@ -1291,7 +1348,7 @@ void simulateStep(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& 
 
 int simulateMatch(Team teams[]) {
     //kickoff
-    int teamIndexOnBall = generateRandom(0, 1);
+    int teamIndexOnBall = generateRandom(0, 2);
     Player* onBall = teams[teamIndexOnBall].getRandomPlayer();
     Player* lastPass = nullptr;
     std::string position = onBall->getSpecificPosition();
