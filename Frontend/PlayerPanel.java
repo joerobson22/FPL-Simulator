@@ -12,6 +12,7 @@ public class PlayerPanel extends JButton implements ActionListener {
     private final Color viceCaptainColor = new Color(255, 225, 143);
     private final Color normalColor = new Color(255, 252, 245);
     private final Color focusColor = new Color(115, 0, 255);
+    private final Color suspendedColor = new Color(255, 0, 0);
 
     //the entire team panel gets 500px -> 400px wide pitch, therefore 400 / 5 (5 at most in any pos) -> 80
     private final int fixedWidth = 80;
@@ -83,16 +84,24 @@ public class PlayerPanel extends JButton implements ActionListener {
         if(focus){
             this.setBorder(BorderFactory.createLineBorder(focusColor, 5));
         }
+        else if(player.isSuspended()){
+            this.setBorder(BorderFactory.createLineBorder(suspendedColor, 4));
+        }
         else if(captain){
-            nameLabelText = "C- " + nameLabelText;
             this.setBorder(BorderFactory.createLineBorder(captainColor, 4));
         }
         else if(viceCaptain){
-            nameLabelText = "V- " + nameLabelText;
             this.setBorder(BorderFactory.createLineBorder(viceCaptainColor, 2));
         }
         else{
             this.setBorder(BorderFactory.createLineBorder(normalColor, 2));
+        }
+
+        if(captain){
+            nameLabelText = "C- " + nameLabelText;
+        }
+        else if(viceCaptain){
+            nameLabelText = "V- " + nameLabelText;
         }
 
         nameLabel.setText(nameLabelText);

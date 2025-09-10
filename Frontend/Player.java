@@ -149,6 +149,10 @@ public class Player{
         return playedThisWeek;
     }
 
+    public int howSuspended(){
+        return suspended;
+    }
+
     public boolean isSuspended(){
         return suspended > 0;
     }

@@ -6,6 +6,9 @@ import java.awt.event.*;
 
 public class PlayerTransferPanel extends JPanel implements ActionListener {
     
+    private Color bigSuspendedColor = new Color(255, 61, 61);
+    private Color smallSuspendedColor = new Color(255, 156, 156);
+
     private FPLPanel fplPanel;
     private Player player;
 
@@ -70,6 +73,22 @@ public class PlayerTransferPanel extends JPanel implements ActionListener {
         playerInfoPanel.setOpaque(false);
         upcomingFixturesPanel.setOpaque(false);
         actionButtonPanel.setOpaque(false);
+
+        
+        if(player.isSuspended()){
+            Color color = new Color(255, 255, 255);
+
+            if(player.howSuspended() == 1) color = smallSuspendedColor;
+            else if(player.howSuspended() == 2) color = bigSuspendedColor;
+
+            this.setBackground(color);
+            playerInfoPanel.setBackground(color);
+            upcomingFixturesPanel.setBackground(color);
+            actionButtonPanel.setBackground(color);
+            playerNamePanel.setBackground(color);
+            playerExtraInfoPanel.setBackground(color);
+            posAndTeamPanel.setBackground(color);
+        }
     }
 
     public void actionPerformed(ActionEvent e){
