@@ -134,8 +134,7 @@ public class Team {
                 }
 
                 for(Player p : players){
-                    if(!p.getGeneralPosition().equals(key)) continue;
-                    if(starting.contains(p)) continue;
+                    if(!p.getGeneralPosition().equals(key) || starting.contains(p) || p.isSuspended()) continue;
 
                     starting.add(p);
                     formation.merge(key, 1, Integer::sum);

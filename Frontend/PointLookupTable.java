@@ -26,6 +26,10 @@ public class PointLookupTable {
     private static int pointsForTransfer = -4;
     private static int pointsFor3Saves = 1;
     private static int pointsForDFCon = 2;
+    private static int pointsForYellowCard = -1;
+    private static int pointsForRedCard = -1;
+    private static int pointsForPenaltyMiss = -2;
+    private static int pointsForPenaltySave = 5;
 
 
     //2 goals conceded  : -1 (only gk and def)  -  
@@ -68,5 +72,21 @@ public class PointLookupTable {
 
     public static int getPointsForDFCon(){
         return pointsForDFCon;
+    }
+
+    public static int getPointsForYellowCard(){
+        return pointsForYellowCard;
+    }
+
+    public static int getPointsForRedCard(){
+        return pointsForRedCard;
+    }
+
+    public static int getPointsForPenaltyMiss(){
+        return pointsForPenaltyMiss;
+    }
+
+    public static int getPointsForPenaltySave(){
+        return pointsForPenaltySave;
     }
 }

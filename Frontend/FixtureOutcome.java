@@ -12,6 +12,10 @@ public class FixtureOutcome {
     private ArrayList<Player> sixtyMins;
     private ArrayList<Player> threeSaves;
     private ArrayList<Player> dfCon;
+    private ArrayList<Player> yellowCards;
+    private ArrayList<Player> redCards;
+    private ArrayList<Player> penaltyMiss;
+    private ArrayList<Player> penaltySave;
 
     //constructors
     public FixtureOutcome(){
@@ -21,9 +25,16 @@ public class FixtureOutcome {
         goalScorers = new ArrayList<>();
         assisters = new ArrayList<>();
         cleanSheets = new ArrayList<>();
+        sixtyMins = new ArrayList<>();
+        threeSaves = new ArrayList<>();
+        dfCon = new ArrayList<>();
     }
 
-    public FixtureOutcome(int homeGoals, int awayGoals, ArrayList<Player> goalScorers, ArrayList<Player> assisters, ArrayList<Player> cleanSheets, ArrayList<Player> sixtyMins, ArrayList<Player> threeSaves, ArrayList<Player> dfCon){
+    public FixtureOutcome(int homeGoals, int awayGoals, 
+    ArrayList<Player> goalScorers, ArrayList<Player> assisters, ArrayList<Player> cleanSheets, 
+    ArrayList<Player> sixtyMins, ArrayList<Player> threeSaves, ArrayList<Player> dfCon,
+    ArrayList<Player> yellowCards, ArrayList<Player> redCards, ArrayList<Player> penaltyMiss,
+    ArrayList<Player> penaltySave){
         this.homeGoals = homeGoals;
         this.awayGoals = awayGoals;
         this.goalScorers = goalScorers;
@@ -32,6 +43,10 @@ public class FixtureOutcome {
         this.sixtyMins = sixtyMins;
         this.threeSaves = threeSaves;
         this.dfCon = dfCon;
+        this.yellowCards = yellowCards;
+        this.redCards = redCards;
+        this.penaltyMiss = penaltyMiss;
+        this.penaltySave = penaltySave;
     }
 
 

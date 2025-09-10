@@ -40,6 +40,11 @@ public class ManagerApprovalLookupTable {
         "ATT", 0
     );
 
+    private static int approvalForRedCard = -5;
+    private static int approvalForYellowCard = -1;
+    private static int approvalForPenaltyMiss = -8;
+    private static int approvalForPenaltySave = 20;
+
 
 
 
@@ -49,4 +54,9 @@ public class ManagerApprovalLookupTable {
 
     public static int getApprovalForBlank(String pos){ return approvalForNoGA.get(pos); }
     public static int getApprovalForGoalConceded(String pos){ return approvalForGoalConceded.get(pos); }
+
+    public static int getApprovalForYellowCard(){ return approvalForYellowCard; }
+    public static int getApprovalForRedCard(){ return approvalForRedCard; }
+    public static int getApprovalForPenaltyMiss(){ return approvalForPenaltyMiss; }
+    public static int getApprovalForPenaltySave(){ return approvalForPenaltySave; }
 }

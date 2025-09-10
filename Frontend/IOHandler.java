@@ -16,8 +16,12 @@ public class IOHandler {
     protected static final int SIXTY_MINUTES = 5;
     protected static final int THREE_SAVES = 6;
     protected static final int DFCON = 7;
+    protected static final int YELLOW_CARDS = 8;
+    protected static final int RED_CARDS = 9;
+    protected static final int PENALTY_MISS = 10;
+    protected static final int PENALTY_SAVE = 11;
 
-    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS", "3 SAVES", "DFCON"};
+    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS", "3 SAVES", "DFCON", "YELLOW CARDS", "RED CARDS", "PENALTY MISS", "PENALTY SAVE"};
 
     public static void writeFixtureData(Fixture fixture, int seed){
         try{
@@ -56,7 +60,7 @@ public class IOHandler {
     }
 
     public static FixtureOutcome readFixtureOutcome(ArrayList<Player> players){
-        System.out.println("Reading fixture outcome");
+        //System.out.println("Reading fixture outcome");
 
         int homeGoals = 0;
         int awayGoals = 0;
@@ -66,6 +70,10 @@ public class IOHandler {
         ArrayList<String> sixtyMins = new ArrayList<>();
         ArrayList<String> threeSaves = new ArrayList<>();
         ArrayList<String> dfCon = new ArrayList<>();
+        ArrayList<String> yellowCards = new ArrayList<>();
+        ArrayList<String> redCards = new ArrayList<>();
+        ArrayList<String> penaltyMiss = new ArrayList<>();
+        ArrayList<String> penaltySave = new ArrayList<>();
 
         try{
             BufferedReader reader = new BufferedReader(new FileReader("fixtureOutcome.txt"));
@@ -74,36 +82,52 @@ public class IOHandler {
 
             while (line != null) {
                 if(i == HOME_GOALS){
-                    System.out.println("Home team goals");
+                    //System.out.println("Home team goals");
                     homeGoals = Integer.valueOf(line);
                 }
                 else if(i == AWAY_GOALS){
-                    System.out.println("Away team goals");
+                    //System.out.println("Away team goals");
                     awayGoals = Integer.valueOf(line);
                 }
                 else if(i == SCORERS){
-                    System.out.println("Goal scorers");
+                    //System.out.println("Goal scorers");
                     goalScorers = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
                 else if(i == ASSISTERS){
-                    System.out.println("Assisters");
+                    //System.out.println("Assisters");
                     assisters = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
                 else if(i == CLEAN_SHEETS){
-                    System.out.println("Clean sheets");
+                    //System.out.println("Clean sheets");
                     cleanSheets = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
                 else if(i == SIXTY_MINUTES){
-                    System.out.println("60 mins");
+                    //System.out.println("60 mins");
                     sixtyMins = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
                 else if(i == THREE_SAVES){
-                    System.out.println("3 saves");
+                    //System.out.println("3 saves");
                     threeSaves = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
                 else if(i == DFCON){
-                    System.out.println("DFCon");
+                    //System.out.println("DFCon");
                     dfCon = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
+                else if(i == YELLOW_CARDS){
+                    //System.out.println("DFCon");
+                    yellowCards = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
+                else if(i == RED_CARDS){
+                    //System.out.println("DFCon");
+                    redCards = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
+                else if(i == PENALTY_MISS){
+                    //System.out.println("DFCon");
+                    penaltyMiss = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
+                else if(i == PENALTY_SAVE){
+                    //System.out.println("DFCon");
+                    penaltySave = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
 
                 line = reader.readLine();
@@ -117,8 +141,13 @@ public class IOHandler {
             System.out.println(e.getStackTrace());
         }
         
-        System.out.println("Generating FixtureOutcome object");
-        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, getPlayersFromID(players, goalScorers), getPlayersFromID(players, assisters), getPlayersFromID(players, cleanSheets), getPlayersFromID(players, sixtyMins), getPlayersFromID(players, threeSaves), getPlayersFromID(players, dfCon));
+        //System.out.println("Generating FixtureOutcome object");
+        FixtureOutcome outcome = new FixtureOutcome(homeGoals, awayGoals, 
+                                    getPlayersFromID(players, goalScorers), getPlayersFromID(players, assisters), 
+                                    getPlayersFromID(players, cleanSheets), getPlayersFromID(players, sixtyMins), 
+                                    getPlayersFromID(players, threeSaves), getPlayersFromID(players, dfCon),
+                                    getPlayersFromID(players, yellowCards), getPlayersFromID(players, redCards),
+                                    getPlayersFromID(players, penaltyMiss), getPlayersFromID(players, penaltySave));
         return outcome;
     }
 
@@ -136,7 +165,7 @@ public class IOHandler {
             if(!valid) continue;
 
             Player p = allPlayers.get(Integer.parseInt(id));
-            System.out.println("Found player " + p.getName() + " with id " + id);
+            //System.out.println("Found player " + p.getName() + " with id " + id);
             players.add(p);
         }
 

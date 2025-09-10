@@ -25,6 +25,10 @@ public class Player{
     private int defending;
     private int physical;
 
+    private int suspended = 0;
+    private int numYellowCards = 0;
+    private int numRedCards = 0;
+
     private int totalPoints;
     private int weeklyPoints;
     private int numGoals;
@@ -145,9 +149,18 @@ public class Player{
         return playedThisWeek;
     }
 
+    public boolean isSuspended(){
+        return suspended > 0;
+    }
+
     //mutators
+    public void suspend(int numGames){
+        suspended = numGames;
+    }
+
     public void playMatch(){
         playedThisWeek = true;
+        if(isSuspended()) suspended--;
     }
 
     public void changeManagerApprovalRating(int amount){
@@ -184,6 +197,30 @@ public class Player{
         numCleanSheets++;
         weeklyPoints += PointLookupTable.getPointsForCleanSheet(generalPosition);
         changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForCleanSheet(generalPosition));
+    }
+
+    public void getYellowCard(){
+        weeklyPoints += PointLookupTable.getPointsForYellowCard();
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForYellowCard());
+        numYellowCards++;
+        if(numYellowCards % 3 == 0) suspend(1);
+    }
+
+    public void getRedCard(){
+        weeklyPoints += PointLookupTable.getPointsForRedCard();
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForRedCard());
+        numRedCards++;
+        suspend(2);
+    }
+
+    public void missPenalty(){
+        weeklyPoints += PointLookupTable.getPointsForPenaltyMiss();
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForPenaltyMiss());
+    }
+
+    public void savePenalty(){
+        weeklyPoints += PointLookupTable.getPointsForPenaltySave();
+        changeManagerApprovalRating(ManagerApprovalLookupTable.getApprovalForPenaltySave());
     }
 
     public void concedeGoals(int numGoals){

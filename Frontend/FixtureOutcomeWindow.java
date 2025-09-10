@@ -70,12 +70,12 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         JPanel extraInfoPanel = new JPanel();
         extraInfoPanel.setLayout(new BoxLayout(extraInfoPanel, BoxLayout.Y_AXIS));
 
-        goalContributionsPanel.add(setupInfoSection("Goals", fixture.getOutcome().getGoalScorers(), infoSectionTitleFontSize, infoSectionBodyFontSize));
-        goalContributionsPanel.add(setupInfoSection("Assists", fixture.getOutcome().getAssisters(), infoSectionTitleFontSize, infoSectionBodyFontSize));
+        if(fixture.getOutcome().getGoalScorers().size() > 0) goalContributionsPanel.add(setupInfoSection("Goals", fixture.getOutcome().getGoalScorers(), infoSectionTitleFontSize, infoSectionBodyFontSize));
+        if(fixture.getOutcome().getAssisters().size() > 0) goalContributionsPanel.add(setupInfoSection("Assists", fixture.getOutcome().getAssisters(), infoSectionTitleFontSize, infoSectionBodyFontSize));
 
-        extraInfoPanel.add(setupInfoSection("Clean Sheets", fixture.getOutcome().getCleanSheets(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
-        extraInfoPanel.add(setupInfoSection("3x Saves", fixture.getOutcome().getThreeSaves(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
-        extraInfoPanel.add(setupInfoSection("Defensive Contributions", fixture.getOutcome().getDFCon(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getCleanSheets().size() > 0) extraInfoPanel.add(setupInfoSection("Clean Sheets", fixture.getOutcome().getCleanSheets(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getThreeSaves().size() > 0) extraInfoPanel.add(setupInfoSection("3x Saves", fixture.getOutcome().getThreeSaves(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getDFCon().size() > 0) extraInfoPanel.add(setupInfoSection("Defensive Contributions", fixture.getOutcome().getDFCon(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
 
         infoPanel.add(startingLineupPanel);
         infoPanel.add(goalContributionsPanel);
