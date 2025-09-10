@@ -7,6 +7,7 @@
 #include <map>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 using namespace std;
 
@@ -55,10 +56,14 @@ class Player{
     string name;
     int goals;
     int assists;
+    int penaltyMisses;
+    int penaltySaves;
     int minsPlayed;
     int dfCon;
     int saves;
     bool sub;
+    bool yellowCard;
+    bool redCard;
 
     int pace;
     int shooting;
@@ -76,10 +81,14 @@ class Player{
 
         goals = 0;
         assists = 0;
-        minsPlayed = 90;
+        penaltyMisses = 0;
+        penaltySaves = 0;
+        minsPlayed = 0;
         dfCon = 0;
         sub = false;
         saves = 0;
+        yellowCard = false;
+        redCard = false;
     }
 
     /*
@@ -148,6 +157,24 @@ class Player{
         assists++;
         cout << name + " assisted!\n\n";
     }
+    void getYellowCard(){
+        yellowCard = true;
+        cout << "\n\nYELLOW CARD: " + name + "\n\n";
+    }
+    void getRedCard(){
+        yellowCard = false;
+        redCard = true;
+        cout << "\n\nRED CARD: " + name + "\n\n";
+    }
+    void missPenalty(){
+        penaltyMisses++;
+        cout << "\n\nMISSED PENALTY: " + name + "\n\n";
+    }
+    void savePenalty(){
+        penaltySaves++;
+        cout << "\n\nSAVED PENALTY: " + name + "\n\n";
+    }
+
     void playMinute(){
         if(!sub) minsPlayed++;
     }
@@ -177,6 +204,10 @@ class Player{
     int getMinsPlayed(){ return minsPlayed; }
     int getDFCon(){ return dfCon; }
     int getSaves(){ return saves; }
+    int getPenaltyMisses(){ return penaltyMisses; }
+    int getPenaltySaves(){ return penaltySaves; }
+    bool gotYellowCard(){ return yellowCard; }
+    bool gotRedCard(){ return redCard; }
 
     void outputPlayer(){
         cout << "name: " + name + "\n";
@@ -191,6 +222,7 @@ class Team{
     string name;
     int goals;
     vector<Player> players;
+    vector<Player> playingPlayers;
     map<string, vector<Player>> team;
     
     public:
@@ -220,16 +252,39 @@ class Team{
             }
         }
     }
+
+    void getRedCard(Player& offender){
+        offender.getRedCard();
+
+        playingPlayers.erase(
+            std::remove_if(
+                playingPlayers.begin(), playingPlayers.end(),
+                [&](Player &p) { return p.getID() == offender.getID(); }
+            ),
+            playingPlayers.end()
+        );
+    }
+
+    void getYellowCard(Player& offender){
+        if(offender.gotYellowCard()) getRedCard(offender);
+        else offender.getYellowCard();
+    }
+
+
     void addPlayer(Player& player){ 
         players.push_back(player);
+        playingPlayers.push_back(player);
         team[player.getGeneralPosition()].push_back(player);
     }
 
     vector<Player>& getPlayers(){ return players; }
 
+    vector<Player>& getPlayingPlayers(){ return playingPlayers; }
+
+
     Player* getPlayerFromPosition(string position){
         vector<Player*> positionPlayers;
-        for(auto& p : players){
+        for(auto& p : playingPlayers){
             if(p.getSpecificPosition() == position){
                 positionPlayers.push_back(&p);
             }
@@ -304,6 +359,46 @@ class Team{
         string output = "";
         for(int i = 0; i < players.size(); i++){
             if(players[i].getDFCon() >= getDFConForPosition(players[i].getGeneralPosition())){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+    string getPenaltyMissesDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            for(int j = 0; j < players[i].getPenaltyMisses(); j++){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+    string getPenaltySavesDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            for(int j = 0; j < players[i].getPenaltySaves(); j++){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+    string getYellowCardDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            if(players[i].gotYellowCard()){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+    string getRedCardDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            if(players[i].gotRedCard()){
                 if(output != "") output += ",";
                 output += to_string(players[i].getID());
             }
@@ -466,6 +561,46 @@ string getDFConString(Team teams[]){
     return output;
 }
 
+string getYellowCardString(Team teams[]){
+    string output = "";
+    output += teams[0].getYellowCardDictionary();
+
+    if(output != "" && teams[1].getYellowCardDictionary() != "") output += ",";
+    output += teams[1].getYellowCardDictionary();
+
+    return output;
+}
+
+string getRedCardString(Team teams[]){
+    string output = "";
+    output += teams[0].getRedCardDictionary();
+
+    if(output != "" && teams[1].getRedCardDictionary() != "") output += ",";
+    output += teams[1].getRedCardDictionary();
+
+    return output;
+}
+
+string getPenaltyMissesString(Team teams[]){
+    string output = "";
+    output += teams[0].getPenaltyMissesDictionary();
+
+    if(output != "" && teams[1].getPenaltyMissesDictionary() != "") output += ",";
+    output += teams[1].getPenaltyMissesDictionary();
+
+    return output;
+}
+
+string getPenaltySavesString(Team teams[]){
+    string output = "";
+    output += teams[0].getPenaltySavesDictionary();
+
+    if(output != "" && teams[1].getPenaltySavesDictionary() != "") output += ",";
+    output += teams[1].getPenaltySavesDictionary();
+
+    return output;
+}
+
 void writeToOutputFile(Team teams[]){
     ofstream output(outputFilePath);
 
@@ -477,6 +612,10 @@ void writeToOutputFile(Team teams[]){
     output << "60 MINS," + get60MinString(teams) + "\n";
     output << "3 SAVES," + get3SavesString(teams) + "\n";
     output << "DFCON," + getDFConString(teams) + "\n";
+    output << "YELLOW CARDS," + getYellowCardString(teams) + "\n";
+    output << "RED CARDS," + getRedCardString(teams) + "\n";
+    output << "PENALTY MISSES," + getPenaltyMissesString(teams) + "\n";
+    output << "PENALTY SAVEES," + getPenaltySavesString(teams) + "\n";
 
     output.close();
 }
@@ -535,18 +674,18 @@ const int CM_PASS_WEIGHT = 100;
 const int CM_DRIBBLE_WEIGHT = 50;
 const int CM_SHOOT_WEIGHT = 6;
 
-const int CAM_PASS_WEIGHT = 75;
-const int CAM_DRIBBLE_WEIGHT = 50;
-const int CAM_SHOOT_WEIGHT = 10;
+const int CAM_PASS_WEIGHT = 50;
+const int CAM_DRIBBLE_WEIGHT = 45;
+const int CAM_SHOOT_WEIGHT = 8;
 
 //w covers lw and rw
-const int W_PASS_WEIGHT = 40;
-const int W_DRIBBLE_WEIGHT = 50;
+const int W_PASS_WEIGHT = 35;
+const int W_DRIBBLE_WEIGHT = 30;
 const int W_SHOOT_WEIGHT = 10;
 
 const int ST_PASS_WEIGHT = 25;
-const int ST_DRIBBLE_WEIGHT = 25;
-const int ST_SHOOT_WEIGHT = 15;
+const int ST_DRIBBLE_WEIGHT = 20;
+const int ST_SHOOT_WEIGHT = 10;
 
 
 
@@ -576,6 +715,7 @@ const double PASS_INTERCEPT_MULTI = 0.25;
 std::unordered_map<std::string, std::unordered_map<std::string, int>> decisionMap;
 std::unordered_map<std::string, std::unordered_map<std::string, int>> passMap;
 std::unordered_map<std::string, std::string> defendingMap;
+std::unordered_map<std::string, int> penaltyChanceMap;
 
 int getPositionIndex(string position){
     for(int i = 0; i < numPositions; i++){
@@ -725,7 +865,7 @@ void setupPassMap(){
     lwbPasses["CAM"] = 22;
     lwbPasses["LW"] = 50;
     lwbPasses["RW"] = 1;
-    lwbPasses["ST"] = 5;
+    lwbPasses["ST"] = 2;
 
     std::unordered_map<string, int> rwbPasses;
     rwbPasses["GK"] = 5;
@@ -739,7 +879,7 @@ void setupPassMap(){
     rwbPasses["CAM"] = 22;
     rwbPasses["LW"] = 1;
     rwbPasses["RW"] = 50;
-    rwbPasses["ST"] = 5;
+    rwbPasses["ST"] = 2;
 
     std::unordered_map<string, int> cdmPasses;
     cdmPasses["GK"] = 2;
@@ -753,7 +893,7 @@ void setupPassMap(){
     cdmPasses["CAM"] = 35;
     cdmPasses["LW"] = 20;
     cdmPasses["RW"] = 20;
-    cdmPasses["ST"] = 10;
+    cdmPasses["ST"] = 3;
 
     std::unordered_map<string, int> cmPasses;
     cmPasses["GK"] = 0;
@@ -767,7 +907,7 @@ void setupPassMap(){
     cmPasses["CAM"] = 50;
     cmPasses["LW"] = 30;
     cmPasses["RW"] = 30;
-    cmPasses["ST"] = 10;
+    cmPasses["ST"] = 5;
 
     std::unordered_map<string, int> camPasses;
     camPasses["GK"] = 0;
@@ -781,7 +921,7 @@ void setupPassMap(){
     camPasses["CAM"] = 50;
     camPasses["LW"] = 40;
     camPasses["RW"] = 40;
-    camPasses["ST"] = 20;
+    camPasses["ST"] = 10;
 
     std::unordered_map<string, int> lwPasses;
     lwPasses["GK"] = 0;
@@ -792,10 +932,10 @@ void setupPassMap(){
     lwPasses["RWB"] = 1;
     lwPasses["CDM"] = 2;
     lwPasses["CM"] = 30;
-    lwPasses["CAM"] = 40;
+    lwPasses["CAM"] = 20;
     lwPasses["LW"] = 0;
     lwPasses["RW"] = 5;
-    lwPasses["ST"] = 25;
+    lwPasses["ST"] = 15;
 
     std::unordered_map<string, int> rwPasses;
     rwPasses["GK"] = 0;
@@ -806,10 +946,10 @@ void setupPassMap(){
     rwPasses["RWB"] = 30;
     rwPasses["CDM"] = 2;
     rwPasses["CM"] = 30;
-    rwPasses["CAM"] = 40;
+    rwPasses["CAM"] = 20;
     rwPasses["LW"] = 5;
     rwPasses["RW"] = 0;
-    rwPasses["ST"] = 25;
+    rwPasses["ST"] = 15;
 
     std::unordered_map<string, int> stPasses;
     stPasses["GK"] = 0;
@@ -823,7 +963,7 @@ void setupPassMap(){
     stPasses["CAM"] = 50;
     stPasses["LW"] = 30;
     stPasses["RW"] = 30;
-    stPasses["ST"] = 40;
+    stPasses["ST"] = 20;
 
     //add all maps to the passMap
     passMap["GK"] = gkPasses;
@@ -855,6 +995,21 @@ void setupDefendingMap(){
     defendingMap["ST"] = "CB";
 }
 
+void setupPenaltyChanceMap(){
+    penaltyChanceMap["GK"] = 0;
+    penaltyChanceMap["CB"] = 1;
+    penaltyChanceMap["LB"] = 1;
+    penaltyChanceMap["RB"] = 1;
+    penaltyChanceMap["LWB"] = 1;
+    penaltyChanceMap["RWB"] = 1;
+    penaltyChanceMap["CDM"] = 2;
+    penaltyChanceMap["CM"] = 5;
+    penaltyChanceMap["CAM"] = 10;
+    penaltyChanceMap["LW"] = 15;
+    penaltyChanceMap["RW"] = 15;
+    penaltyChanceMap["ST"] = 25;
+}
+
 void setupMaps(){
     setupDecisionMap();
     setupPassMap();
@@ -878,6 +1033,13 @@ string getRandomKeyFromMap(std::unordered_map<std::string, int> map, const std::
     return keys[numKeys - 1];
 }
 
+void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+    
+}
+
+void foul(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
+
+}
 
 void goal(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     teams[*teamIndexOnBall].scored(*onBall, lastPass);
@@ -1102,6 +1264,14 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
 
 void simulateStep(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
     cout << onBall->getName() + " (" + position + ")\n";
+
+    //every playing player, play one minute
+    for(int i = 0; i < 2; i++){
+        for(auto &p : teams[i].getPlayingPlayers()){
+            p.playMinute();
+        }
+    }
+
     //player decision making:
     //first, use SPECIFIC position to look at the different options: passing, dribbling or shooting.
     string choice = getRandomKeyFromMap(decisionMap[position], allChoices, numChoices);
@@ -1173,7 +1343,7 @@ int main() {
     //simulate the match
     setupMaps();
 
-    srand(time(NULL));
+    //srand(time(NULL));
 
     int errorCode = simulateMatch(teams);
     if(errorCode != 0){

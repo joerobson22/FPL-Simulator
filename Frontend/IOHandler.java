@@ -21,7 +21,7 @@ public class IOHandler {
     protected static final int PENALTY_MISS = 10;
     protected static final int PENALTY_SAVE = 11;
 
-    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS", "3 SAVES", "DFCON", "YELLOW CARDS", "RED CARDS", "PENALTY MISS", "PENALTY SAVE"};
+    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS", "3 SAVES", "DFCON", "YELLOW CARDS", "RED CARDS", "PENALTY MISSES", "PENALTY SAVES"};
 
     public static void writeFixtureData(Fixture fixture, int seed){
         try{

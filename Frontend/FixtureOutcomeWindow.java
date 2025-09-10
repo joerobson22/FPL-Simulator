@@ -65,21 +65,22 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         JPanel startingLineupPanel = new JPanel();
         startingLineupPanel.add(setupInfoSection("Lineups", fixture.getLineups(), infoSectionTitleFontSize, infoSectionBodyFontSize));
 
-        JPanel goalContributionsPanel = new JPanel();
-        goalContributionsPanel.setLayout(new BoxLayout(goalContributionsPanel, BoxLayout.Y_AXIS));
-        JPanel extraInfoPanel = new JPanel();
-        extraInfoPanel.setLayout(new BoxLayout(extraInfoPanel, BoxLayout.Y_AXIS));
+        JPanel fplInfoPanel = new JPanel();
+        fplInfoPanel.setLayout(new BoxLayout(fplInfoPanel, BoxLayout.Y_AXIS));
 
-        if(fixture.getOutcome().getGoalScorers().size() > 0) goalContributionsPanel.add(setupInfoSection("Goals", fixture.getOutcome().getGoalScorers(), infoSectionTitleFontSize, infoSectionBodyFontSize));
-        if(fixture.getOutcome().getAssisters().size() > 0) goalContributionsPanel.add(setupInfoSection("Assists", fixture.getOutcome().getAssisters(), infoSectionTitleFontSize, infoSectionBodyFontSize));
+        if(fixture.getOutcome().getGoalScorers().size() > 0) fplInfoPanel.add(setupInfoSection("Goals", fixture.getOutcome().getGoalScorers(), infoSectionTitleFontSize, infoSectionBodyFontSize));
+        if(fixture.getOutcome().getAssisters().size() > 0) fplInfoPanel.add(setupInfoSection("Assists", fixture.getOutcome().getAssisters(), infoSectionTitleFontSize, infoSectionBodyFontSize));
 
-        if(fixture.getOutcome().getCleanSheets().size() > 0) extraInfoPanel.add(setupInfoSection("Clean Sheets", fixture.getOutcome().getCleanSheets(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
-        if(fixture.getOutcome().getThreeSaves().size() > 0) extraInfoPanel.add(setupInfoSection("3x Saves", fixture.getOutcome().getThreeSaves(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
-        if(fixture.getOutcome().getDFCon().size() > 0) extraInfoPanel.add(setupInfoSection("Defensive Contributions", fixture.getOutcome().getDFCon(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getCleanSheets().size() > 0) fplInfoPanel.add(setupInfoSection("Clean Sheets", fixture.getOutcome().getCleanSheets(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getThreeSaves().size() > 0) fplInfoPanel.add(setupInfoSection("3x Saves", fixture.getOutcome().getThreeSaves(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getDFCon().size() > 0) fplInfoPanel.add(setupInfoSection("Defensive Contributions", fixture.getOutcome().getDFCon(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getYellowCards().size() > 0) fplInfoPanel.add(setupInfoSection("Yellow Cards", fixture.getOutcome().getYellowCards(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getRedCards().size() > 0) fplInfoPanel.add(setupInfoSection("Red Cards", fixture.getOutcome().getRedCards(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getPenaltyMisses().size() > 0) fplInfoPanel.add(setupInfoSection("PenaltyMisses", fixture.getOutcome().getPenaltyMisses(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getPenaltySaves().size() > 0) fplInfoPanel.add(setupInfoSection("Penalty Saves", fixture.getOutcome().getPenaltySaves(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
 
         infoPanel.add(startingLineupPanel);
-        infoPanel.add(goalContributionsPanel);
-        infoPanel.add(extraInfoPanel);
+        infoPanel.add(fplInfoPanel);
     }
 
     public JPanel setupInfoSection(String title, ArrayList<Player> players, int headerFontSize, int bodyFontSize){
