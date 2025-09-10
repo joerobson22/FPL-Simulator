@@ -76,7 +76,8 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         if(fixture.getOutcome().getDFCon().size() > 0) fplInfoPanel.add(setupInfoSection("Defensive Contributions", fixture.getOutcome().getDFCon(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
         if(fixture.getOutcome().getYellowCards().size() > 0) fplInfoPanel.add(setupInfoSection("Yellow Cards", fixture.getOutcome().getYellowCards(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
         if(fixture.getOutcome().getRedCards().size() > 0) fplInfoPanel.add(setupInfoSection("Red Cards", fixture.getOutcome().getRedCards(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
-        if(fixture.getOutcome().getPenaltyMisses().size() > 0) fplInfoPanel.add(setupInfoSection("PenaltyMisses", fixture.getOutcome().getPenaltyMisses(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getPenaltyGoals().size() > 0) fplInfoPanel.add(setupInfoSection("Penalty Goals", fixture.getOutcome().getPenaltyGoals(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
+        if(fixture.getOutcome().getPenaltyMisses().size() > 0) fplInfoPanel.add(setupInfoSection("Penalty Misses", fixture.getOutcome().getPenaltyMisses(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
         if(fixture.getOutcome().getPenaltySaves().size() > 0) fplInfoPanel.add(setupInfoSection("Penalty Saves", fixture.getOutcome().getPenaltySaves(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
 
         infoPanel.add(startingLineupPanel);

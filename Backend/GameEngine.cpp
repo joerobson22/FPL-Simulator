@@ -55,6 +55,7 @@ class Player{
     string generalPosition;
     string name;
     int goals;
+    int penaltyGoals;
     int assists;
     int penaltyMisses;
     int penaltySaves;
@@ -80,6 +81,7 @@ class Player{
         }
 
         goals = 0;
+        penaltyGoals = 0;
         assists = 0;
         penaltyMisses = 0;
         penaltySaves = 0;
@@ -153,9 +155,10 @@ class Player{
         }
     }
 
-    void scored(){ 
+    void scored(int penalty){ 
         goals++;
         cout << name + " scored!\n";
+        penaltyGoals += penalty;
     }
     void assisted(){ 
         assists++;
@@ -204,6 +207,7 @@ class Player{
     string getGeneralPosition(){ return generalPosition; }
     string getName(){ return name; }
     int getGoals(){ return goals; }
+    int getPenaltyGoals(){ return penaltyGoals; }
     int getAssists(){ return assists; }
     int getMinsPlayed(){ return minsPlayed; }
     int getDFCon(){ return dfCon; }
@@ -240,12 +244,12 @@ class Team{
         goals = 0;
     }
 
-    void scored(Player& scorer, Player* assister){
+    void scored(Player& scorer, Player* assister, int penalty){
         goals++;
 
         for(int i = 0; i < playingPlayers.size(); i++){
             if(scorer.getID() == playingPlayers[i].getID()){
-                playingPlayers[i].scored();
+                playingPlayers[i].scored(penalty);
             }
         }
         if(assister){
@@ -421,6 +425,16 @@ class Team{
         string output = "";
         for(int i = 0; i < players.size(); i++){
             if(players[i].getDFCon() >= getDFConForPosition(players[i].getGeneralPosition())){
+                if(output != "") output += ",";
+                output += to_string(players[i].getID());
+            }
+        }
+        return output;
+    }
+    string getPenaltyGoalScorersDictionary(){
+        string output = "";
+        for(int i = 0; i < players.size(); i++){
+            for(int j = 0; j < players[i].getPenaltyGoals(); j++){
                 if(output != "") output += ",";
                 output += to_string(players[i].getID());
             }
@@ -643,6 +657,16 @@ string getRedCardString(Team teams[]){
     return output;
 }
 
+string getPenaltyScorersString(Team teams[]){
+    string output = "";
+    output += teams[0].getPenaltyGoalScorersDictionary();
+
+    if(output != "" && teams[1].getPenaltyGoalScorersDictionary() != "") output += ",";
+    output += teams[1].getPenaltyGoalScorersDictionary();
+
+    return output;
+}
+
 string getPenaltyMissesString(Team teams[]){
     string output = "";
     output += teams[0].getPenaltyMissesDictionary();
@@ -679,6 +703,7 @@ void writeToOutputFile(Team teams[]){
     output << "DFCON," + getDFConString(teams) + "\n";
     output << "YELLOW CARDS," + getYellowCardString(teams) + "\n";
     output << "RED CARDS," + getRedCardString(teams) + "\n";
+    output << "PENALTY GOALS," + getPenaltyScorersString(teams) + "\n";
     output << "PENALTY MISSES," + getPenaltyMissesString(teams) + "\n";
     output << "PENALTY SAVES," + getPenaltySavesString(teams) + "\n";
 
@@ -750,8 +775,8 @@ const int W_SHOOT_WEIGHT = 5;
 
 const int ST_PASS_WEIGHT = 40;
 const int ST_DRIBBLE_WEIGHT = 25;
-const int ST_SHOOT_WEIGHT = 5;
-
+const int ST_SHOOT_WEIGHT = 7;
+ 
 
 
 const int GK_PENALTY_CHANCE = 0;
@@ -1147,8 +1172,8 @@ string getRandomKeyFromMap(std::unordered_map<std::string, int> map, const std::
 
 
 
-void goal(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
-    teams[*teamIndexOnBall].scored(*onBall, lastPass);
+void goal(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position, int penalty){
+    teams[*teamIndexOnBall].scored(*onBall, lastPass, penalty);
 
     *teamIndexOnBall = !(*teamIndexOnBall);
     lastPass = nullptr;
@@ -1204,7 +1229,7 @@ void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
 
     if(saveRating < shotRating){
         cout << "penalty scored\n";
-        goal(teams, teamIndexOnBall, onBall, lastPass, position);
+        goal(teams, teamIndexOnBall, onBall, lastPass, position, 1);
     }
     else{
         cout << "penalty missed\n";
@@ -1226,7 +1251,7 @@ void foul(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     //also check if it's a penalty!
     int penaltyChance = penaltyChanceMap[onBall->getSpecificPosition()];
     //cout << "chance of penalty: " + to_string(penaltyChance) + "\n";
-    if(generateRandom(0, 100) < penaltyChance){
+    if(generateRandom(0, 1000) < penaltyChance){
         lastPass = onBall;
         penalty(teams, teamIndexOnBall, onBall, lastPass, position);
     }
@@ -1417,7 +1442,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
 
     if(roll < chanceToScore){
         cout << "\nGOAL!!!\n\n\n\n";
-        goal(teams, teamIndexOnBall, onBall, lastPass, position);
+        goal(teams, teamIndexOnBall, onBall, lastPass, position, 0);
     }
     else{
         cout << "SAVE!\n";

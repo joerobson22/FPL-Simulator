@@ -18,10 +18,11 @@ public class IOHandler {
     protected static final int DFCON = 7;
     protected static final int YELLOW_CARDS = 8;
     protected static final int RED_CARDS = 9;
-    protected static final int PENALTY_MISS = 10;
-    protected static final int PENALTY_SAVE = 11;
+    protected static final int PENALTY_GOAL = 10;
+    protected static final int PENALTY_MISS = 11;
+    protected static final int PENALTY_SAVE = 12;
 
-    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS", "3 SAVES", "DFCON", "YELLOW CARDS", "RED CARDS", "PENALTY MISSES", "PENALTY SAVES"};
+    private static final String[] IGNORE_STRINGS = {"", "GOAL SCORERS", "ASSISTERS", "CLEAN SHEETS", "60 MINS", "3 SAVES", "DFCON", "YELLOW CARDS", "RED CARDS", "PENALTY GOALS", "PENALTY MISSES", "PENALTY SAVES"};
 
     public static void writeFixtureData(Fixture fixture, int seed){
         try{
@@ -72,6 +73,7 @@ public class IOHandler {
         ArrayList<String> dfCon = new ArrayList<>();
         ArrayList<String> yellowCards = new ArrayList<>();
         ArrayList<String> redCards = new ArrayList<>();
+        ArrayList<String> penaltyGoal = new ArrayList<>();
         ArrayList<String> penaltyMiss = new ArrayList<>();
         ArrayList<String> penaltySave = new ArrayList<>();
 
@@ -121,6 +123,9 @@ public class IOHandler {
                     //System.out.println("DFCon");
                     redCards = new ArrayList<String>(Arrays.asList(line.split(",")));
                 }
+                else if(i == PENALTY_GOAL){
+                    penaltyGoal = new ArrayList<String>(Arrays.asList(line.split(",")));
+                }
                 else if(i == PENALTY_MISS){
                     //System.out.println("DFCon");
                     penaltyMiss = new ArrayList<String>(Arrays.asList(line.split(",")));
@@ -147,7 +152,8 @@ public class IOHandler {
                                     getPlayersFromID(players, cleanSheets), getPlayersFromID(players, sixtyMins), 
                                     getPlayersFromID(players, threeSaves), getPlayersFromID(players, dfCon),
                                     getPlayersFromID(players, yellowCards), getPlayersFromID(players, redCards),
-                                    getPlayersFromID(players, penaltyMiss), getPlayersFromID(players, penaltySave));
+                                    getPlayersFromID(players, penaltyGoal), getPlayersFromID(players, penaltyMiss), 
+                                    getPlayersFromID(players, penaltySave));
         return outcome;
     }
 
