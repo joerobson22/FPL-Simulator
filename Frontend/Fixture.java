@@ -109,6 +109,20 @@ public class Fixture {
         for(Player p : outcome.getDFCon()){
             p.makeDFCon();
         }
+        //yellow cards
+        for(Player p : outcome.getYellowCards()){
+            p.getYellowCard();
+        }
+        //red cards
+        for(Player p : outcome.getRedCards()){
+            p.getRedCard();
+        }
+        for(Player p : outcome.getPenaltyMisses()){
+            p.missPenalty();
+        }
+        for(Player p : outcome.getPenaltySaves()){
+            p.savePenalty();
+        }
 
 
 

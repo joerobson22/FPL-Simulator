@@ -83,6 +83,22 @@ public class FixtureOutcome {
         return dfCon;
     }
 
+    public ArrayList<Player> getYellowCards(){
+        return yellowCards;
+    }
+
+    public ArrayList<Player> getRedCards(){
+        return redCards;
+    }
+
+    public ArrayList<Player> getPenaltyMisses(){
+        return penaltyMiss;
+    }
+
+    public ArrayList<Player> getPenaltySaves(){
+        return penaltySave;
+    }
+
     public String getScoreString(){
         return Integer.toString(homeGoals) + "-" + Integer.toString(awayGoals);
     }
