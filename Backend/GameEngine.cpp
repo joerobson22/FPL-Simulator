@@ -756,18 +756,31 @@ const int ST_SHOOT_WEIGHT = 5;
 
 const int GK_PENALTY_CHANCE = 0;
 const int CB_PENALTY_CHANCE = 1;
-const int LB_PENALTY_CHANCE = 2;
-const int RB_PENALTY_CHANCE = 2;
-const int LWB_PENALTY_CHANCE = 3;
-const int RWB_PENALTY_CHANCE = 3;
-const int CDM_PENALTY_CHANCE = 4;
-const int CM_PENALTY_CHANCE = 5;
-const int CAM_PENALTY_CHANCE = 8;
-const int LW_PENALTY_CHANCE = 10;
-const int RW_PENALTY_CHANCE = 10;
-const int ST_PENALTY_CHANCE = 12;
+const int LB_PENALTY_CHANCE = 1;
+const int RB_PENALTY_CHANCE = 1;
+const int LWB_PENALTY_CHANCE = 1;
+const int RWB_PENALTY_CHANCE = 1;
+const int CDM_PENALTY_CHANCE = 2;
+const int CM_PENALTY_CHANCE = 2;
+const int CAM_PENALTY_CHANCE = 3;
+const int LW_PENALTY_CHANCE = 4;
+const int RW_PENALTY_CHANCE = 4;
+const int ST_PENALTY_CHANCE = 5;
 
-
+/*
+const int GK_PENALTY_CHANCE = 100;
+const int CB_PENALTY_CHANCE = 100;
+const int LB_PENALTY_CHANCE = 100;
+const int RB_PENALTY_CHANCE = 100;
+const int LWB_PENALTY_CHANCE = 100;
+const int RWB_PENALTY_CHANCE = 100;
+const int CDM_PENALTY_CHANCE = 100;
+const int CM_PENALTY_CHANCE = 100;
+const int CAM_PENALTY_CHANCE = 100;
+const int LW_PENALTY_CHANCE = 100;
+const int RW_PENALTY_CHANCE = 100;
+const int ST_PENALTY_CHANCE = 100;
+*/
 
 
 const double GK_POSITIVE_VARIATION = 0.25;
@@ -792,6 +805,7 @@ const int RED_CARD_THRESHOLD = 25;
 
 const double PENALTY_SHOT_MODIFIER = 0.75;
 const double PENALTY_SAVE_MODIFIER = 0.1;
+//const double PENALTY_SAVE_MODIFIER = 100;
 
 const int SHOOTING_ON_TARGET_THRESHOLD = 60;
 const double SHOOTING_ON_TARGET_SHOOTING_BONUS_PROPORTION = 0.2;
@@ -1202,10 +1216,10 @@ void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
 void foul(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position, Player*& defender, int tackleRating){
     cout << "\nFOUL!\n";
     //check if it's a red or yellow card
-    if(generateRandom(0, defender->getDefending()) < RED_CARD_THRESHOLD){
+    if(generateRandom(0, 100) < RED_CARD_THRESHOLD){
         teams[!(*teamIndexOnBall)].getRedCard(defender->getID());
     }
-    else if(generateRandom(0, defender->getDefending()) < YELLOW_CARD_THRESHOLD){
+    else if(generateRandom(0, 100) < YELLOW_CARD_THRESHOLD){
         teams[!(*teamIndexOnBall)].getYellowCard(defender->getID());
     }
 
@@ -1497,6 +1511,9 @@ int main() {
         cout << "Match simulation failed with error" + to_string(errorCode) + ".\n";
         return -1;
     }
+
+    //cout << "TEAM 1 KEEPER SAVED " + to_string(teams[0].getPlayerFromPosition("GK")->getPenaltySaves()) + " PENALTIES\n";
+    //cout << "TEAM 2 KEEPER SAVED " + to_string(teams[1].getPlayerFromPosition("GK")->getPenaltySaves()) + " PENALTIES\n";
 
     //write the match details to the 'fixtureOutcome.txt' file
     writeToOutputFile(teams);

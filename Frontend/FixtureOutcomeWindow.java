@@ -8,7 +8,7 @@ import java.awt.event.*;
 
 public class FixtureOutcomeWindow extends JFrame implements ActionListener{
     private final int WINDOW_WIDTH = 500;
-    private final int WINDOW_HEIGHT = 1000;
+    private final int WINDOW_HEIGHT = 800;
 
     private final String fixtureFont = "SansSerif";
     private final int fixtureFontSize = 20;
@@ -63,7 +63,7 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
         JPanel startingLineupPanel = new JPanel();
-        startingLineupPanel.add(setupInfoSection("Lineups", fixture.getLineups(), infoSectionTitleFontSize, infoSectionBodyFontSize));
+        startingLineupPanel.add(setupInfoSection("Lineups", fixture.getLineups(), infoSectionTitleSmallerFontSize, infoSectionSmallerBodyFontSize));
 
         JPanel fplInfoPanel = new JPanel();
         fplInfoPanel.setLayout(new BoxLayout(fplInfoPanel, BoxLayout.Y_AXIS));
@@ -83,8 +83,64 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         infoPanel.add(fplInfoPanel);
     }
 
+    public JPanel setupInfoSection(String title, ArrayList<Player> players, int headerFontSize, int bodyFontSize) {
+        // Main vertical container
+        JPanel panel = new JPanel();
+        Box section = Box.createVerticalBox();
+        section.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+        // Title label
+        JLabel titleLabel = LabelCreator.createJLabel(
+                title, "SansSerif", headerFontSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK
+        );
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        section.add(titleLabel);
+
+        // Content panel (2 columns: home / away)
+        JPanel contentPanel = new JPanel(new GridLayout(1, 2, 2, 0)); // tiny gap
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+        // Panels for home / away players
+        JPanel homePanel = new JPanel();
+        JPanel awayPanel = new JPanel();
+        homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
+        awayPanel.setLayout(new BoxLayout(awayPanel, BoxLayout.Y_AXIS));
+        homePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        awayPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+        ArrayList<JLabel> homePanelLabels = new ArrayList<>();
+        ArrayList<JLabel> awayPanelLabels = new ArrayList<>();
+
+        for (Player p : players) {
+            JLabel label = LabelCreator.createJLabel(
+                    p.getName(), "SansSerif", bodyFontSize, Font.PLAIN, SwingConstants.LEFT, Color.BLACK
+            );
+            if (p.getTeam() == fixture.getHomeTeam()) {
+                homePanelLabels.add(label);
+            } else if (p.getTeam() == fixture.getAwayTeam()) {
+                awayPanelLabels.add(label);
+            }
+        }
+
+        // Compress duplicate players
+        homePanel = compressInfoPanel(homePanel, homePanelLabels, true);
+        awayPanel = compressInfoPanel(awayPanel, awayPanelLabels, false);
+
+        // Add to content panel
+        contentPanel.add(homePanel);
+        contentPanel.add(awayPanel);
+
+        // Add to main section
+        section.add(contentPanel);
+        panel.add(section);
+
+        return panel;
+    }
+
+    /*
     public JPanel setupInfoSection(String title, ArrayList<Player> players, int headerFontSize, int bodyFontSize){
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         JPanel titlePanel = new JPanel();
         JLabel titleLabel = LabelCreator.createJLabel(title, "SansSerif", headerFontSize, Font.BOLD, SwingConstants.CENTER, Color.BLACK);
@@ -125,7 +181,7 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         panel.add(contentPanel, "Center");
 
         return panel;
-    }
+    }*/
 
     private JPanel compressInfoPanel(JPanel panel, ArrayList<JLabel> labels, boolean home){
         for(int i = 0; i < labels.size(); i++){
