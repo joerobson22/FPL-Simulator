@@ -351,6 +351,29 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
 
+
+    private static ArrayList<Player> bubbleSortPlayers(ArrayList<Player> players){
+        boolean swaps = true;
+        while(swaps){
+            swaps = false;
+            int n = players.size();
+            for(int i = 1; i < n; i++){
+                if(players.get(i).getTotalPoints() > players.get(i - 1).getTotalPoints()){
+                    //swap the players
+                    Player temp = players.get(i);
+                    players.set(i, players.get(i - 1));
+                    players.set(i - 1, temp);
+                    
+                    swaps = true;
+                }
+            }
+            n--;
+        }
+
+        return players;
+    }
+
+
     //action listener
     public void actionPerformed(ActionEvent e)
     {

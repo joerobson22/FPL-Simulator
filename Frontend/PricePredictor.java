@@ -49,7 +49,9 @@ public class PricePredictor {
             double price = (double)p.getWeeklyPoints() / (double)(NUM_SIMULATIONS * NUM_GAMES_PER_ROUND);
             price *= positionalMultipliers.get(p.getGeneralPosition());
             price = Math.min(Math.max(4.0, price), maxPricePerPosition.get(p.getGeneralPosition()));
-            price = round(price, 1);
+
+            price = (Math.round(price) * 2);
+            price /= 2.0;
             if(p.getWeeklyPoints() > 0) price += 0.5;
             p.setPrice(price);
         }
@@ -112,31 +114,6 @@ public class PricePredictor {
         return;
     }
 
-    private static ArrayList<Player> bubbleSortPlayers(ArrayList<Player> players){
-        boolean swaps = true;
-        while(swaps){
-            swaps = false;
-            int n = players.size();
-            for(int i = 1; i < n; i++){
-                if(players.get(i).getTotalPoints() > players.get(i - 1).getTotalPoints()){
-                    //swap the players
-                    Player temp = players.get(i);
-                    players.set(i, players.get(i - 1));
-                    players.set(i - 1, temp);
-                    
-                    swaps = true;
-                }
-            }
-            n--;
-        }
-
-        return players;
-    }
-
-    private static double round (double value, int precision) {
-        int scale = (int) Math.pow(10, precision);
-        return (double) Math.round(value * scale) / scale;
-    }
 
 
     private static void clearScreen(){
