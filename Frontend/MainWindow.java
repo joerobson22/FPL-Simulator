@@ -128,7 +128,7 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     private void setupPlayerPrices(){
-        allPlayers = PricePredictor.getPlayerPrices(IOHandler.readAllFixtures(allTeams), allPlayers);
+        //allPlayers = PricePredictor.getPlayerPrices(IOHandler.readAllFixtures(allTeams), allPlayers);
 
         this.setVisible(true);
 
@@ -338,10 +338,7 @@ public class MainWindow extends JFrame implements ActionListener{
         currentGameWeek++;
         simAllButton.setVisible(false);
         teamConfirmed = false;
-        fantasyTeam.saveTeam();
-        fantasyTeam.resetWeeklyTotal();
-        fantasyTeam.addFreeTransfer();
-        fplPanel.unconfirmTeam();
+        fplPanel.nextGameWeek();
 
         for(Player p : allPlayers){
             p.resetWeeklyPoints();

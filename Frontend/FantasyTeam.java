@@ -9,6 +9,7 @@ public class FantasyTeam {
     private ArrayList<Player> players;
     private ArrayList<Player> startingXI;
     private ArrayList<Player> bench;
+    private ArrayList<Player> subs;
 
     private Player captain;
     private Player viceCaptain;
@@ -26,6 +27,7 @@ public class FantasyTeam {
         startingXI = new ArrayList<>();
         bench = new ArrayList<>();
         teamHistory = new ArrayList<>();
+        subs = new ArrayList<>();
 
         budget = 100.0;
         weeklyPoints = 0;
@@ -86,7 +88,22 @@ public class FantasyTeam {
         return String.valueOf(freeTransfers);
     }
 
+    public ArrayList<Player> getSubs(){
+        return subs;
+    }
+
     //mutators
+    public void nextGameWeek(){
+        saveTeam();
+        resetWeeklyTotal();
+        addFreeTransfer();
+        subs.clear();
+    }
+
+    public void addSub(Player player){
+        subs.add(player);
+    }
+
     private void addPlayer(Player player){
         budget -= player.getPrice();
         players.add(player);

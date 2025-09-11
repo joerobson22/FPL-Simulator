@@ -96,6 +96,12 @@ public class FPLPanel extends JPanel implements ActionListener{
     private int viewingGameWeek = 0;
     private int currentGameWeek = 0;
 
+    private boolean benchBoosting = false;
+    private boolean wildcarding = false;
+    private boolean freeHitting = false;
+    private boolean tripleCaptaining = false;
+    private boolean chipPlayed = false;
+
     public FPLPanel(MainWindow mainWindow, FantasyTeam fantasyTeam, ArrayList<Player> allPlayers, int width){
         this.setLayout(new BorderLayout());
         this.mainWindow = mainWindow;
@@ -373,6 +379,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     //calculate and update the team's weekly score
     public void updateTeamPoints(){
         fantasyTeam.resetWeeklyTotal();
+        /*
         for(PlayerPanel panel : playerPanels){
             Player player = panel.getPlayer();
             if(!player.hasPlayedThisWeek()) continue;
@@ -380,7 +387,23 @@ public class FPLPanel extends JPanel implements ActionListener{
             if(!panel.isBenched()) fantasyTeam.changeWeeklyPoints(player);
             panel.setPoints(player.getWeeklyPoints(), captainMultiplier);
         }
+            */
+        updateTeamPointsFromList(fantasyTeam.getStartingXI(), false);
+        updateTeamPointsFromList(fantasyTeam.getBench(), benchBoosting); //this is just for updating the visuals of the players on the bench --> also change the 'true' to 'bench boosting'
+        updateTeamPointsFromList(fantasyTeam.getSubs(), false);
+
         scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
+    }
+
+    private void updateTeamPointsFromList(ArrayList<Player> list, boolean benched){
+        for(Player player : list){
+            if(!player.hasPlayedThisWeek()) continue;
+
+            if(!benched) fantasyTeam.changeWeeklyPoints(player);
+
+            PlayerPanel panel = getPlayerPanel(player);
+            panel.setPoints(player.getWeeklyPoints(), captainMultiplier);
+        }
     }
 
     //updating the transfer panel- only does it if currently not viewing the same position
@@ -405,6 +428,79 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     
     
+    public void nextGameWeek(){
+        finalisePoints();
+
+        unconfirmTeam();
+        fantasyTeam.nextGameWeek();
+    }
+
+    public void finalisePoints(){
+        //if bench boosting, skip this
+
+        //find if any players didnt play and sub them out
+        for(Player p : fantasyTeam.getPlayers()){
+            //didnt play!
+            if(!p.getTeam().getFixture(currentGameWeek).getLineups().contains(p)){
+                //are they the captain?
+                if(p == fantasyTeam.getCaptain()){
+                    //swap them out with the vice captain
+                    PlayerPanel captainPanel = getCaptain();
+                    PlayerPanel viceCaptainPanel = getViceCaptain();
+
+                    Player viceCaptain = fantasyTeam.getViceCaptain();
+                    Player captain = fantasyTeam.getCaptain();
+
+                    fantasyTeam.makeCaptain(viceCaptain);
+                    fantasyTeam.makeViceCaptain(captain);
+
+                    captainPanel.makeViceCaptain(currentGameWeek);
+                    viceCaptainPanel.makeCaptain(currentGameWeek);
+                }
+
+                if(benchBoosting) continue; //prevent any players having their score counted twice
+
+                //now check the bench to see if there are any guys on the bench to replace them
+                for(Player benchP : fantasyTeam.getBench()){
+                    if(!benchP.getTeam().getFixture(currentGameWeek).getLineups().contains(benchP) || fantasyTeam.getSubs().contains(benchP)) continue;
+
+                    String startPosition = p.getGeneralPosition();
+                    String benchPosition = benchP.getGeneralPosition();
+
+                    //if they aren't the same position and subbing the bench player on results in an invalid formation, ignore this sub.
+                    if(!startPosition.equals(benchPosition) && teamSections.get(startPosition).getComponentCount() - 1 < positionMins.get(startPosition)) continue;
+                    
+                    //if they played and havent already been subbed on, then add this player to the fantasy subs
+                    fantasyTeam.addSub(benchP);
+                    break;
+                }
+            }
+        }
+
+        updateTeamPoints();
+    }
+
+    private PlayerPanel getCaptain(){
+        for(PlayerPanel p : playerPanels){
+            if(p.isCaptain()) return p;
+        }
+        return null;
+    }
+
+    private PlayerPanel getViceCaptain(){
+        for(PlayerPanel p : playerPanels){
+            if(p.isViceCaptain()) return p;
+        }
+        return null;
+    }
+
+    private PlayerPanel getPlayerPanel(Player p){
+        for(PlayerPanel panel : playerPanels){
+            if(panel.getPlayer() == p) return panel;
+        }
+        return null;
+    }
+
 
     //confirm team
     public void confirmTeam(){
