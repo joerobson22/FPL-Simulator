@@ -93,6 +93,19 @@ public class FantasyTeam {
     }
 
     //mutators
+    public void wildCardPlayed(){
+        freeTransfers = -1;
+    }
+
+    public void freeHitPlayed(){
+        freeTransfers = -1;
+        //save team state
+    }
+
+    public void tripleCaptainPlayed(){
+        //idk note this in some variable i suppose
+    }
+
     public void nextGameWeek(){
         saveTeam();
         resetWeeklyTotal();

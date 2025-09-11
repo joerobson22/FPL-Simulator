@@ -96,6 +96,11 @@ public class FPLPanel extends JPanel implements ActionListener{
     private int viewingGameWeek = 0;
     private int currentGameWeek = 0;
 
+    private boolean benchBoostPlayed = false;
+    private boolean wildcardPlayed = false;
+    private boolean freeHitPlayed = false;
+    private boolean tripleCaptainPlayed = false;
+
     private boolean benchBoosting = false;
     private boolean wildcarding = false;
     private boolean freeHitting = false;
@@ -374,22 +379,19 @@ public class FPLPanel extends JPanel implements ActionListener{
         cancelConfirmButton.setVisible(show);
         budgetLabel.setVisible(show);
         chipsPanel.setVisible(show);
+
+        wildcardButton.setVisible(!wildcardPlayed);
+        benchBoostButton.setVisible(!benchBoostPlayed);
+        freeHitButton.setVisible(!freeHitPlayed);
+        tripleCaptainButton.setVisible(!tripleCaptainPlayed);
     }
 
     //calculate and update the team's weekly score
     public void updateTeamPoints(){
         fantasyTeam.resetWeeklyTotal();
-        /*
-        for(PlayerPanel panel : playerPanels){
-            Player player = panel.getPlayer();
-            if(!player.hasPlayedThisWeek()) continue;
 
-            if(!panel.isBenched()) fantasyTeam.changeWeeklyPoints(player);
-            panel.setPoints(player.getWeeklyPoints(), captainMultiplier);
-        }
-            */
         updateTeamPointsFromList(fantasyTeam.getStartingXI(), false);
-        updateTeamPointsFromList(fantasyTeam.getBench(), benchBoosting); //this is just for updating the visuals of the players on the bench --> also change the 'true' to 'bench boosting'
+        updateTeamPointsFromList(fantasyTeam.getBench(), !benchBoosting); //this is just for updating the visuals of the players on the bench --> also change the 'true' to 'bench boosting'
         updateTeamPointsFromList(fantasyTeam.getSubs(), false);
 
         scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
@@ -433,6 +435,8 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         unconfirmTeam();
         fantasyTeam.nextGameWeek();
+        chipPlayed = false;
+        benchBoosting = false;
     }
 
     public void finalisePoints(){
@@ -532,6 +536,56 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     
+
+    //CHIPS
+    private void wildcard(){
+        if(chipPlayed || wildcardPlayed || currentGameWeek == 0) return;
+
+        chipPlayed = true;
+        wildcardPlayed = true;
+
+        fantasyTeam.wildCardPlayed();
+
+        updateTransferInformationVisibility(currentGameWeek == viewingGameWeek);
+        updateTransferInformation();
+    }
+
+    private void benchBoost(){
+        if(chipPlayed || benchBoostPlayed) return;
+
+        chipPlayed = true;
+        benchBoostPlayed = true;
+
+        benchBoosting = true;
+
+        updateTransferInformationVisibility(currentGameWeek == viewingGameWeek);
+        updateTransferInformation();
+    }
+
+    private void freeHit(){
+        if(chipPlayed || freeHitPlayed || currentGameWeek == 0) return;
+
+        chipPlayed = true;
+        freeHitPlayed = true;
+
+        fantasyTeam.freeHitPlayed();
+
+        updateTransferInformationVisibility(currentGameWeek == viewingGameWeek);
+        updateTransferInformation();
+    }
+
+    private void tripleCaptain(){
+        if(chipPlayed || tripleCaptainPlayed) return;
+
+        chipPlayed = true;
+        tripleCaptainPlayed = true;
+
+        fantasyTeam.tripleCaptainPlayed();
+
+        updateTransferInformationVisibility(currentGameWeek == viewingGameWeek);
+        updateTransferInformation();
+    }
+
     //INPUTS
 
     //action performed!!!
@@ -557,6 +611,18 @@ public class FPLPanel extends JPanel implements ActionListener{
             else if(cancelConfirmButton.getText().equals(CONFIRM_TEXT)){
                 confirmTeam();
             }
+        }
+        else if(wildcardButton == e.getSource()){
+            wildcard();
+        }
+        else if(benchBoostButton == e.getSource()){
+            benchBoost();
+        }
+        else if(freeHitButton == e.getSource()){
+            freeHit();
+        }
+        else if(tripleCaptainButton == e.getSource()){
+            tripleCaptain();
         }
     }
 
