@@ -46,10 +46,9 @@ public class StartWindow extends JFrame implements ActionListener{
     {
         if(goButton == e.getSource() && textEditBox.getText().length() > 0)
         {
-            fantasyTeam = new FantasyTeam(textEditBox.getText());
-
-            mainWindow = new MainWindow(fantasyTeam);
             this.setVisible(false);
+            fantasyTeam = new FantasyTeam(textEditBox.getText());
+            mainWindow = new MainWindow(fantasyTeam);
         }
     }
     

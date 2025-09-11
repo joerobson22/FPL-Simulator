@@ -112,7 +112,6 @@ public class MainWindow extends JFrame implements ActionListener{
         mainPanel.add("Center", contentPanel);
 
         this.setContentPane(mainPanel);
-        this.setVisible(true);
         this.setTitle("FPL Simulator");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
@@ -124,7 +123,19 @@ public class MainWindow extends JFrame implements ActionListener{
 
         fixtureList = new FixtureList();
         setupFixtures();
+        setupPlayerPrices();
         updateAllVisuals();
+    }
+
+    private void setupPlayerPrices(){
+        allPlayers = PricePredictor.getPlayerPrices(IOHandler.readAllFixtures(allTeams), allPlayers);
+
+        this.setVisible(true);
+
+        for(Player p : allPlayers) p.fullReset();
+        for(Team t : allTeams) t.reset();
+
+        statsPanel.updateStats(allPlayers, currentGameWeek);
     }
 
     private void setupTeams(){
@@ -236,7 +247,7 @@ public class MainWindow extends JFrame implements ActionListener{
             System.out.println("=== GAME ENGINE OUTPUT ===");
             System.out.println();
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                //System.out.println(line);
             }
             System.out.println();
             System.out.println("=== END ENGINE OUTPUT ===");

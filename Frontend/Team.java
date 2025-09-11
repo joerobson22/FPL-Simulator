@@ -45,6 +45,14 @@ public class Team {
     }
 
 
+    public void reset(){
+        numWins = 0;
+        numDraws = 0;
+        numLosses = 0;
+        totalPoints = 0;
+        goalDifference = 0;
+    }
+
     //accessors
     public int getLeaguePosition(){
         return leaguePosition;

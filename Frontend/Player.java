@@ -74,6 +74,20 @@ public class Player{
         this.physical = attributes.get(5);
     }
 
+    public void lightReset(){
+        managerApprovalRating = rating;
+        numYellowCards = 0;
+        numRedCards = 0;
+        suspended = 0;
+    }
+
+    public void fullReset(){
+        lightReset();
+        weeklyPointHistory.set(0, 0);
+        weeklyPoints = 0;
+        totalPoints = 0;
+    }
+
     //accessors
     public int getID(){
         return playerID;
