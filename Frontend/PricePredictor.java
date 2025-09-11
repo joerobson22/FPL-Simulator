@@ -6,32 +6,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Map;
 
 public class PricePredictor {
     private final static String GAME_ENGINE_PATH = "Backend/GameEngine.exe";
-    private final static int NUM_SIMULATIONS = 10;
+    private final static int NUM_SIMULATIONS = 100;
     private final static int NUM_GAMES_PER_ROUND = 38;
     private final static int PROGRESS_BAR_WIDTH = 100;
 
     private static Map<String, Double> maxPricePerPosition = Map.of(
-        "GK", 5.5,
-        "DEF", 6.0,
-        "MID", 14.0,
-        "ATT", 14.0
+        "GK", 6.0,
+        "DEF", 7.0,
+        "MID", 12.5,
+        "ATT", 12.0
     );
 
-    private static Map<String, Double> positionalMultipliers = Map.of(
-        "GK", 1.25,
-        "DEF", 1.5,
-        "MID", 2.5,
-        "ATT", 3.0
+    private static Map<String, Double> quantityMultiPerPosition = Map.of(
+        "GK", 3.0,
+        "DEF", 2.5,
+        "MID", 1.5,
+        "ATT", 1.25
     );
 
     public static ArrayList<Player> getPlayerPrices(FixtureList fixtureList, ArrayList<Player> players){
-        int numFailures = 0;
-
         for(int i = 0; i < NUM_SIMULATIONS; i++){
             for(int gw = 0; gw < NUM_GAMES_PER_ROUND; gw++){
                 ArrayList<Fixture> thisWeekFixtures = fixtureList.getFixtures(gw);
@@ -44,19 +43,79 @@ public class PricePredictor {
         }
 
         //then change all prices
-        for(Player p : players){
-            //System.out.println(p.getName() + ": " + String.valueOf(p.getWeeklyPoints()) + "pts");
-            double price = (double)p.getWeeklyPoints() / (double)(NUM_SIMULATIONS * NUM_GAMES_PER_ROUND);
-            price *= positionalMultipliers.get(p.getGeneralPosition());
-            price = Math.min(Math.max(4.0, price), maxPricePerPosition.get(p.getGeneralPosition()));
+        players = bubbleSortPlayersWeeklyPoints(players);
+        players = setPlayerPrices(players);
 
-            price = (Math.round(price) * 2);
-            price /= 2.0;
-            if(p.getWeeklyPoints() > 0) price += 0.5;
-            p.setPrice(price);
+        return players;
+    }
+
+
+    private static ArrayList<Player> bubbleSortPlayersWeeklyPoints(ArrayList<Player> players){
+        boolean swaps = true;
+        while(swaps){
+            swaps = false;
+            int n = players.size();
+            for(int i = 1; i < n; i++){
+                if(players.get(i).getWeeklyPoints() > players.get(i - 1).getWeeklyPoints()){
+                    //swap the players
+                    Player p1 = players.get(i);
+                    Player p2 = players.get(i - 1);
+
+                    players.set(i, p2);
+                    players.set(i - 1, p1);
+                    
+                    swaps = true;
+                }
+            }
+            n--;
         }
 
-        //System.out.println("Num failures: " + String.valueOf(numFailures));
+        return players;
+    }
+
+    private static ArrayList<Player> setPlayerPrices(ArrayList<Player> players){
+        double minPrice = 4.0;
+        int maxPositionQuantity = 50;
+        double normalPriceDecrease = 0.5;
+        double largePriceDecrease = 1.0;
+        double priceDecreaseChangeThreshold = 8.0;
+
+        //what we want here
+        //we have a map of the maximum price for each position
+        //then for every 0.5m price we go down, lowest being 4.0m, double the number of players at the next price point
+        String[] positions = {"GK", "DEF", "MID", "ATT"};
+        Map<String, Double> positionPrices = new HashMap<>();
+        Map<String, Double[]> positionQuantities = new HashMap<>();
+        //index 0 = max quantity, index 1 = quantity to add (max being 50)
+        for(String pos : positions){
+            positionPrices.put(pos, maxPricePerPosition.get(pos));
+            positionQuantities.put(pos, new Double[]{1.0, 0.0});
+        }
+        
+        for(Player p : players){
+            String position = p.getGeneralPosition();
+            double price = positionPrices.get(position);
+            Double maxQuantity = positionQuantities.get(position)[0];
+            Double currentQuantity = positionQuantities.get(position)[1];
+
+            //if we've reached the correct number of prices in this position
+            if(currentQuantity >= maxQuantity){
+                currentQuantity = 0.0;
+                double quantityMulti = quantityMultiPerPosition.get(position);
+                maxQuantity = Math.min(maxQuantity * quantityMulti, maxPositionQuantity);
+
+                double priceChange = normalPriceDecrease;
+                if(price > priceDecreaseChangeThreshold) priceChange = largePriceDecrease;
+
+                price = Math.max(price - priceChange, minPrice);
+                positionPrices.put(position, price);
+            }
+
+            currentQuantity++;
+            p.setPrice(price);
+
+            positionQuantities.put(position, new Double[]{maxQuantity, currentQuantity});
+        }
 
         return players;
     }

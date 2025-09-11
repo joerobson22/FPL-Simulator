@@ -135,7 +135,7 @@ public class MainWindow extends JFrame implements ActionListener{
         for(Player p : allPlayers) p.fullReset();
         for(Team t : allTeams) t.reset();
 
-        statsPanel.updateStats(allPlayers, currentGameWeek);
+        allPlayers = bubbleSortPlayersPrice(allPlayers);
     }
 
     private void setupTeams(){
@@ -332,6 +332,9 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     public void nextGameWeek(){
+        //sort all players by their price
+        allPlayers = bubbleSortPlayersTotalPoints(allPlayers);
+        
         currentGameWeek++;
         simAllButton.setVisible(false);
         teamConfirmed = false;
@@ -352,17 +355,19 @@ public class MainWindow extends JFrame implements ActionListener{
 
 
 
-    private static ArrayList<Player> bubbleSortPlayers(ArrayList<Player> players){
+    private ArrayList<Player> bubbleSortPlayersPrice(ArrayList<Player> players){
         boolean swaps = true;
         while(swaps){
             swaps = false;
             int n = players.size();
             for(int i = 1; i < n; i++){
-                if(players.get(i).getTotalPoints() > players.get(i - 1).getTotalPoints()){
+                if(players.get(i).getPrice() > players.get(i - 1).getPrice()){
                     //swap the players
-                    Player temp = players.get(i);
-                    players.set(i, players.get(i - 1));
-                    players.set(i - 1, temp);
+                    Player p1 = players.get(i);
+                    Player p2 = players.get(i - 1);
+
+                    players.set(i, p2);
+                    players.set(i - 1, p1);
                     
                     swaps = true;
                 }
@@ -373,6 +378,28 @@ public class MainWindow extends JFrame implements ActionListener{
         return players;
     }
 
+    private ArrayList<Player> bubbleSortPlayersTotalPoints(ArrayList<Player> players){
+        boolean swaps = true;
+        while(swaps){
+            swaps = false;
+            int n = players.size();
+            for(int i = 1; i < n; i++){
+                if(players.get(i).getTotalPoints() > players.get(i - 1).getTotalPoints()){
+                    //swap the players
+                    Player p1 = players.get(i);
+                    Player p2 = players.get(i - 1);
+
+                    players.set(i, p2);
+                    players.set(i - 1, p1);
+                    
+                    swaps = true;
+                }
+            }
+            n--;
+        }
+
+        return players;
+    }
 
     //action listener
     public void actionPerformed(ActionEvent e)

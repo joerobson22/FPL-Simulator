@@ -170,9 +170,14 @@ public class IOHandler {
             }
             if(!valid) continue;
 
-            Player p = allPlayers.get(Integer.parseInt(id));
-            //System.out.println("Found player " + p.getName() + " with id " + id);
-            players.add(p);
+            int integerID = Integer.parseInt(id);
+
+            for(Player p : allPlayers){
+                if(p.getID() == integerID){
+                    players.add(p);
+                    break;
+                }
+            }
         }
 
         return players;

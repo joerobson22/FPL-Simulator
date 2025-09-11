@@ -270,4 +270,13 @@ public class Team {
     public void removePlayer(Player player){
         players.remove(player);
     }
+
+    public void removePlayerWithID(int id){
+        for(Player p : players){
+            if(p.getID() == id){
+                players.remove(p);
+                break;
+            }
+        }
+    }
 }

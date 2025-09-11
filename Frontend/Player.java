@@ -79,6 +79,9 @@ public class Player{
         numYellowCards = 0;
         numRedCards = 0;
         suspended = 0;
+        numGoals = 0;
+        numAssists = 0;
+        numCleanSheets = 0;
     }
 
     public void fullReset(){
