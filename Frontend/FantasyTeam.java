@@ -18,6 +18,7 @@ public class FantasyTeam {
     private int totalPoints;
     private int weeklyPoints;
     private int freeTransfers;
+    private boolean tripleCaptain;
 
     //constructor
     public FantasyTeam(String name){
@@ -38,7 +39,7 @@ public class FantasyTeam {
 
     //accessors
     public void saveTeam(){
-        teamHistory.add(new PreviousFantasyTeam(startingXI, bench, captain, viceCaptain, weeklyPoints));
+        teamHistory.add(new PreviousFantasyTeam(startingXI, bench, captain, viceCaptain, weeklyPoints, tripleCaptain));
     }
 
     public boolean isTeamValid(){
@@ -104,6 +105,7 @@ public class FantasyTeam {
 
     public void tripleCaptainPlayed(){
         //idk note this in some variable i suppose
+        tripleCaptain = true;
     }
 
     public void nextGameWeek(){

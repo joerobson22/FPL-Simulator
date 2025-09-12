@@ -8,13 +8,15 @@ public class PreviousFantasyTeam{
     private Player captain;
     private Player viceCaptain;
     private int points;
+    private boolean tripleCaptain;
 
-    public PreviousFantasyTeam(ArrayList<Player> startingXI, ArrayList<Player> bench, Player captain, Player viceCaptain, int points){
+    public PreviousFantasyTeam(ArrayList<Player> startingXI, ArrayList<Player> bench, Player captain, Player viceCaptain, int points, boolean tripleCaptain){
         this.startingXI = new ArrayList<>();
         this.bench = new ArrayList<>();
         this.captain = captain;
         this.viceCaptain = viceCaptain;
         this.points = points;
+        this.tripleCaptain = tripleCaptain;
 
         //make copies of the starting 11 and bench otherwise confusing james
         for(Player p : startingXI) this.startingXI.add(p);
@@ -26,5 +28,6 @@ public class PreviousFantasyTeam{
     public Player getCaptain() { return captain; }
     public Player getViceCaptain() { return viceCaptain; }
     public int getPoints() { return points; }
+    public boolean tripleCaptained(){ return tripleCaptain; }
 }
 

@@ -314,20 +314,20 @@ public class FPLPanel extends JPanel implements ActionListener{
             PreviousFantasyTeam ft = fantasyTeam.getPreviousFantasyTeam(viewingGameWeek);
             //for each player in the starting lineup, make a new player panel for it and add it to the correct position
             for(Player p : ft.getStartingXI()){
-                createAndAddPastPlayer(p, teamSections.get(p.getGeneralPosition()), ft.getCaptain(), ft.getViceCaptain(), false);
+                createAndAddPastPlayer(p, teamSections.get(p.getGeneralPosition()), ft.getCaptain(), ft.getViceCaptain(), false, ft.tripleCaptained());
             }
             for(Player p : ft.getBench()){
-                createAndAddPastPlayer(p, benchPanel, ft.getCaptain(), ft.getViceCaptain(), true);
+                createAndAddPastPlayer(p, benchPanel, ft.getCaptain(), ft.getViceCaptain(), true, ft.tripleCaptained());
             }
             scoreLabel.setText(String.valueOf(ft.getPoints()) + "pts");
         }
         else {
             //for each player in the starting lineup, make a new player panel for it and add it to the correct position
             for(Player p : fantasyTeam.getStartingXI()){
-                createAndAddPastPlayer(p, teamSections.get(p.getGeneralPosition()), fantasyTeam.getCaptain(), fantasyTeam.getViceCaptain(), false);
+                createAndAddPastPlayer(p, teamSections.get(p.getGeneralPosition()), fantasyTeam.getCaptain(), fantasyTeam.getViceCaptain(), false, tripleCaptaining);
             }
             for(Player p : fantasyTeam.getBench()){
-                createAndAddPastPlayer(p, benchPanel, fantasyTeam.getCaptain(), fantasyTeam.getViceCaptain(), true);
+                createAndAddPastPlayer(p, benchPanel, fantasyTeam.getCaptain(), fantasyTeam.getViceCaptain(), true, tripleCaptaining);
             }
             scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
         }
@@ -345,13 +345,16 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     //helper method to create and then add a player panel to a given panel
-    public void createAndAddPastPlayer(Player p, JPanel panel, Player captain, Player viceCaptain, boolean benched){
+    public void createAndAddPastPlayer(Player p, JPanel panel, Player captain, Player viceCaptain, boolean benched, boolean tripleCaptained){
         PlayerPanel pp = new PlayerPanel(this, p.getGeneralPosition(), benched);
         pp.setPlayer(p, viewingGameWeek);
 
         if(captain == p) pp.makeCaptain(viewingGameWeek);
         else if(viceCaptain == p) pp.makeViceCaptain(viewingGameWeek);
         
+        if(tripleCaptained) captainMultiplier = 3;
+        else captainMultiplier = 2;
+
         // Always set points for past gameweeks
         if (viewingGameWeek < currentGameWeek) {
             int points = p.getGameWeekPoints(viewingGameWeek);
@@ -402,6 +405,9 @@ public class FPLPanel extends JPanel implements ActionListener{
             if(!player.hasPlayedThisWeek()) continue;
 
             if(!benched) fantasyTeam.changeWeeklyPoints(player);
+
+            if(tripleCaptaining) captainMultiplier = 3;
+            else captainMultiplier = 2;
 
             PlayerPanel panel = getPlayerPanel(player);
             panel.setPoints(player.getWeeklyPoints(), captainMultiplier);
