@@ -210,6 +210,27 @@ public class FPLPanel extends JPanel implements ActionListener{
         //create the title panel, containing the header and the table titles
         JPanel transferTitlePanel = new JPanel(new GridLayout(2, 1));
         transferTitlePanel.add(LabelCreator.createJLabel("Transfers", "SansSerif", 15, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        
+        JPanel transferTitleHeadersPanel = new JPanel(new GridLayout(1, 3));
+        JPanel headerPanelPlayerSection = new JPanel(new GridLayout(1, 2));
+        JPanel headerPanelInfoSection = new JPanel(new GridLayout(1, 2));
+
+        //sort out the player information
+        headerPanelPlayerSection.add(LabelCreator.createJLabel("PLAYER", "SansSerif", 10, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        headerPanelInfoSection.add(LabelCreator.createJLabel("PRICE", "SansSerif", 8, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        headerPanelInfoSection.add(LabelCreator.createJLabel("PTS", "SansSerif", 8, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        headerPanelPlayerSection.add(headerPanelInfoSection);
+
+        transferTitleHeadersPanel.add(headerPanelPlayerSection);
+        //arranged like this
+        //PLAYER    PRICE  PTS   |   FIXTURES    |    BUY
+
+        transferTitleHeadersPanel.add(LabelCreator.createJLabel("FIXTURES", "SansSerif", 12, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        transferTitleHeadersPanel.add(LabelCreator.createJLabel("BUY", "SansSerif", 12, Font.BOLD, SwingConstants.CENTER, Color.BLACK));
+        
+        transferTitlePanel.add(transferTitleHeadersPanel);
+
+
         //create the transfer scroll panel and setup the scrolll mode
         transferScrollPanel.setLayout(new BoxLayout(transferScrollPanel, BoxLayout.Y_AXIS));
         transferScrollWrapper = new JScrollPane(transferScrollPanel,

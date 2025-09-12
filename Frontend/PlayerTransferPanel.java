@@ -49,7 +49,7 @@ public class PlayerTransferPanel extends JPanel implements ActionListener {
 
         JPanel playerExtraInfoPanel = new JPanel(new GridLayout(1, 2));
         playerExtraInfoPanel.add(LabelCreator.createJLabel("£" + String.valueOf(p.getPrice()) + "m", "SansSerif", playerInfoTextSize, Font.PLAIN, SwingConstants.CENTER, Color.BLACK));
-        playerExtraInfoPanel.add(LabelCreator.createJLabel(String.valueOf(p.getTotalPoints()), "SansSerif", playerInfoTextSize, Font.PLAIN, SwingConstants.CENTER, Color.BLACK));
+        playerExtraInfoPanel.add(LabelCreator.createJLabel(String.valueOf(p.getTotalPoints()) + "pts", "SansSerif", playerInfoTextSize, Font.PLAIN, SwingConstants.CENTER, Color.BLACK));
 
         playerInfoPanel.add(playerNamePanel);
         playerInfoPanel.add(playerExtraInfoPanel);
