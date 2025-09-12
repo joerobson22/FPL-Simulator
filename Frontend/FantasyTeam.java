@@ -147,7 +147,8 @@ public class FantasyTeam {
 
     public void changeWeeklyPoints(Player p){
         int change = p.getWeeklyPoints();
-        if(p == captain) change *= 2;
+        int captainMulti = tripleCaptain ? 3 : 2;
+        if(p == captain) change *= captainMulti;
         weeklyPoints += change;
     }
 

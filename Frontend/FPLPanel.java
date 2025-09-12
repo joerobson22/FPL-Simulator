@@ -92,7 +92,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     private String viewingPosition = " ";
     private boolean teamConfirmed;
     private PlayerChoiceWindow pcw;
-    private int captainMultiplier = 2;
+    private int captainMultiplier;
     private int viewingGameWeek = 0;
     private int currentGameWeek = 0;
 
@@ -352,8 +352,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         if(captain == p) pp.makeCaptain(viewingGameWeek);
         else if(viceCaptain == p) pp.makeViceCaptain(viewingGameWeek);
         
-        if(tripleCaptained) captainMultiplier = 3;
-        else captainMultiplier = 2;
+        captainMultiplier = tripleCaptained ? 3 : 2;
 
         // Always set points for past gameweeks
         if (viewingGameWeek < currentGameWeek) {
@@ -393,8 +392,11 @@ public class FPLPanel extends JPanel implements ActionListener{
     public void updateTeamPoints(){
         fantasyTeam.resetWeeklyTotal();
 
+        //System.out.println("starting lineup");
         updateTeamPointsFromList(fantasyTeam.getStartingXI(), false);
+        //System.out.println("bench players");
         updateTeamPointsFromList(fantasyTeam.getBench(), !benchBoosting); //this is just for updating the visuals of the players on the bench --> also change the 'true' to 'bench boosting'
+        //System.out.println("subbed on players");
         updateTeamPointsFromList(fantasyTeam.getSubs(), false);
 
         scoreLabel.setText(String.valueOf(fantasyTeam.getWeeklyPoints()) + "pts");
@@ -404,10 +406,14 @@ public class FPLPanel extends JPanel implements ActionListener{
         for(Player player : list){
             if(!player.hasPlayedThisWeek()) continue;
 
-            if(!benched) fantasyTeam.changeWeeklyPoints(player);
+            //System.out.println(player.getName());
 
-            if(tripleCaptaining) captainMultiplier = 3;
-            else captainMultiplier = 2;
+            if(!benched) {
+                fantasyTeam.changeWeeklyPoints(player);
+                //System.out.println("add " + String.valueOf(player.getWeeklyPoints()));
+            }
+
+            captainMultiplier = tripleCaptaining ? 3 : 2;
 
             PlayerPanel panel = getPlayerPanel(player);
             panel.setPoints(player.getWeeklyPoints(), captainMultiplier);
@@ -443,6 +449,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         fantasyTeam.nextGameWeek();
         chipPlayed = false;
         benchBoosting = false;
+        tripleCaptaining = false;
     }
 
     public void finalisePoints(){
@@ -585,6 +592,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         chipPlayed = true;
         tripleCaptainPlayed = true;
+        tripleCaptaining = true;
 
         fantasyTeam.tripleCaptainPlayed();
 
