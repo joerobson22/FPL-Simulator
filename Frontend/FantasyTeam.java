@@ -18,7 +18,10 @@ public class FantasyTeam {
     private int totalPoints;
     private int weeklyPoints;
     private int freeTransfers;
-    private boolean tripleCaptain;
+    private boolean tripleCaptaining = false;
+    private boolean benchBoosting = false;
+    private boolean freeHitting = false;
+    private boolean wildcarding = false;
 
     //constructor
     public FantasyTeam(String name){
@@ -39,7 +42,7 @@ public class FantasyTeam {
 
     //accessors
     public void saveTeam(){
-        teamHistory.add(new PreviousFantasyTeam(startingXI, bench, captain, viceCaptain, weeklyPoints, tripleCaptain));
+        teamHistory.add(new PreviousFantasyTeam(startingXI, bench, captain, viceCaptain, weeklyPoints, wildcarding, benchBoosting, freeHitting, tripleCaptaining));
     }
 
     public boolean isTeamValid(){
@@ -95,17 +98,22 @@ public class FantasyTeam {
 
     //mutators
     public void wildCardPlayed(){
+        wildcarding = true;
         freeTransfers = -1;
     }
 
     public void freeHitPlayed(){
+        freeHitting = true;
         freeTransfers = -1;
         //save team state
     }
 
     public void tripleCaptainPlayed(){
-        //idk note this in some variable i suppose
-        tripleCaptain = true;
+        tripleCaptaining = true;
+    }
+
+    public void benchBoosting(){
+        benchBoosting = true;
     }
 
     public void nextGameWeek(){
@@ -113,6 +121,11 @@ public class FantasyTeam {
         resetWeeklyTotal();
         addFreeTransfer();
         subs.clear();
+
+        tripleCaptaining = false;
+        benchBoosting = false;
+        wildcarding = false;
+        freeHitting = false;
     }
 
     public void addSub(Player player){
@@ -147,7 +160,7 @@ public class FantasyTeam {
 
     public void changeWeeklyPoints(Player p){
         int change = p.getWeeklyPoints();
-        int captainMulti = tripleCaptain ? 3 : 2;
+        int captainMulti = tripleCaptaining ? 3 : 2;
         if(p == captain) change *= captainMulti;
         weeklyPoints += change;
     }
