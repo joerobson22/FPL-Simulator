@@ -11,6 +11,10 @@ import java.awt.event.*;
 
 public class FPLPanel extends JPanel implements ActionListener{
 
+    private Color usedChipColor = new Color(240, 158, 158);
+    private Color inUseChipColor = new Color(70, 237, 242);
+    private Color availableChipColor = new Color(172, 232, 211);
+
     private final int NEUTRAL_STATUS = 0;
     private final int SUBSTITUTE_STATUS = 1;
     private final int TRANSFER_STATUS = 2;
@@ -271,6 +275,12 @@ public class FPLPanel extends JPanel implements ActionListener{
         JButton button = new JButton(text);
         button.setFont(new Font(font, fontType, fontSize));
         button.addActionListener(this);
+
+        button.setOpaque(true);
+        button.setContentAreaFilled(true);
+        button.setBorderPainted(true);
+        //button.setBorder(blackline);
+
         return button;
     }
 
@@ -380,12 +390,51 @@ public class FPLPanel extends JPanel implements ActionListener{
         freeTransfersLabel.setVisible(show);
         cancelConfirmButton.setVisible(show);
         budgetLabel.setVisible(show);
-        chipsPanel.setVisible(show);
 
-        wildcardButton.setVisible(!wildcardPlayed);
-        benchBoostButton.setVisible(!benchBoostPlayed);
-        freeHitButton.setVisible(!freeHitPlayed);
-        tripleCaptainButton.setVisible(!tripleCaptainPlayed);
+        //use current status variables to see what button to change the border of
+        if(viewingGameWeek >= currentGameWeek){
+            //wildcard
+            if(wildcarding) wildcardButton.setBackground(inUseChipColor);
+            else if (wildcardPlayed) wildcardButton.setBackground(usedChipColor);
+            else wildcardButton.setBackground(availableChipColor);
+
+            //benchBoost
+            if(benchBoosting) benchBoostButton.setBackground(inUseChipColor);
+            else if (benchBoostPlayed) benchBoostButton.setBackground(usedChipColor);
+            else benchBoostButton.setBackground(availableChipColor);
+
+            //freeHit
+            if(freeHitting) freeHitButton.setBackground(inUseChipColor);
+            else if (freeHitPlayed) freeHitButton.setBackground(usedChipColor);
+            else freeHitButton.setBackground(availableChipColor);
+
+            //tripleCaptain
+            if(tripleCaptaining) tripleCaptainButton.setBackground(inUseChipColor);
+            else if (tripleCaptainPlayed) tripleCaptainButton.setBackground(usedChipColor);
+            else tripleCaptainButton.setBackground(availableChipColor);
+        }
+        else{
+            PreviousFantasyTeam ft = fantasyTeam.getPreviousFantasyTeam(viewingGameWeek);
+            //wildcard
+            if(ft.wildcarding()) wildcardButton.setBackground(inUseChipColor);
+            else if (wildcardPlayed) wildcardButton.setBackground(usedChipColor);
+            else wildcardButton.setBackground(availableChipColor);
+
+            //benchBoost
+            if(ft.benchBoosting()) benchBoostButton.setBackground(inUseChipColor);
+            else if (benchBoostPlayed) benchBoostButton.setBackground(usedChipColor);
+            else benchBoostButton.setBackground(availableChipColor);
+
+            //freeHit
+            if(ft.freeHitting()) freeHitButton.setBackground(inUseChipColor);
+            else if (freeHitPlayed) freeHitButton.setBackground(usedChipColor);
+            else freeHitButton.setBackground(availableChipColor);
+
+            //tripleCaptain
+            if(ft.tripleCaptained()) tripleCaptainButton.setBackground(inUseChipColor);
+            else if (tripleCaptainPlayed) tripleCaptainButton.setBackground(usedChipColor);
+            else tripleCaptainButton.setBackground(availableChipColor);
+        }
     }
 
     //calculate and update the team's weekly score
@@ -450,6 +499,8 @@ public class FPLPanel extends JPanel implements ActionListener{
         chipPlayed = false;
         benchBoosting = false;
         tripleCaptaining = false;
+        wildcarding = false;
+        freeHitting = false;
     }
 
     public void finalisePoints(){
@@ -557,6 +608,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         chipPlayed = true;
         wildcardPlayed = true;
 
+        wildcarding = true;
         fantasyTeam.wildCardPlayed();
 
         updateTransferInformationVisibility(currentGameWeek == viewingGameWeek);
@@ -570,6 +622,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         benchBoostPlayed = true;
 
         benchBoosting = true;
+        fantasyTeam.benchBoosting();
 
         updateTransferInformationVisibility(currentGameWeek == viewingGameWeek);
         updateTransferInformation();
@@ -581,6 +634,7 @@ public class FPLPanel extends JPanel implements ActionListener{
         chipPlayed = true;
         freeHitPlayed = true;
 
+        freeHitting = true;
         fantasyTeam.freeHitPlayed();
 
         updateTransferInformationVisibility(currentGameWeek == viewingGameWeek);
@@ -592,8 +646,8 @@ public class FPLPanel extends JPanel implements ActionListener{
 
         chipPlayed = true;
         tripleCaptainPlayed = true;
-        tripleCaptaining = true;
 
+        tripleCaptaining = true;
         fantasyTeam.tripleCaptainPlayed();
 
         updateTransferInformationVisibility(currentGameWeek == viewingGameWeek);
