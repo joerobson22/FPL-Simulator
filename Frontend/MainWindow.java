@@ -128,7 +128,7 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     private void setupPlayerPrices(){
-        //allPlayers = PricePredictor.getPlayerPrices(IOHandler.readAllFixtures(allTeams), allPlayers);
+        allPlayers = PricePredictor.getPlayerPrices(IOHandler.readAllFixtures(allTeams), allPlayers);
 
         this.setVisible(true);
 

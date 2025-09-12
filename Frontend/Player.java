@@ -86,7 +86,9 @@ public class Player{
 
     public void fullReset(){
         lightReset();
-        weeklyPointHistory.set(0, 0);
+        for(int i = 0; i < weeklyPointHistory.size(); i++){
+            weeklyPointHistory.set(i, 0);
+        }
         weeklyPoints = 0;
         totalPoints = 0;
     }
