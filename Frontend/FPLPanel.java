@@ -525,8 +525,6 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     public void finalisePoints(){
-        //if bench boosting, skip this
-
         //find if any players didnt play and sub them out
         for(Player p : fantasyTeam.getPlayers()){
             //didnt play!
@@ -555,6 +553,8 @@ public class FPLPanel extends JPanel implements ActionListener{
 
                     String startPosition = p.getGeneralPosition();
                     String benchPosition = benchP.getGeneralPosition();
+
+                    if((startPosition.equals("GK") && !benchPosition.equals("GK")) || (!startPosition.equals("GK") && benchPosition.equals("GK"))) continue;
 
                     //if they aren't the same position and subbing the bench player on results in an invalid formation, ignore this sub.
                     if(!startPosition.equals(benchPosition) && teamSections.get(startPosition).getComponentCount() - 1 < positionMins.get(startPosition)) continue;
@@ -624,7 +624,7 @@ public class FPLPanel extends JPanel implements ActionListener{
 
     //CHIPS
     private void wildcard(){
-        if(chipPlayed || wildcardPlayed || currentGameWeek == 0) return;
+        if(chipPlayed || wildcardPlayed || currentGameWeek == 0 || currentGameWeek != viewingGameWeek) return;
 
         chipPlayed = true;
         wildcardPlayed = true;
@@ -637,7 +637,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     private void benchBoost(){
-        if(chipPlayed || benchBoostPlayed) return;
+        if(chipPlayed || benchBoostPlayed || currentGameWeek != viewingGameWeek) return;
 
         chipPlayed = true;
         benchBoostPlayed = true;
@@ -650,7 +650,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     private void freeHit(){
-        if(chipPlayed || freeHitPlayed || currentGameWeek == 0) return;
+        if(chipPlayed || freeHitPlayed || currentGameWeek == 0 || currentGameWeek != viewingGameWeek) return;
 
         chipPlayed = true;
         freeHitPlayed = true;
@@ -663,7 +663,7 @@ public class FPLPanel extends JPanel implements ActionListener{
     }
 
     private void tripleCaptain(){
-        if(chipPlayed || tripleCaptainPlayed) return;
+        if(chipPlayed || tripleCaptainPlayed || currentGameWeek != viewingGameWeek) return;
 
         chipPlayed = true;
         tripleCaptainPlayed = true;

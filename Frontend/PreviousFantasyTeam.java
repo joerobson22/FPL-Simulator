@@ -31,6 +31,12 @@ public class PreviousFantasyTeam{
 
     public ArrayList<Player> getStartingXI() { return startingXI; }
     public ArrayList<Player> getBench() { return bench; }
+    public ArrayList<Player> getPlayers(){
+        ArrayList<Player> players = new ArrayList<>();
+        for(Player p : startingXI) players.add(p);
+        for(Player p : bench) players.add(p);
+        return players;
+    }
     public Player getCaptain() { return captain; }
     public Player getViceCaptain() { return viceCaptain; }
     public int getPoints() { return points; }

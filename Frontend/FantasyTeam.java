@@ -122,6 +122,16 @@ public class FantasyTeam {
         addFreeTransfer();
         subs.clear();
 
+        //if we were just free hitting, reset the team
+        if(freeHitting){
+            PreviousFantasyTeam ft = teamHistory.get(teamHistory.size() - 2);
+            players = ft.getPlayers();
+            startingXI = ft.getStartingXI();
+            bench = ft.getBench();
+            captain = ft.getCaptain();
+            viceCaptain = ft.getViceCaptain();
+        }
+
         tripleCaptaining = false;
         benchBoosting = false;
         wildcarding = false;
