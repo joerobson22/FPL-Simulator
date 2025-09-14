@@ -29,6 +29,7 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
         this.fixture = fixture;
 
         setupWindow();
+        this.setLocationRelativeTo(null);
     }
 
     private void setupWindow(){

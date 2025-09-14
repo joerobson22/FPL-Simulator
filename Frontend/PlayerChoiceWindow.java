@@ -86,6 +86,7 @@ public class PlayerChoiceWindow extends JFrame implements ActionListener {
         this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.setTitle("FPL Simulator- Player Choice");
         this.setResizable(false);
+        this.setLocationRelativeTo(null);
 
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

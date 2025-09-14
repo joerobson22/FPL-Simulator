@@ -132,6 +132,10 @@ public class PlayerPanel extends JButton implements ActionListener {
         setPlayer(player2, gameWeek);
     }
 
+    public void setPosition(String position){
+        this.position = position;
+    }
+
     //helper method to get a transparent team badge icon
     private ImageIcon getTransparentIcon(String logoPath, int width, int height, float alpha) {
         ImageIcon icon = new ImageIcon(logoPath);

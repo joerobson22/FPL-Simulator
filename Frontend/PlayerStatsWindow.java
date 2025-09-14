@@ -34,6 +34,7 @@ public class PlayerStatsWindow extends JFrame{
         this.allPlayers = allPlayers;
 
         setup();
+        this.setLocationRelativeTo(null);
     }
 
     public void setup(){

@@ -846,12 +846,15 @@ public class FPLPanel extends JPanel implements ActionListener{
         Player player1 = panel1.getPlayer();
         Player player2 = panel2.getPlayer();
 
+        String position1 = panel1.getPosition();
+        String position2 = panel2.getPosition();
+
         focusPlayer = null;
         status = NEUTRAL_STATUS;
         cancelConfirmButton.setText(CONFIRM_TEXT);
 
         //can't swap a gk with a non gk
-        if((panel1.getPosition().equals("GK") && !panel2.getPosition().equals("GK")) || (!panel1.getPosition().equals("GK") && panel2.getPosition().equals("GK"))){
+        if((position1.equals("GK") && !position2.equals("GK")) || (!position1.equals("GK") && position2.equals("GK"))){
             return;
         }
 
@@ -862,49 +865,45 @@ public class FPLPanel extends JPanel implements ActionListener{
         //if both benched, then we can swap just fine, no problems
         if(player1Bench && player2Bench){
             panel1.swapPlayers(panel2, viewingGameWeek);
+            panel1.setPosition(position2);
+            panel2.setPosition(position1);
         }
         //if one is benched, swap their players
         //unbench the benched one, bench the unbenched one
         //add player panels to correct panels
         else if(player1Bench && !player2Bench){
-            String panel1Pos = panel1.getPosition();
-            String panel2Pos = panel2.getPosition();
-
             //CHECK THIS FORMATION WILL BE VALID
-            int numPlayers = teamSections.get(panel2Pos).getComponentCount() - 1;
-            if(panel1Pos.equals(panel2Pos)) numPlayers++;
+            int numPlayers = teamSections.get(position2).getComponentCount() - 1;
+            if(position1.equals(position2)) numPlayers++;
 
             //if number of players left in a section is less than allowed, then give up
-            if(numPlayers < positionMins.get(panel2Pos)){
+            if(numPlayers < positionMins.get(position2)){
                 return;
             }
             //PANEL 1 IS ON THE BENCH IN THIS SCENARIO
             panel1.takeOffBench(viewingGameWeek);
             panel2.putOnBench(viewingGameWeek);
             
-            teamSections.get(panel1Pos).add(panel1);
-            teamSections.get(panel2Pos).remove(panel2);
+            teamSections.get(position1).add(panel1);
+            teamSections.get(position1).remove(panel2);
             benchPanel.add(panel2);
         }
         //and vice versa
         else if(!player1Bench && player2Bench){
-            String panel1Pos = panel1.getPosition();
-            String panel2Pos = panel2.getPosition();
-
             //CHECK THIS FORMATION WILL BE VALID
-            int numPlayers = teamSections.get(panel1Pos).getComponentCount() - 1;
-            if(panel2Pos.equals(panel1Pos)) numPlayers++;
+            int numPlayers = teamSections.get(position1).getComponentCount() - 1;
+            if(position2.equals(position1)) numPlayers++;
             
             //if number of players left in a section is less than allowed, then give up
-            if(numPlayers < positionMins.get(panel1Pos)){
+            if(numPlayers < positionMins.get(position1)){
                 return;
             }
             //PANEL 2 IS ON THE BENCH IN THIS SCENARIO
             panel2.takeOffBench(viewingGameWeek);
             panel1.putOnBench(viewingGameWeek);
             
-            teamSections.get(panel2Pos).add(panel2);
-            teamSections.get(panel1Pos).remove(panel1);
+            teamSections.get(position2).add(panel2);
+            teamSections.get(position1).remove(panel1);
             benchPanel.add(panel1);
 
             //sort out captaincy
@@ -921,6 +920,8 @@ public class FPLPanel extends JPanel implements ActionListener{
         }
 
         fantasyTeam.makeSubstitution(player1, player2, player1Bench, player2Bench);
+        panel1.updateVisuals(false, currentGameWeek);
+        panel2.updateVisuals(false, currentGameWeek);
 
         this.revalidate();
         this.repaint();
