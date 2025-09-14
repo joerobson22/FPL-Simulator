@@ -166,6 +166,7 @@ std::string Team::getCleanSheetDictionary(bool cleanSheet){
     if(cleanSheet){
         for(int i = 0; i < players.size(); i++){
             if(!HelperMethods::validCleanSheetPosition(players[i].getGeneralPosition())) continue;
+            if(players[i].gotRedCard()) continue;
             if(output != "") output += ",";
 
             output += std::to_string(players[i].getID());
