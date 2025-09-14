@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.Map;
 
 public class PricePredictor {
-    private final static String GAME_ENGINE_PATH = "Backend/GameEngine.exe";
+    private final static String GAME_ENGINE_PATH = "Backend/Engine/GameEngine.exe";
     private final static int NUM_SIMULATIONS = 10;
     private final static int NUM_GAMES_PER_ROUND = 38;
     private final static int PROGRESS_BAR_WIDTH = 100;

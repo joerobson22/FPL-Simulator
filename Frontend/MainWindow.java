@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class MainWindow extends JFrame implements ActionListener{
-    private final String GAME_ENGINE_PATH = "Backend/GameEngine.exe";
+    private final String GAME_ENGINE_PATH = "Backend/Engine/GameEngine.exe";
 
     private final int WINDOW_WIDTH = 1500;
     private final int WINDOW_HEIGHT = 1000;
