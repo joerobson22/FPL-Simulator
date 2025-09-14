@@ -16,6 +16,10 @@ const int PARTS = 2;
 const int MINUTES_PER_PART = 45;
 const int STEPS_PER_MINUTE = 5;
 
+const int DFCON_DEFENDER = 10;
+const int DFCON_MIDFIELDER = 12;
+const int DFCON_OTHER = 100000;
+
 //FINAL POSITION MAP:
 //gk
 //cb, lb, cb, lwb, rwb

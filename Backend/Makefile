@@ -1,10 +1,22 @@
-GPP = g++
+CXX = g++
+CXXFLAGS = -std=c++11
+FOLDER = Engine/
+TARGET = $(FOLDER)GameEngine
+SRCS = $(FOLDER)GameEngine.cpp $(FOLDER)Player.cpp $(FOLDER)Team.cpp $(FOLDER)MatchSim.cpp $(FOLDER)HelperMethods.cpp $(FOLDER)FileIO.cpp
+OBJS = $(SRCS:.cpp=.o)
 
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
 
-cpp_build: GameEngine.cpp
-	$(GPP) -std=c++17 GameEngine.cpp -o GameEngine.exe
-
-
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f GameEngine.exe
+	rm -f *.o $(TARGET)
+
+rebuild: clean $(TARGET)
+
+run:
+	./$(TARGET)
+
+.PHONY: clean rebuild

@@ -1,541 +1,9 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <optional>
-#include <unordered_map>
 #include <map>
-#include <cstdlib>
-#include <ctime>
-#include <algorithm>
-
-#include "Constants.h"
-#include "Player.h"
+#include <iostream>
+#include <unordered_map>
+#include "MatchSim.h"
 
 using namespace std;
-
-
-
-int seed;
-
-bool validCleanSheetPosition(string position){
-    return position == "GK" || position == "DEF" || position == "MID";
-}
-
-bool validDFConPosition(string position){
-    return position == "DEF" || position == "MID";
-}
-
-int getDFConForPosition(string position){
-    if(!validDFConPosition(position)) return 1000000;
-
-    if(position == "DEF") return 10;
-    else return 12;
-}
-
-int generateRandom(int min, int maxExclusive)
-{
-    if (maxExclusive <= min) return min;
-    int range = maxExclusive - min;
-    return min + (rand() % range);
-}
-
-
-//TEAM CLASS
-class Team{
-    private:
-    string name;
-    int goals;
-    vector<Player> players;
-    vector<Player> playingPlayers;
-    map<string, vector<Player>> team;
-    
-    public:
-    Team(){
-        this->name = "";
-        goals = 0;
-    }
-
-    Team(string name){
-        this->name = name;
-        goals = 0;
-    }
-
-    void scored(Player& scorer, Player* assister, int penalty){
-        goals++;
-
-        for(int i = 0; i < playingPlayers.size(); i++){
-            if(scorer.getID() == playingPlayers[i].getID()){
-                playingPlayers[i].scored(penalty);
-            }
-        }
-        if(assister){
-            for(int i = 0; i < playingPlayers.size(); i++){
-                if(assister->getID() == playingPlayers[i].getID()){
-                    playingPlayers[i].assisted();
-                }
-            }
-        }
-    }
-
-    void missedPenalty(Player& misser){
-        for(int i = 0; i < playingPlayers.size(); i++){
-            if(misser.getID() == playingPlayers[i].getID()){
-                playingPlayers[i].missPenalty();
-            }
-        }
-    }
-
-    void getRedCard(int id){
-        Player* p = nullptr;
-        for(int i = 0; i < playingPlayers.size(); i++){
-            if(playingPlayers[i].getID() == id){
-                p = &playingPlayers[i];
-                p->getRedCard();
-                break;
-            }
-        }
-
-        for(int i = 0; i < players.size(); i++){
-            if(p->getID() == id){
-                players[i] = *p;
-                break;
-            }
-        }
-
-        playingPlayers.erase(
-            std::remove_if(
-                playingPlayers.begin(), playingPlayers.end(),
-                [&](Player &p) { return p.getID() == id; }
-            ),
-            playingPlayers.end()
-        );
-    }
-
-    void getYellowCard(int id){
-        for(int i = 0; i < playingPlayers.size(); i++){
-            if(playingPlayers[i].getID() == id){
-                if(playingPlayers[i].gotYellowCard()) playingPlayers[i].getRedCard();
-                else playingPlayers[i].getYellowCard();
-            }
-        }
-    }
-
-    void teamPlayAMinute(){
-        for(int i = 0; i < playingPlayers.size(); i++){
-            playingPlayers[i].playMinute();
-        }
-    }
-
-    Player* getPenaltyTaker(){
-        int highest = -1;
-        Player* taker;
-        for(auto &p : playingPlayers){
-            if(p.getShooting() > highest && p.getGeneralPosition() != "GK"){
-                //cout << to_string(highest) + "\n";
-                highest = p.getShooting();
-                taker = &p;
-            }
-        }
-        return taker;
-    }
-
-
-    void addPlayer(Player& player){ 
-        players.push_back(player);
-        playingPlayers.push_back(player);
-        team[player.getGeneralPosition()].push_back(player);
-    }
-
-    vector<Player>& getPlayers(){ return players; }
-
-    vector<Player>& getPlayingPlayers(){ return playingPlayers; }
-
-    void transferPlayingPlayersToPlayers(){
-        for(int i = 0; i < playingPlayers.size(); i++){
-            int iid = playingPlayers[i].getID();
-            for(int j = 0; j < players.size(); j++){
-                int jid = players[j].getID();
-                if(jid == iid){
-                    players[j] = playingPlayers[i];
-                    break;
-                }
-            }
-        }
-    }
-
-
-    Player* getPlayerFromPosition(string position){
-        vector<Player*> positionPlayers;
-        for(auto& p : playingPlayers){
-            if(p.getSpecificPosition() == position){
-                positionPlayers.push_back(&p);
-            }
-        }
-        if(positionPlayers.size() == 0) return nullptr;
-
-        return positionPlayers[generateRandom(0, positionPlayers.size())];
-    }
-
-    vector<Player*> getPlayersFromGeneralPosition(string generalPos){
-        vector<Player*> positionPlayers;
-        for(auto& p : players){
-            if(p.getGeneralPosition() == generalPos){
-                positionPlayers.push_back(&p);
-            }
-        }
-        return positionPlayers;
-    }
-
-    string getGoalScorersDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            for(int j = 0; j < players[i].getGoals(); j++){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string getAssistersDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            for(int j = 0; j < players[i].getAssists(); j++){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string getCleanSheetDictionary(bool cleanSheet){
-        string output = "";
-        if(cleanSheet){
-            cout << "CLEAN SHEET!\n";
-            for(int i = 0; i < players.size(); i++){
-                if(!validCleanSheetPosition(players[i].getGeneralPosition())) continue;
-                if(output != "") output += ",";
-
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string get60MinDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            if(players[i].getMinsPlayed() >= 60){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string get3SavesDictionary(){
-        string output = "";
-        for(int j = 0; j < players[0].getSaves() % 3; j++){
-            if(output != "") output += ",";
-            output += to_string(players[0].getID());
-        }
-        return output;
-    }
-    string getDFConDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            if(players[i].getDFCon() >= getDFConForPosition(players[i].getGeneralPosition())){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string getPenaltyGoalScorersDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            for(int j = 0; j < players[i].getPenaltyGoals(); j++){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string getPenaltyMissesDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            for(int j = 0; j < players[i].getPenaltyMisses(); j++){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string getPenaltySavesDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            for(int j = 0; j < players[i].getPenaltySaves(); j++){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string getYellowCardDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            if(players[i].gotYellowCard()){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-    string getRedCardDictionary(){
-        string output = "";
-        for(int i = 0; i < players.size(); i++){
-            if(players[i].gotRedCard()){
-                if(output != "") output += ",";
-                output += to_string(players[i].getID());
-            }
-        }
-        return output;
-    }
-
-    int getGoals(){ return goals; }
-
-    //temporary testing functions
-    void outputTeam(){
-        cout << name + "\n\n";
-        for(int i = 0; i < players.size(); i++){
-            players[i].outputPlayer();
-            cout << "\n";
-        }
-    }
-    Player* getRandomPlayer(){
-        return &playingPlayers[rand() % playingPlayers.size()];
-    }
-};
-
-int getTeamIndex(Team teams[], Player p){
-    for(int i = 0; i < 2; i++){
-        for(int j = 0; j < 11; j++){
-            if(p.getID() == teams[i].getPlayers()[j].getID()) return i;
-        }
-    }
-    return -1;
-}
-
-//FILE INPUT FUNCTIONS
-pair<string, string> parseKeyValuePair(string section){
-    string key = "";
-    string value = "";
-
-    size_t colonPos = section.find(':');
-
-    if(colonPos != string::npos){
-        key = section.substr(0, colonPos);
-        value = section.substr(colonPos + 1);
-    }
-
-    return make_pair(key, value);
-}
-
-void readInputFile(Team teams[]){
-    string line;
-    ifstream reader(inputFilePath);
-
-    int teamPlayers = -1;
-
-    int i = -1;
-    while(getline(reader, line)){
-        i++;
-        //different specific cases
-        if(i == FILE_SEED_LINE){
-            seed = stoi(line);
-            cout << "\n\n-----------SEED----------\n" + line + "\n\n";
-            srand(static_cast<unsigned int>(seed));
-            continue;
-        }
-        else if(i == FILE_HOME_TEAM_LINE){
-            teams[0] = Team(line);
-            continue;
-        }
-        else if(i == FILE_AWAY_TEAM_LINE){
-            teams[1] = Team(line);
-            continue;
-        }
-        else if(line == FILE_HOME_PLAYERS_START_LINE) {
-            teamPlayers = 0;
-            continue;
-        }
-        else if(line == FILE_AWAY_PLAYERS_START_LINE){
-            teamPlayers = 1;
-            continue;
-        } 
-
-        //otherwise the line is a new player's information
-        //so find every comma, then pass that substring into parseKeyValuePair
-        vector<pair<string, string>> keyValuePairs;
-        
-        int subStrStart = 0;
-        int j = 0;
-        for(j = 0; j < line.size(); j++){
-            char c = line.at(j);
-
-            if(c == ',' || j == line.size()){
-                keyValuePairs.push_back(parseKeyValuePair(line.substr(subStrStart, j - subStrStart)));
-                subStrStart = j + 1;
-            }
-        }
-        keyValuePairs.push_back(parseKeyValuePair(line.substr(subStrStart, j - subStrStart)));
-
-        Player p(keyValuePairs);
-        teams[teamPlayers].addPlayer(p);
-    }
-}
-//---------------------------------
-
-//FILE OUTPUT FUNCTIONS
-string getGoalScorersString(Team teams[]){
-    string output = "";
-    output += teams[0].getGoalScorersDictionary();
-
-    if(output != "" && teams[1].getGoalScorersDictionary() != "") output += ",";
-    output += teams[1].getGoalScorersDictionary();
-
-    return output;
-}
-
-string getAssistersString(Team teams[]){
-    string output = "";
-    output += teams[0].getAssistersDictionary();
-
-    if(output != "" && teams[1].getAssistersDictionary() != "") output += ",";
-    output += teams[1].getAssistersDictionary();
-
-    return output;
-}
-
-string getCleanSheetsString(Team teams[]){
-    string output = "";
-    output += teams[0].getCleanSheetDictionary(teams[1].getGoals() == 0);
-
-    if(output != "" && teams[1].getCleanSheetDictionary(teams[0].getGoals() == 0) != "") output += ",";
-    output += teams[1].getCleanSheetDictionary(teams[0].getGoals() == 0);
-
-    return output;
-}
-
-string get60MinString(Team teams[]){
-    string output = "";
-    output += teams[0].get60MinDictionary();
-
-    if(output != "" && teams[1].get60MinDictionary() != "") output += ",";
-    output += teams[1].get60MinDictionary();
-
-    return output;
-}
-
-string get3SavesString(Team teams[]){
-    string output = "";
-    output += teams[0].get3SavesDictionary();
-
-    if(output != "" && teams[1].get3SavesDictionary() != "") output += ",";
-    output += teams[1].get3SavesDictionary();
-
-    return output;
-}
-
-string getDFConString(Team teams[]){
-    string output = "";
-    output += teams[0].getDFConDictionary();
-
-    if(output != "" && teams[1].getDFConDictionary() != "") output += ",";
-    output += teams[1].getDFConDictionary();
-
-    return output;
-}
-
-string getYellowCardString(Team teams[]){
-    string output = "";
-    output += teams[0].getYellowCardDictionary();
-
-    if(output != "" && teams[1].getYellowCardDictionary() != "") output += ",";
-    output += teams[1].getYellowCardDictionary();
-
-    return output;
-}
-
-string getRedCardString(Team teams[]){
-    string output = "";
-    output += teams[0].getRedCardDictionary();
-
-    if(output != "" && teams[1].getRedCardDictionary() != "") output += ",";
-    output += teams[1].getRedCardDictionary();
-
-    return output;
-}
-
-string getPenaltyScorersString(Team teams[]){
-    string output = "";
-    output += teams[0].getPenaltyGoalScorersDictionary();
-
-    if(output != "" && teams[1].getPenaltyGoalScorersDictionary() != "") output += ",";
-    output += teams[1].getPenaltyGoalScorersDictionary();
-
-    return output;
-}
-
-string getPenaltyMissesString(Team teams[]){
-    string output = "";
-    output += teams[0].getPenaltyMissesDictionary();
-
-    if(output != "" && teams[1].getPenaltyMissesDictionary() != "") output += ",";
-    output += teams[1].getPenaltyMissesDictionary();
-
-    return output;
-}
-
-string getPenaltySavesString(Team teams[]){
-    string output = "";
-    output += teams[0].getPenaltySavesDictionary();
-
-    if(output != "" && teams[1].getPenaltySavesDictionary() != "") output += ",";
-    output += teams[1].getPenaltySavesDictionary();
-
-    return output;
-}
-
-void writeToOutputFile(Team teams[]){
-    teams[0].transferPlayingPlayersToPlayers();
-    teams[1].transferPlayingPlayersToPlayers();
-
-    ofstream output(outputFilePath);
-
-    output << to_string(teams[0].getGoals()) + "\n";
-    output << to_string(teams[1].getGoals()) + "\n";
-    output << "GOAL SCORERS," + getGoalScorersString(teams) + "\n";
-    output << "ASSISTERS," + getAssistersString(teams) + "\n";
-    output << "CLEAN SHEETS," + getCleanSheetsString(teams) + "\n";
-    output << "60 MINS," + get60MinString(teams) + "\n";
-    output << "3 SAVES," + get3SavesString(teams) + "\n";
-    output << "DFCON," + getDFConString(teams) + "\n";
-    output << "YELLOW CARDS," + getYellowCardString(teams) + "\n";
-    output << "RED CARDS," + getRedCardString(teams) + "\n";
-    output << "PENALTY GOALS," + getPenaltyScorersString(teams) + "\n";
-    output << "PENALTY MISSES," + getPenaltyMissesString(teams) + "\n";
-    output << "PENALTY SAVES," + getPenaltySavesString(teams) + "\n";
-
-    output.close();
-}
-//----------------------------------
-
-
-
-
-//MATCH ENGINE!!!
-
-
-
-
 
 std::unordered_map<std::string, std::unordered_map<std::string, int>> decisionMap;
 std::unordered_map<std::string, std::unordered_map<std::string, int>> passMap;
@@ -849,7 +317,7 @@ string getRandomKeyFromMap(std::unordered_map<std::string, int> map, const std::
         total += map[keys[i]];
     }
     //now generate a number and go back through the map until we know which position the number applies to
-    int number = generateRandom(0, total);
+    int number = HelperMethods::generateRandom(0, total);
     total = 0;
     for(int i = 0; i < numKeys; i++){
         total += map[keys[i]];
@@ -885,14 +353,12 @@ void save(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
 }
 
 void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position){
-    cout << "PENALTY!\n";
-
     //decide which player should take
     onBall = teams[*teamIndexOnBall].getPenaltyTaker();
     cout << onBall->getName() + " taking the penalty\n";
     int shootingRating = onBall->getShooting();
-    int shotRating = shootingRating + generateRandom(0, shootingRating * PENALTY_SHOT_MODIFIER);
-    shotRating = generateRandom(shotRating * 0.5, shotRating);
+    int shotRating = shootingRating + HelperMethods::generateRandom(0, shootingRating * PENALTY_SHOT_MODIFIER);
+    shotRating = HelperMethods::generateRandom(shotRating * 0.5, shotRating);
     //cout << "chosen taker\n";
 
     Player* keeper = teams[!(*teamIndexOnBall)].getPlayerFromPosition("GK");
@@ -901,8 +367,8 @@ void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
     cout << "keeper rating: " + to_string(keeperRating) + "\n";
     //cout << "found keeper\n";
 
-    int saveRating = keeperRating + generateRandom(0, keeperRating * PENALTY_SAVE_MODIFIER);
-    saveRating = generateRandom(saveRating * 0.5, saveRating);
+    int saveRating = keeperRating + HelperMethods::generateRandom(0, keeperRating * PENALTY_SAVE_MODIFIER);
+    saveRating = HelperMethods::generateRandom(saveRating * 0.5, saveRating);
     //cout << "got save rating\n";
 
     //figure out who gets credited with the assist
@@ -931,17 +397,17 @@ void penalty(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
 void foul(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass, std::string& position, Player*& defender, int tackleRating){
     cout << "\nFOUL!\n";
     //check if it's a red or yellow card
-    if(generateRandom(0, 100) < RED_CARD_THRESHOLD){
+    if(HelperMethods::generateRandom(0, 100) < RED_CARD_THRESHOLD){
         teams[!(*teamIndexOnBall)].getRedCard(defender->getID());
     }
-    else if(generateRandom(0, 100) < YELLOW_CARD_THRESHOLD){
+    else if(HelperMethods::generateRandom(0, 100) < YELLOW_CARD_THRESHOLD){
         teams[!(*teamIndexOnBall)].getYellowCard(defender->getID());
     }
 
     //also check if it's a penalty!
     int penaltyChance = penaltyChanceMap[onBall->getSpecificPosition()];
     //cout << "chance of penalty: " + to_string(penaltyChance) + "\n";
-    if(generateRandom(0, 1000) < penaltyChance){
+    if(HelperMethods::generateRandom(0, 1000) < penaltyChance){
         lastPass = onBall;
         penalty(teams, teamIndexOnBall, onBall, lastPass, position);
     }
@@ -962,7 +428,7 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     //first check for interception from passer (passing vs defending) ------------------------------------
     //get the passer's passing ability (with some random variation)
     int passAbility = onBall->getPassing();
-    int passRating = passAbility + generateRandom(-passAbility * PASSING_VARIATION, passAbility * PASSING_VARIATION);
+    int passRating = passAbility + HelperMethods::generateRandom(-passAbility * PASSING_VARIATION, passAbility * PASSING_VARIATION);
 
     //cout << "pass rating: " + to_string(passRating) + "\n";
 
@@ -1001,7 +467,7 @@ void pass(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPass
     //then check for interception for person marking receiver (pace vs physicality) -----------------------------------------------
     //get the receiver's pace ability (with some random variation)
     int paceAbility = player->getPace();
-    int paceRating = paceAbility + generateRandom(-paceAbility * PACE_VARIATION, paceAbility * PACE_VARIATION);
+    int paceRating = paceAbility + HelperMethods::generateRandom(-paceAbility * PACE_VARIATION, paceAbility * PACE_VARIATION);
     //cout << "pace\n";
     //cout << "pace rating: " + to_string(paceRating) + "\n";
 
@@ -1035,7 +501,7 @@ void dribble(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
     //check being tackled
     //get dribbling ability
     int dribbleAbility = onBall->getDribbling();
-    int dribbleRating = dribbleAbility + generateRandom(-dribbleAbility * DRIBBLING_VARIATION, dribbleAbility * DRIBBLING_VARIATION);
+    int dribbleRating = dribbleAbility + HelperMethods::generateRandom(-dribbleAbility * DRIBBLING_VARIATION, dribbleAbility * DRIBBLING_VARIATION);
 
     //get position of the defender
     string dribblerPosition = position;
@@ -1045,7 +511,7 @@ void dribble(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
     if(defender){
         //get defending ability
         int defendAbility = defender->getDefending();
-        int defendRating = defendAbility + generateRandom(-defendAbility * DEFENDING_VARIATION, defendAbility * DEFENDING_VARIATION);
+        int defendRating = defendAbility + HelperMethods::generateRandom(-defendAbility * DEFENDING_VARIATION, defendAbility * DEFENDING_VARIATION);
 
         //get the chance of the dribble succeeding
         int total = dribbleRating + defendRating;
@@ -1058,7 +524,7 @@ void dribble(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastP
             return;
         }
         else{
-            if(generateRandom(0, defendRating) < FOUL_THRESHOLD){
+            if(HelperMethods::generateRandom(0, defendRating) < FOUL_THRESHOLD){
                 foul(teams, teamIndexOnBall, onBall, lastPass, position, defender, defendRating);
             }
         }
@@ -1076,7 +542,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     int shotRating = playerShooting;
     //cout << "shooting: " + to_string(playerShooting) + "\n";
 
-    shotRating += generateRandom(-(double)playerShooting * SHOOTING_VARIATION, (double)playerShooting * SHOOTING_VARIATION);
+    shotRating += HelperMethods::generateRandom(-(double)playerShooting * SHOOTING_VARIATION, (double)playerShooting * SHOOTING_VARIATION);
     //cout << "shot rating: " + to_string(shotRating) + "\n";
 
     //if the current player was passed to, increase shooting by half the other player's passing
@@ -1084,7 +550,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
         //cout << "Passed to\n";
         int passValue = lastPass->getPassing();
         //cout << "pass value\n";
-        passValue += generateRandom(-passValue * SHOT_PASS_VARIATION, passValue * SHOT_PASS_VARIATION);
+        passValue += HelperMethods::generateRandom(-passValue * SHOT_PASS_VARIATION, passValue * SHOT_PASS_VARIATION);
         //cout << "noise added\n";
         shotRating += passValue * SHOT_PASS_MODIFIER;
         //cout << "shot rating calculated\n";
@@ -1093,7 +559,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     else{
         //cout << "won it back\n";
         int paceValue = onBall->getPace();
-        paceValue += generateRandom(-paceValue * SHOT_PACE_VARIATION, paceValue * SHOT_PACE_VARIATION);
+        paceValue += HelperMethods::generateRandom(-paceValue * SHOT_PACE_VARIATION, paceValue * SHOT_PACE_VARIATION);
         shotRating += paceValue * SHOT_PACE_MODIFIER;
     }
     //cout << "shot rating: " + to_string(shotRating) + "\n";
@@ -1101,8 +567,8 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     //check for defensive blocks
     vector<Player*> defenders = teams[!(*teamIndexOnBall)].getPlayersFromGeneralPosition("DEF");
     for(auto player : defenders){
-        if(generateRandom(0, 100) <= (DEF_BLOCK_CHANCE * 100) && 
-        generateRandom(player->getDefending() - (player->getDefending() * DEF_BLOCK_VARIATION), player->getDefending() + (player->getDefending() * DEF_BLOCK_VARIATION)) > shotRating){
+        if(HelperMethods::generateRandom(0, 100) <= (DEF_BLOCK_CHANCE * 100) && 
+        HelperMethods::generateRandom(player->getDefending() - (player->getDefending() * DEF_BLOCK_VARIATION), player->getDefending() + (player->getDefending() * DEF_BLOCK_VARIATION)) > shotRating){
             cout << "BLOCKED by " + player->getName() + "\n";
             block(player, teams, teamIndexOnBall, onBall, lastPass, position);
             return;
@@ -1110,7 +576,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     }
 
     //is it even on target?
-    if(generateRandom(0, 100) + (playerShooting * SHOOTING_ON_TARGET_SHOOTING_BONUS_PROPORTION) <= SHOOTING_ON_TARGET_THRESHOLD){
+    if(HelperMethods::generateRandom(0, 100) + (playerShooting * SHOOTING_ON_TARGET_SHOOTING_BONUS_PROPORTION) <= SHOOTING_ON_TARGET_THRESHOLD){
         cout << "OFF TARGET\n";
         save(teams, teamIndexOnBall, onBall, lastPass, position, false, false);
         return;
@@ -1119,7 +585,7 @@ void shoot(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& lastPas
     //now compare show rating to other team's gk ability
     int gkRating = teams[!(*teamIndexOnBall)].getPlayerFromPosition("GK")->getRating();
     int saveRating = gkRating;
-    saveRating += generateRandom(-gkRating * GK_NEGATIVE_VARIATION, gkRating * GK_POSITIVE_VARIATION);
+    saveRating += HelperMethods::generateRandom(-gkRating * GK_NEGATIVE_VARIATION, gkRating * GK_POSITIVE_VARIATION);
     //cout << "Keeper rating: " + to_string(saveRating) + "\n";
 
     int total = shotRating + saveRating;
@@ -1167,7 +633,7 @@ void simulateStep(Team teams[], int* teamIndexOnBall, Player*& onBall, Player*& 
 
 int simulateMatch(Team teams[]) {
     //kickoff
-    int teamIndexOnBall = generateRandom(0, 2);
+    int teamIndexOnBall = HelperMethods::generateRandom(0, 2);
     Player* onBall = teams[teamIndexOnBall].getRandomPlayer();
     Player* lastPass = nullptr;
     std::string position = onBall->getSpecificPosition();
@@ -1199,39 +665,3 @@ int simulateMatch(Team teams[]) {
     return 0;
 }
 
-
-
-
-
-//main function:
-//1. reads fixture data .txt file
-//2. creates player and team objects
-//3. simulates the match
-//4. writes outcome to output file
-
-int main() {
-    cout << "GameEngine.exe running\n";
-
-    Team teams[2];
-    //read the 'fixtureData.txt' file and create 2 teams with correct players
-    readInputFile(teams);
-
-    //simulate the match
-    setupMaps();
-
-    //srand(time(NULL));
-
-    int errorCode = simulateMatch(teams);
-    if(errorCode != 0){
-        cout << "Match simulation failed with error" + to_string(errorCode) + ".\n";
-        return -1;
-    }
-
-    //cout << "TEAM 1 KEEPER SAVED " + to_string(teams[0].getPlayerFromPosition("GK")->getPenaltySaves()) + " PENALTIES\n";
-    //cout << "TEAM 2 KEEPER SAVED " + to_string(teams[1].getPlayerFromPosition("GK")->getPenaltySaves()) + " PENALTIES\n";
-
-    //write the match details to the 'fixtureOutcome.txt' file
-    writeToOutputFile(teams);
-
-    return 0;
-}
