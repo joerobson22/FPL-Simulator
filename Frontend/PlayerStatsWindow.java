@@ -35,6 +35,8 @@ public class PlayerStatsWindow extends JFrame{
 
         setup();
         this.setLocationRelativeTo(null);
+        ImageIcon icon = new ImageIcon("Frontend/assets/logo.png");
+        this.setIconImage(icon.getImage());
     }
 
     public void setup(){

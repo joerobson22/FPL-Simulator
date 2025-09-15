@@ -60,6 +60,8 @@ public class Settings extends JFrame implements ActionListener{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        ImageIcon icon = new ImageIcon("Frontend/assets/logo.png");
+        this.setIconImage(icon.getImage());
     }
 
     public void actionPerformed(ActionEvent e){

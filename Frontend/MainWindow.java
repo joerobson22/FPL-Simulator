@@ -129,6 +129,8 @@ public class MainWindow extends JFrame implements ActionListener{
         //GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         //Rectangle bounds = ge.getMaximumWindowBounds();
         //this.setBounds(bounds);
+        ImageIcon icon = new ImageIcon("Frontend/assets/logo.png");
+        this.setIconImage(icon.getImage());
 
         fixtureList = new FixtureList();
         setupFixtures();
@@ -413,7 +415,7 @@ public class MainWindow extends JFrame implements ActionListener{
         teamConfirmed = false;
         fplPanel.nextGameWeek();
 
-        if(currentGameWeek == 17) fplPanel.replenishChips();
+        if(currentGameWeek == 18) fplPanel.replenishChips();
 
         for(Player p : allPlayers){
             p.resetWeeklyPoints();

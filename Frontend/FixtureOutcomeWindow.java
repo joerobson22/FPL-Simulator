@@ -30,6 +30,8 @@ public class FixtureOutcomeWindow extends JFrame implements ActionListener{
 
         setupWindow();
         this.setLocationRelativeTo(null);
+        ImageIcon icon = new ImageIcon("Frontend/assets/logo.png");
+        this.setIconImage(icon.getImage());
     }
 
     private void setupWindow(){

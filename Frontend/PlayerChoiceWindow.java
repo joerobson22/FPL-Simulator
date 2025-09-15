@@ -87,6 +87,8 @@ public class PlayerChoiceWindow extends JFrame implements ActionListener {
         this.setTitle("FPL Simulator- Player Choice");
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        ImageIcon icon = new ImageIcon("Frontend/assets/logo.png");
+        this.setIconImage(icon.getImage());
 
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

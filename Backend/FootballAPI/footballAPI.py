@@ -14,9 +14,11 @@ PREMIER_LEAGUE_ID_API = 39
 PREMIER_LEAGUE_ID_FIFA = 13
 LEAGUE_NAME = "English Premier League"
 
+#ON A FREE PLAN ON api-football.com YOU CAN ONLY ACCESS DATA FROM 2021-2023
+#otherwise £15 to do so (unlimited requests too tbf)
+
 #links are slightly different each time
 KAGGLE_DATABASE_LINKS = {
-    22 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
     23 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
     24 : ("stefanoleone992/ea-sports-fc-", "-complete-player-dataset"),
     25 : ("nyagami/ea-sports-fc-", "-database-ratings-and-stats")
