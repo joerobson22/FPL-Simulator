@@ -187,6 +187,8 @@ public class IOHandler {
         allTeams = new ArrayList<>();
         try{
             BufferedReader reader = new BufferedReader(new FileReader("allTeams.txt"));
+            //read the first year line
+            reader.readLine();
             String line = reader.readLine();
 
             int id = 1;
@@ -216,6 +218,8 @@ public class IOHandler {
         FixtureList fixtureList = new FixtureList();
         try{
             BufferedReader reader = new BufferedReader(new FileReader("allFixtures.txt"));
+            //read the first year line
+            reader.readLine();
             String line = reader.readLine();
 
             int i = 0;

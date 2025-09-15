@@ -52,9 +52,14 @@ public class MainWindow extends JFrame implements ActionListener{
     boolean simulating = false;
     boolean teamConfirmed = false;
 
+    int simulationDepth;
+    int season;
+
     //setup methods
 
-    public MainWindow(FantasyTeam fantasyTeam){
+    public MainWindow(FantasyTeam fantasyTeam, int simulationDepth, int season){
+        runPythonBackend();
+
         setupTeams();
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -63,6 +68,8 @@ public class MainWindow extends JFrame implements ActionListener{
         int oneThird = screenWidth / 3;
 
         this.fantasyTeam = fantasyTeam;
+        this.simulationDepth = simulationDepth;
+        this.season = season;
 
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
@@ -127,8 +134,65 @@ public class MainWindow extends JFrame implements ActionListener{
         updateAllVisuals();
     }
 
+    private void runPythonBackend(){
+        String path = "Backend/FootballAPI/";
+        String pyPath = path + "footballAPI.py";
+        
+
+        try{
+            //GET THE DATA SCRAPING SCRIPT .EXE FILE PATH
+            File pyFile = new File(pyPath).getCanonicalFile();
+            System.out.println("Python file path: " + pyFile.getAbsolutePath());
+            System.out.println("File exists: " + pyFile.exists());
+            
+            if (!pyFile.exists()) {
+                System.err.println("ERROR: footballAPI.py not found!");
+                return;
+            }
+            
+            //CREATE A NEW PROCESSBUILDER TO CALL THE DATA SCRAPING SCRIPT
+            ProcessBuilder pb = new ProcessBuilder("python3", pyFile.getAbsolutePath());
+            pb.redirectErrorStream(true);
+
+            pb.directory(new File(path));
+            System.out.println("Working directory: " + pb.directory().getAbsolutePath());
+            //START THE DATA SCRAPING SCRIPT
+            System.out.println("Calling footballAPI.py");
+            Process process = pb.start();
+
+            // read the output stream
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            
+            String line;
+            System.out.println("=== PYTHON SCRIPT OUTPUT ===");
+            System.out.println();
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            System.out.println();
+            System.out.println("=== PYTHON SCRIPT OUTPUT ===");
+
+            System.out.println("Waiting for footballAPI.py to finish running");
+            int exitCode = process.waitFor();
+
+            System.out.println("Script ended with exit code " + String.valueOf(exitCode));
+        }
+        catch (IOException e) {
+            System.err.println("IOException occurred: " + e.getMessage());
+            e.printStackTrace();
+        } 
+        catch (InterruptedException e) {
+            System.err.println("Process was interrupted: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        } 
+        catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     private void setupPlayerPrices(){
-        allPlayers = PricePredictor.getPlayerPrices(IOHandler.readAllFixtures(allTeams), allPlayers);
+        allPlayers = PricePredictor.getPlayerPrices(IOHandler.readAllFixtures(allTeams), allPlayers, simulationDepth);
 
         this.setVisible(true);
 
@@ -139,6 +203,7 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     private void setupTeams(){
+        System.out.println("now setting up players and teams");
         allTeams = IOHandler.readAllTeamData(allTeams);
         allPlayers = IOHandler.readAllPlayerData(allTeams, allPlayers);
     }

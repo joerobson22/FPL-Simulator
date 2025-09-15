@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class PricePredictor {
     private final static String GAME_ENGINE_PATH = "Backend/Engine/GameEngine.exe";
-    private final static int NUM_SIMULATIONS = 1;
     private final static int NUM_GAMES_PER_ROUND = 38;
     private final static int PROGRESS_BAR_WIDTH = 100;
 
@@ -30,11 +29,11 @@ public class PricePredictor {
         "ATT", 1.25
     );
 
-    public static ArrayList<Player> getPlayerPrices(FixtureList fixtureList, ArrayList<Player> players){
-        for(int i = 0; i < NUM_SIMULATIONS; i++){
+    public static ArrayList<Player> getPlayerPrices(FixtureList fixtureList, ArrayList<Player> players, int simulationDepth){
+        for(int i = 0; i < simulationDepth; i++){
             for(int gw = 0; gw < NUM_GAMES_PER_ROUND; gw++){
                 ArrayList<Fixture> thisWeekFixtures = fixtureList.getFixtures(gw);
-                outputSimulationProgress(i, gw);
+                outputSimulationProgress(i, gw, simulationDepth);
                 for(Fixture f : thisWeekFixtures){
                     simulateFixture(f, players, gw);
                 }
@@ -180,10 +179,10 @@ public class PricePredictor {
         System.out.flush();
     }
 
-    private static void outputSimulationProgress(int round, int gw){
+    private static void outputSimulationProgress(int round, int gw, int simulationDepth){
         clearScreen();
 
-        int targetSimulations = NUM_SIMULATIONS * NUM_GAMES_PER_ROUND;
+        int targetSimulations = simulationDepth * NUM_GAMES_PER_ROUND;
         int numGamesSimulated = (round * NUM_GAMES_PER_ROUND) + gw;
         int progress = (int)((double)((double)numGamesSimulated / (double)targetSimulations) * PROGRESS_BAR_WIDTH);
 

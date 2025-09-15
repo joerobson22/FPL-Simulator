@@ -4,6 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Settings extends JFrame implements ActionListener{
+    final int WINDOW_WIDTH = 300;
+    final int WINDOW_HEIGHT = 200;
+
     JPanel mainPanel;
     JPanel simulationDepthPanel;
     JPanel seasonChoicePanel;
@@ -11,8 +14,8 @@ public class Settings extends JFrame implements ActionListener{
 
     JButton goButton;
 
-    JComboBox simulationDepthComboBox;
-    JComboBox seasonChoiceComboBox;
+    JComboBox<Integer> simulationDepthComboBox;
+    JComboBox<Integer> seasonChoiceComboBox;
 
     String teamName;
 
@@ -25,6 +28,10 @@ public class Settings extends JFrame implements ActionListener{
 
         simulationDepthComboBox = new JComboBox<>(simulationDepths);
         seasonChoiceComboBox = new JComboBox<>(seasons);
+        DefaultListCellRenderer listRenderer = new DefaultListCellRenderer();
+        listRenderer.setHorizontalAlignment(DefaultListCellRenderer.CENTER);
+        simulationDepthComboBox.setRenderer(listRenderer);
+        seasonChoiceComboBox.setRenderer(listRenderer);
 
         simulationDepthPanel = new JPanel(new BorderLayout());
         seasonChoicePanel = new JPanel(new BorderLayout());
@@ -48,17 +55,18 @@ public class Settings extends JFrame implements ActionListener{
 
         this.setContentPane(mainPanel);
         this.setVisible(true);
-        this.setSize(500, 500);
+        this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.setTitle("FPL Simulator- Settings");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
+        this.setLocationRelativeTo(null);
     }
 
     public void actionPerformed(ActionEvent e){
         if(goButton == e.getSource()){
             this.setVisible(false);
             FantasyTeam fantasyTeam = new FantasyTeam(teamName);
-            MainWindow mainWindow = new MainWindow(fantasyTeam);
+            MainWindow mainWindow = new MainWindow(fantasyTeam, (int)simulationDepthComboBox.getSelectedItem(), (int)seasonChoiceComboBox.getSelectedItem());
         }
     }
 }

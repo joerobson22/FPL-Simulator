@@ -56,8 +56,6 @@ public class StartWindow extends JFrame implements ActionListener{
         this.setTitle("FPL Simulator- Account Creation");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
-        
-        // Center the window on screen
         this.setLocationRelativeTo(null);
     }
 
