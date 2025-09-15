@@ -21,7 +21,7 @@ public class Settings extends JFrame implements ActionListener{
 
     Integer[] simulationDepths = {1, 5, 10, 20, 50, 100};
     String[] simulationDepthTimeEstimations = {"10 seconds", "30 seconds", "1 minute", "2 minutes", "5 minutes", "10 minutes"};
-    Integer[] seasons = {2019, 2020, 2021, 2022, 2023, 2024, 2025};
+    Integer[] seasons = {2021, 2022, 2023};//, 2024, 2025};   <- WHEN EAFC26 kaggle database comes out, pay £15 to get fixture data and whatnot and then allow the use of these
 
     public Settings(String teamName){
         this.teamName = teamName;

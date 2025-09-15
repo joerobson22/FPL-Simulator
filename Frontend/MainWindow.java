@@ -413,6 +413,8 @@ public class MainWindow extends JFrame implements ActionListener{
         teamConfirmed = false;
         fplPanel.nextGameWeek();
 
+        if(currentGameWeek == 17) fplPanel.replenishChips();
+
         for(Player p : allPlayers){
             p.resetWeeklyPoints();
         }

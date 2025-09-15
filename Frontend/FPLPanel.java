@@ -524,6 +524,13 @@ public class FPLPanel extends JPanel implements ActionListener{
         freeHitting = false;
     }
 
+    public void replenishChips(){
+        wildcardPlayed = false;
+        benchBoostPlayed = false;
+        freeHitPlayed = false;
+        tripleCaptainPlayed = false;
+    }
+
     public void finalisePoints(){
         //find if any players didnt play and sub them out
         for(Player p : fantasyTeam.getPlayers()){

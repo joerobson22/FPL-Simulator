@@ -12,23 +12,25 @@ FIXTURE_FILE_PATHWAY = "../../allFixtures.txt"
 URL = "https://v3.football.api-sports.io"
 PREMIER_LEAGUE_ID_API = 39
 PREMIER_LEAGUE_ID_FIFA = 13
-LEAGUE_NAME = "Premier League"
-
-EARLY_FIFA_DATABASE_LINK_START = "stefanoleone992/fifa-" # + fifa version (last 2 digits of season end year)
-EARLY_FIFA_DATABASE_LINK_END = "-complete-player-dataset"
+LEAGUE_NAME = "English Premier League"
 
 #links are slightly different each time
 KAGGLE_DATABASE_LINKS = {
-    20 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
-    21 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
     22 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
     23 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
     24 : ("stefanoleone992/ea-sports-fc-", "-complete-player-dataset"),
     25 : ("nyagami/ea-sports-fc-", "-database-ratings-and-stats")
 }
 
+KAGGLE_CSV_NAMES = {
+    22 : "players_22.csv",
+    23 : "male_players.csv",
+    24 : "male_players.csv"
+}
 
-PLAYER_ATTRIBUTES = ["player_id", "short_name", "club_name", "player_positions", "club_position", "overall", "pace", "shooting", "passing", "dribbling", "defending", "physic"]
+
+PLAYER_ATTRIBUTES_LATE = ["player_id", "short_name", "club_name", "player_positions", "club_position", "overall", "pace", "shooting", "passing", "dribbling", "defending", "physic"]
+PLAYER_ATTRIBUTES_EARLY = ["sofifa_id", "short_name", "club_name", "player_positions", "club_position", "overall", "pace", "shooting", "passing", "dribbling", "defending", "physic"]
 
 api_key = "fb5d179556e47eac911953572e8fc472" #passed from apiWindow.java -> or if already exists, from apiKey.txt
 season_start_year = "2023" #passed from settings.java -> default to 2023/2024 season
@@ -103,22 +105,23 @@ def lookup_team_name(name):
 
 #getting a json string of all fixtures from a given season
 def get_fixtures(leagueID, season):
-    query_string = {
-        "league" : str(leagueID),
-        "season" : season
-    }
-
+    query_string = {"league": str(leagueID), "season": season}
     headers = {
-    'x-rapidapi-key': api_key,
-    'x-rapidapi-host': 'v3.football.api-sports.io'
+        'x-rapidapi-key': api_key,
+        'x-rapidapi-host': 'v3.football.api-sports.io'
     }
-
     url = URL + "/fixtures"
 
     response = requests.get(url, headers=headers, params=query_string)
     data = response.json()
 
+    print("Status:", response.status_code)
+    print("Results:", data.get("results"))
+    print("Errors:", data.get("errors"))
+    print("Paging:", data.get("paging"))
+    print(data)
     return data
+
 
 
 #get a json string of all teams in a league from one season
@@ -194,14 +197,21 @@ def write_fixtures_to_file(fixtures):
     file.close()
 
 
-def get_all_players_from_league(df, league_id, season):
-    #drop any players without a league
-    df = df.dropna(subset=["league_id"])
-    #convert all float entries to integers
-    df["fifa_version"] = df["fifa_version"].astype(int)
-    df["league_id"] = df["league_id"].astype(int)
-    #return the dataframe
-    return df[(df["league_id"] == league_id) & (df["fifa_version"] == season)]
+def get_all_players_from_league(df, league_id, league_name, season):
+    if(fifa_version <= 22):
+        #find players in league via league name
+        return df[df["league_name"] == league_name]
+    else:
+        #return players via league id and fifa version
+
+        #drop any players without a league
+        df = df.dropna(subset=["league_id"])
+        #convert all float entries to integers
+        df["fifa_version"] = df["fifa_version"].astype(int)
+        df["league_id"] = df["league_id"].astype(int)
+        #find players in league via 
+        return df[(df["league_id"] == league_id) & (df["fifa_version"] == season)]
+    
 
 
 data_exists = True
@@ -219,7 +229,7 @@ else:
     data_exists = False
     should_read_data = True
 
-
+should_read_data = True
 
 if(should_read_data):
     print("data season is different, read data")
@@ -286,15 +296,21 @@ if(should_read_data):
     path = kagglehub.dataset_download(database_link)
     print(path)
 
+    csvFileName = KAGGLE_CSV_NAMES[fifa_version]
     #get the dataframe of all male players
-    player_DF = pd.read_csv(path + "/male_players.csv")
+    player_DF = pd.read_csv(path + "/" + csvFileName)
     attributes = player_DF.columns.to_list()
     print(attributes)
 
     #get all players from the premier league
-    all_fifa_players = get_all_players_from_league(player_DF, PREMIER_LEAGUE_ID_FIFA, fifa_version)
+    all_fifa_players = get_all_players_from_league(player_DF, PREMIER_LEAGUE_ID_FIFA, LEAGUE_NAME, fifa_version)
     #get all fifa players and drop any duplicates
-    league_player_data = all_fifa_players[PLAYER_ATTRIBUTES].drop_duplicates(subset=["player_id"], keep="first")
+    attribute_set = PLAYER_ATTRIBUTES_LATE
+    if fifa_version == 22:
+        attribute_set = PLAYER_ATTRIBUTES_EARLY
+    subset_string = attribute_set[0]
+    
+    league_player_data = all_fifa_players[attribute_set].drop_duplicates(subset=[subset_string], keep="first")
 
     #now write all of this to external file
     league_player_data.to_csv(PLAYER_FILE_PATHWAY, index=False, sep="\t")
