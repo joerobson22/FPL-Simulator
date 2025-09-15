@@ -312,4 +312,17 @@ public class IOHandler {
 
         return allPlayers;
     }
+
+    public static void writeSeason(int season){
+        try{
+            FileWriter writer = new FileWriter("Backend/FootballAPI/season.txt");
+            writer.write(String.valueOf(season) + "\n");
+            writer.close();
+        }
+        catch(IOException e){
+            System.out.println(e.getStackTrace());
+        }
+        
+    }
+
 }

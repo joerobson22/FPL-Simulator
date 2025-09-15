@@ -21,7 +21,7 @@ public class Settings extends JFrame implements ActionListener{
 
     Integer[] simulationDepths = {1, 5, 10, 20, 50, 100};
     String[] simulationDepthTimeEstimations = {"10 seconds", "30 seconds", "1 minute", "2 minutes", "5 minutes", "10 minutes"};
-    Integer[] seasons = {2023, 2024, 2025};
+    Integer[] seasons = {2019, 2020, 2021, 2022, 2023, 2024, 2025};
 
     public Settings(String teamName){
         this.teamName = teamName;
@@ -65,8 +65,13 @@ public class Settings extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e){
         if(goButton == e.getSource()){
             this.setVisible(false);
+            int simulationDepth = simulationDepths[simulationDepthComboBox.getSelectedIndex()];
+            int season = seasons[seasonChoiceComboBox.getSelectedIndex()];
+            System.out.println("simulationDepth: " + String.valueOf(simulationDepth));
+            System.out.println("season: " + String.valueOf(season));
+
             FantasyTeam fantasyTeam = new FantasyTeam(teamName);
-            MainWindow mainWindow = new MainWindow(fantasyTeam, (int)simulationDepthComboBox.getSelectedItem(), (int)seasonChoiceComboBox.getSelectedItem());
+            MainWindow mainWindow = new MainWindow(fantasyTeam, simulationDepth, season);
         }
     }
 }

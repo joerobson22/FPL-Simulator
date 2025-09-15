@@ -12,19 +12,38 @@ FIXTURE_FILE_PATHWAY = "../../allFixtures.txt"
 URL = "https://v3.football.api-sports.io"
 PREMIER_LEAGUE_ID_API = 39
 PREMIER_LEAGUE_ID_FIFA = 13
-LEAGUE_NAME = "English Premier League"
+LEAGUE_NAME = "Premier League"
 
 EARLY_FIFA_DATABASE_LINK_START = "stefanoleone992/fifa-" # + fifa version (last 2 digits of season end year)
 EARLY_FIFA_DATABASE_LINK_END = "-complete-player-dataset"
-LATE_FIFA_DATABASE_LINK_START = "stefanoleone992/ea-sports-fc-" # + fifa version (last 2 digits of season end year)
-LATE_FIFA_DATABASE_LINK_END = "-complete-player-dataset"
+
+#links are slightly different each time
+KAGGLE_DATABASE_LINKS = {
+    20 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
+    21 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
+    22 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
+    23 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
+    24 : ("stefanoleone992/ea-sports-fc-", "-complete-player-dataset"),
+    25 : ("nyagami/ea-sports-fc-", "-database-ratings-and-stats")
+}
+
 
 PLAYER_ATTRIBUTES = ["player_id", "short_name", "club_name", "player_positions", "club_position", "overall", "pace", "shooting", "passing", "dribbling", "defending", "physic"]
 
 api_key = "fb5d179556e47eac911953572e8fc472" #passed from apiWindow.java -> or if already exists, from apiKey.txt
-season_start_year = "2023" #passed from settings.java
+season_start_year = "2023" #passed from settings.java -> default to 2023/2024 season
 season_end_year = "2024"
 fifa_version = 24 #last 2 digits of end year
+
+#read the current data's season start year from season.txt
+season_file = open("season.txt", "r")
+season_start_year = season_file.readline().strip()
+season_end_year = str(int(season_start_year) + 1)
+fifa_version = int(season_end_year[-2:])
+
+print(season_start_year)
+print(season_end_year)
+print(fifa_version)
 
 TEAM_NAME_LOOKUP = {
     "Arsenal": "Arsenal",
@@ -154,7 +173,7 @@ def download_team_logos(team_JSON, folder=TEAM_LOGOS_PATHWAY):
 
 def write_teams_to_file(tuples):
     file = open(TEAM_FILE_PATHWAY, "w")
-    file.write(season_end_year + "\n")
+    file.write(season_start_year + "\n")
     i = 0
 
     for tuple in tuples:
@@ -166,7 +185,7 @@ def write_teams_to_file(tuples):
 
 def write_fixtures_to_file(fixtures):
     file = open(FIXTURE_FILE_PATHWAY, "w")
-    file.write(season_end_year + "\n")
+    file.write(season_start_year + "\n")
 
     for key in fixtures:
         for tuple in fixtures[key]:
@@ -192,7 +211,9 @@ data_exists = os.path.exists(TEAM_FILE_PATHWAY)
 
 if(data_exists):
     file = open(TEAM_FILE_PATHWAY, "r")
-    data_exists = file.readline().strip() == season_end_year
+    current_data_season = file.readline().strip()
+    print("CURRENT DATA SEASON: " + str(current_data_season))
+    data_exists = current_data_season == season_start_year
     should_read_data = not data_exists
 else:
     data_exists = False
@@ -201,6 +222,8 @@ else:
 
 
 if(should_read_data):
+    print("data season is different, read data")
+
     #get fixture and team json strings
     fixture_JSON = get_fixtures(PREMIER_LEAGUE_ID_API, season_start_year)
     team_JSON = get_teams(PREMIER_LEAGUE_ID_API, season_start_year)
@@ -255,13 +278,9 @@ if(should_read_data):
 
 
     #create link to download database from
-    database_link = ""
-
-    if fifa_version < 24:
-        database_link = EARLY_FIFA_DATABASE_LINK_START + str(fifa_version) + EARLY_FIFA_DATABASE_LINK_END
-    else:
-        database_link = LATE_FIFA_DATABASE_LINK_START + str(fifa_version) + LATE_FIFA_DATABASE_LINK_END
-
+    link_tuple = KAGGLE_DATABASE_LINKS[fifa_version]
+    database_link = link_tuple[0] + str(fifa_version) + link_tuple[1]
+    print(database_link)
 
     #now download the correct fifa database
     path = kagglehub.dataset_download(database_link)

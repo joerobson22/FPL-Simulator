@@ -58,6 +58,12 @@ public class MainWindow extends JFrame implements ActionListener{
     //setup methods
 
     public MainWindow(FantasyTeam fantasyTeam, int simulationDepth, int season){
+        this.fantasyTeam = fantasyTeam;
+        this.simulationDepth = simulationDepth;
+        this.season = season;
+
+
+        writeSettingsToExternalFile();
         runPythonBackend();
 
         setupTeams();
@@ -66,10 +72,6 @@ public class MainWindow extends JFrame implements ActionListener{
         int screenWidth = screenSize.width;
         int screenHeight = screenSize.height;
         int oneThird = screenWidth / 3;
-
-        this.fantasyTeam = fantasyTeam;
-        this.simulationDepth = simulationDepth;
-        this.season = season;
 
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
@@ -132,6 +134,12 @@ public class MainWindow extends JFrame implements ActionListener{
         setupFixtures();
         setupPlayerPrices();
         updateAllVisuals();
+    }
+
+    private void writeSettingsToExternalFile(){
+        System.out.println("SEASON:");
+        System.out.println(season);
+        IOHandler.writeSeason(season);
     }
 
     private void runPythonBackend(){
