@@ -11,7 +11,7 @@ JAVA_CLASSES = $(JAVA_SRCS:.java=.class)
 
 # C++ sources and objects
 CXX_PATH = Backend/Engine/
-TARGET = $(CXX_PATH)GameEngine
+TARGET = $(CXX_PATH)GameEngine.exe
 SRCS = $(CXX_PATH)GameEngine.cpp $(CXX_PATH)Player.cpp $(CXX_PATH)Team.cpp \
        $(CXX_PATH)MatchSim.cpp $(CXX_PATH)HelperMethods.cpp $(CXX_PATH)FileIO.cpp
 OBJS = $(SRCS:.cpp=.o)

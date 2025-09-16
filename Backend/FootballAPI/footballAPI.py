@@ -19,6 +19,7 @@ LEAGUE_NAME = "English Premier League"
 
 #links are slightly different each time
 KAGGLE_DATABASE_LINKS = {
+    22 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
     23 : ("stefanoleone992/fifa-", "-complete-player-dataset"),
     24 : ("stefanoleone992/ea-sports-fc-", "-complete-player-dataset"),
     25 : ("nyagami/ea-sports-fc-", "-database-ratings-and-stats")
