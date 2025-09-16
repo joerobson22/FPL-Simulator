@@ -108,6 +108,7 @@ def lookup_team_name(name):
 
 #getting a json string of all fixtures from a given season
 def get_fixtures(leagueID, season):
+    print("Calling api-football.com to get fixtures from " + str(season_start_year))
     query_string = {"league": str(leagueID), "season": season}
     headers = {
         'x-rapidapi-key': api_key,
@@ -118,17 +119,24 @@ def get_fixtures(leagueID, season):
     response = requests.get(url, headers=headers, params=query_string)
     data = response.json()
 
-    print("Status:", response.status_code)
-    print("Results:", data.get("results"))
-    print("Errors:", data.get("errors"))
-    print("Paging:", data.get("paging"))
-    print(data)
+    status = response.status_code
+    results = data.get("results")
+    errors = data.get("errors")
+
+    if status == 200 and results == 380 and errors == 0:
+        print("API request successful")
+    else:
+        print("Status:" + str(status))
+        print("Results: " + str(results))
+        print("Errors: " + str(errors))
+    
     return data
 
 
 
 #get a json string of all teams in a league from one season
 def get_teams(leagueID, season):
+    print("Calling api-football.com to get all teams from " + LEAGUE_NAME)
     query_string = {
         "league" : str(leagueID),
         "season" : season
@@ -144,12 +152,23 @@ def get_teams(leagueID, season):
     response = requests.get(url, headers=headers, params=query_string)
     data = response.json()
 
+    status = response.status_code
+    results = data.get("results")
+    errors = data.get("errors")
+
+    if status == 200 and results == 20 and errors == 0:
+        print("API request successful")
+    else:
+        print("Status: " + str(status))
+        print("Results: " + str(results))
+        print("Errors: " + str(errors))
+
     return data
 
 
 #download team logos from apifootball.com
 def download_team_logos(team_JSON, folder=TEAM_LOGOS_PATHWAY):
-    print("downloading team logos")
+    print("Downloading team logos from api-football.com")
     os.makedirs(folder, exist_ok=True)
 
     for team in team_JSON["response"]:
@@ -178,6 +197,8 @@ def download_team_logos(team_JSON, folder=TEAM_LOGOS_PATHWAY):
 
 
 def write_teams_to_file(tuples):
+    print("Writing teams and abbreviations to allTeams.txt")
+
     file = open(TEAM_FILE_PATHWAY, "w")
     file.write(season_start_year + "\n")
     i = 0
@@ -190,6 +211,8 @@ def write_teams_to_file(tuples):
 
 
 def write_fixtures_to_file(fixtures):
+    print("Writing all fixtures to allFixtures.txt")
+
     file = open(FIXTURE_FILE_PATHWAY, "w")
     file.write(season_start_year + "\n")
 
@@ -201,6 +224,8 @@ def write_fixtures_to_file(fixtures):
 
 
 def get_all_players_from_league(df, league_id, league_name, season):
+    print("Getting all players from kaggle database: league_id-" + str(league_id) + " season-" + str(season))
+
     if(fifa_version <= 22):
         #find players in league via league name
         return df[df["league_name"] == league_name]
@@ -232,16 +257,12 @@ else:
     data_exists = False
     should_read_data = True
 
-should_read_data = True
-
 if(should_read_data):
-    print("data season is different, read data")
+    print("Read data")
 
     #get fixture and team json strings
     fixture_JSON = get_fixtures(PREMIER_LEAGUE_ID_API, season_start_year)
     team_JSON = get_teams(PREMIER_LEAGUE_ID_API, season_start_year)
-
-    print(json.dumps(team_JSON["response"], indent=2))
 
     all_teams = []
 
@@ -303,7 +324,7 @@ if(should_read_data):
     #get the dataframe of all male players
     player_DF = pd.read_csv(path + "/" + csvFileName)
     attributes = player_DF.columns.to_list()
-    print(attributes)
+    #print(attributes)
 
     #get all players from the premier league
     all_fifa_players = get_all_players_from_league(player_DF, PREMIER_LEAGUE_ID_FIFA, LEAGUE_NAME, fifa_version)
@@ -318,6 +339,6 @@ if(should_read_data):
     #now write all of this to external file
     league_player_data.to_csv(PLAYER_FILE_PATHWAY, index=False, sep="\t")
 else:
-    print("no need to read new data, all the data already exists")
+    print("Current data is already the right season")
 
-print("complete")
+print("Complete")
