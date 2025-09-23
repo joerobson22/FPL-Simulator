@@ -35,7 +35,7 @@ KAGGLE_CSV_NAMES = {
 PLAYER_ATTRIBUTES_LATE = ["player_id", "short_name", "club_name", "player_positions", "club_position", "overall", "pace", "shooting", "passing", "dribbling", "defending", "physic"]
 PLAYER_ATTRIBUTES_EARLY = ["sofifa_id", "short_name", "club_name", "player_positions", "club_position", "overall", "pace", "shooting", "passing", "dribbling", "defending", "physic"]
 
-api_key = "fb5d179556e47eac911953572e8fc472" #passed from apiWindow.java -> or if already exists, from apiKey.txt
+api_key = ""# = "fb5d179556e47eac911953572e8fc472" #passed from apiWindow.java -> or if already exists, from apiKey.txt
 season_start_year = "2023" #passed from settings.java -> default to 2023/2024 season
 season_end_year = "2024"
 fifa_version = 24 #last 2 digits of end year
@@ -247,9 +247,12 @@ should_read_data = False
 
 data_exists = os.path.exists(TEAM_FILE_PATHWAY)
 
+#check if the current data in the fixture and team lists is the season we're requesting
+#if so, then skip all of this
 if(data_exists):
     file = open(TEAM_FILE_PATHWAY, "r")
     current_data_season = file.readline().strip()
+    file.close()
     print("CURRENT DATA SEASON: " + str(current_data_season))
     data_exists = current_data_season == season_start_year
     should_read_data = not data_exists
@@ -259,6 +262,12 @@ else:
 
 if(should_read_data):
     print("Read data")
+
+    #read the user's API key
+    api_key_file = open(API_KEY_PATHWAY, "r")
+    api_key = api_key_file.readline().strip()
+    print("YOUR API KEY: " + api_key)
+    api_key_file.close()
 
     #get fixture and team json strings
     fixture_JSON = get_fixtures(PREMIER_LEAGUE_ID_API, season_start_year)

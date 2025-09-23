@@ -141,7 +141,7 @@ public class MainWindow extends JFrame implements ActionListener{
     private void writeSettingsToExternalFile(){
         System.out.println("SEASON:");
         System.out.println(season);
-        IOHandler.writeSeason(season);
+        IOHandler.writeSingleLine(String.valueOf(season), "Backend/FootballAPI/season.txt");
     }
 
     private void runPythonBackend(){

@@ -2,8 +2,9 @@ package Frontend;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
-public class Settings extends JFrame implements ActionListener{
+public class SettingsWindow extends JFrame implements ActionListener{
     final int WINDOW_WIDTH = 300;
     final int WINDOW_HEIGHT = 200;
 
@@ -23,7 +24,7 @@ public class Settings extends JFrame implements ActionListener{
     String[] simulationDepthTimeEstimations = {"10 seconds", "30 seconds", "1 minute", "2 minutes", "5 minutes", "10 minutes"};
     Integer[] seasons = {2021, 2022, 2023};//, 2024, 2025};   <- WHEN EAFC26 kaggle database comes out, pay £15 to get fixture data and whatnot and then allow the use of these
 
-    public Settings(String teamName){
+    public SettingsWindow(String teamName){
         this.teamName = teamName;
 
         simulationDepthComboBox = new JComboBox<>(simulationDepths);
@@ -73,7 +74,15 @@ public class Settings extends JFrame implements ActionListener{
             System.out.println("season: " + String.valueOf(season));
 
             FantasyTeam fantasyTeam = new FantasyTeam(teamName);
-            MainWindow mainWindow = new MainWindow(fantasyTeam, simulationDepth, season);
+
+            File apiKeyFile = new File("Backend/FootballAPI/apiKey.txt");
+            if(apiKeyFile.exists()){
+                MainWindow mainWindow = new MainWindow(fantasyTeam, simulationDepth, season);
+            }
+            else
+            {
+                KeyEntryWindow keyEntryWindow = new KeyEntryWindow(fantasyTeam, simulationDepth, season);
+            }
         }
     }
 }
